@@ -196,3 +196,8 @@ To run in background:
 
 If you're on Mac, you may need to add the `--max-concurrency 1` option to
 Stellite-wallet-cli, and possibly Stellited, if you get crashes refreshing.
+
+## Contributors
+
+Hayzam Sherif [@hayzamjs](https://github.com/hayzamjs)
+Arkadiy Deliev
