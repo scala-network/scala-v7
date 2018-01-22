@@ -10,7 +10,7 @@ Portions Copyright (c) 2012-2013, The Cryptonote developers
 - Web: [stellite.cash](https://stellite.cash)
 - Mail: [stellite@protonmail.com](mailto:stellite@protonmail.com)
 - GitHub: [https://github.com/Stellitecoin](https://github.com/Stellitecoin)
-- Blockexplorer: [blockexplorer.stellite.cash](http://blockexplorer.stellite.cash)
+- Blockexplorer: [explorer.stellite.cash](http://blockexplorer.stellite.cash)
 
 ## Introduction
 
