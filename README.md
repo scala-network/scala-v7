@@ -14,11 +14,15 @@ Portions Copyright (c) 2012-2013, The Cryptonote developers
 
 Stellite is a private, secure, untraceable cryptocurrency.We bring the best from the whole cryptonight space, both from Monero and Electroneum. In Stellite You are your bank, you control your funds, and nobody can trace your transfers unless you allow them to do so. Stellite is a soft fork of monero trying to implement the best of proposals in the entire privacy coin ecosystem.
 
+**Features:** We are trying to do things no cryptocurrency has ever done before. Full blown small device mining for instance smartphones, tablets, smart tv etc etc are in our scopes. P2P distributed seed lists are the next target after that. All this coupled with the below given features will make stellite one of the best cryptocurrencies on the market.
+
 **Privacy:** Stellite uses a cryptographically sound system to allow you to send and receive funds without your transactions being easily revealed on the blockchain (the ledger of transactions that everyone has). This ensures that your purchases, receipts, and all transfers remain absolutely private by default.
 
 **Security:** Using the power of a distributed peer-to-peer consensus network, every transaction on the network is cryptographically secured. Individual wallets have a 25 word mnemonic seed that is only displayed once, and can be written down to backup the wallet. Wallet files are encrypted with a passphrase to ensure they are useless if stolen.
 
 **Untraceability:** By taking advantage of ring signatures, a special property of a certain type of cryptography, Stellite is able to ensure that transactions are not only untraceable, but have an optional measure of ambiguity that ensures that transactions cannot easily be tied back to an individual user or computer.
+
+**Timeline:** We are going to be implementing true small hashrate device mining and P2P distributed seed lists without hardcode by Q2 of 2018.
 
 ## About this Project
 
@@ -87,7 +91,9 @@ invokes cmake commands as needed.
 
 * Add `PATH="$PATH:$HOME/Stellite/build/release/bin"` to `.profile`
 
-* Run Stellite with `Stellited --detach`
+* Run Stellite with `stellited --detach`
+
+* For wicked fast sync use `./stellited --add-exclusive-node [IP:PORT]` with one of the adddress and ports [here](https://pastebin.com/raw/DCMwYmUm) 
 
 * **Optional**: build and run the test suite to verify the binaries:
 
