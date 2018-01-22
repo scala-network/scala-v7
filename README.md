@@ -7,9 +7,11 @@ Portions Copyright (c) 2012-2013, The Cryptonote developers
 
 ## Development Resources
 
-- Web: [Stellite.com](https://Stellite.io)
-- Mail: [Stellitecoin@protonmail.com](mailto:Stellitecoin@protonmail.com)
-- GitHub: [https://github.com/Stelliteproject/Stellite](https://github.com/Stelliteproject/Stellite
+- Web: [stellite.cash](https://stellite.cash)
+- Mail: [stellite@protonmail.com](mailto:stellite@protonmail.com)
+- GitHub: [https://github.com/Stellitecoin](https://github.com/Stellitecoin)
+- Blockexplorer: [blockexplorer.stellite.cash](http://blockexplorer.stellite.cash)
+
 ## Introduction
 
 Stellite is a private, secure, untraceable cryptocurrency.We bring the best from the whole cryptonight space, both from Monero and Electroneum. In Stellite You are your bank, you control your funds, and nobody can trace your transfers unless you allow them to do so. Stellite is a soft fork of monero trying to implement the best of proposals in the entire privacy coin ecosystem.
