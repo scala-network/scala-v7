@@ -200,4 +200,5 @@ Stellite-wallet-cli, and possibly Stellited, if you get crashes refreshing.
 ## Contributors
 
 Hayzam Sherif [@hayzamjs](https://github.com/hayzamjs)
+
 Arkadiy Deliev
