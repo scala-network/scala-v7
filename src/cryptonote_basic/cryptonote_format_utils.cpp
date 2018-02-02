@@ -550,9 +550,9 @@ namespace cryptonote
     switch (std::atomic_load(&default_decimal_point))
     {
       case 2:
-        return "stellite";
+        return "electroneum";
     case 0:
-        return "scent";
+        return "ecent";
       default:
         ASSERT_MES_AND_THROW("Invalid decimal point specification: " << default_decimal_point);
     }
@@ -696,11 +696,7 @@ namespace cryptonote
   //---------------------------------------------------------------
   bool calculate_block_hash(const block& b, crypto::hash& res)
   {
-    crypto::hash block_blob_hash = get_blob_hash(block_to_blob(b));
-
-    bool hash_result = get_object_hash(get_block_hashing_blob(b), res);
-
-    return hash_result;
+    return get_object_hash(get_block_hashing_blob(b), res);
   }
   //---------------------------------------------------------------
   bool get_block_hash(const block& b, crypto::hash& res)
