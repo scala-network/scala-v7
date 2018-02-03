@@ -1,8 +1,11 @@
 # Stellite
 
 Copyright (c) 2017, The Stellite Project
+
 Copyright (c) 2017, The Electroneum Project
+
 Copyright (c) 2014-2017, The Monero Project
+
 Portions Copyright (c) 2012-2013, The Cryptonote developers
 
 ## Development Resources
@@ -10,7 +13,7 @@ Portions Copyright (c) 2012-2013, The Cryptonote developers
 - Web: [stellite.cash](https://stellite.cash)
 - Mail: [stellite@protonmail.com](mailto:stellite@protonmail.com)
 - GitHub: [https://github.com/Stellitecoin](https://github.com/Stellitecoin)
-- Blockexplorer: [explorer.stellite.cash](http://blockexplorer.stellite.cash)
+- Blockexplorer: [explorer.stellite.cash](https://explorer.stellite.cash)
 
 ## Introduction
 
