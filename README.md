@@ -74,8 +74,6 @@ library archives (`.a`).
 [^] On Debian/Ubuntu `libgtest-dev` only includes sources and headers. You must
 build the library binary manually. This can be done with the following command ```sudo apt-get install libgtest-dev && cd /usr/src/gtest && sudo cmake . && sudo make && sudo mv libg* /usr/lib/ ```
 
-## Info :- This is an alpha build, there will be bugs, if there are please do make an issue post explaining it here on github. This alpha will work on linux and most probably on MacOS with some tweaking here and there. If you need help with it please do join our discord channel :- https://discord.gg/dPzrZj
-
 ### Build instructions
 
 Stellite Alphav2 uses the CMake build system and a top-level [Makefile](Makefile) that
@@ -87,7 +85,7 @@ invokes cmake commands as needed.
 * Change to the root of the source code directory and build:
 
         cd Stellite
-        ./build.sh
+        make
 
     *Optional*: If your machine has several cores and enough memory, enable
     parallel build by running `make -j<number of threads>` instead of `make`. For
