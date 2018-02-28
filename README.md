@@ -76,7 +76,7 @@ build the library binary manually. This can be done with the following command `
 
 ### Build instructions
 
-Stellite Alphav2 uses the CMake build system and a top-level [Makefile](Makefile) that
+Stellite uses the CMake build system and a top-level [Makefile](Makefile) that
 invokes cmake commands as needed.
 
 #### On Linux and OS X
