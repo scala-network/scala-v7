@@ -8,7 +8,7 @@ Copyright (c) 2014-2017, The Monero Project
 
 Portions Copyright (c) 2012-2013, The Cryptonote developers
 
-Portions Copyright (c) 2017-2018, The Masari Project
+Portions Copyright (c) 2017 The Masari Project
 
 
 ## Development Resources
