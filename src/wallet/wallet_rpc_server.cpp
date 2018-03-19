@@ -233,7 +233,7 @@ namespace tools
       MWARNING("Requested ring size " << (mixin + 1) << " too low for hard fork 6, using 5");
       mixin = 4;
     }
-    else if (mixin < 2 && m_wallet->use_fork_rules(2, 10)) {
+    else if (mixin < 2 && m_wallet->use_fork_rules(6, 10)) {
       MWARNING("Requested ring size " << (mixin + 1) << " too low for hard fork 2, using 3");
       mixin = 2;
     }
