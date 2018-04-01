@@ -90,21 +90,11 @@ static const struct {
   // version 1 from the start of the blockchain
   { 1, 1, 0, 1341378000 },
  
-  // Version 2 starts from block 67500, fork time finalaised on 2018-03-09
-  {2,67500,0,1520584977},
+  // Version 2 starts for private testnet starts from block 10
+  { 2, 67500, 0, 1520584977 },
 
-  // version 3 starts from block 1141317, which is on or around the 24th of September, 2016. Fork time finalised on 2016-03-21.
-  //{ 3, 1141317, 0, 1458558528 },
-  
-  // version 4 starts from block 1220516, which is on or around the 5th of January, 2017. Fork time finalised on 2016-09-18.
-  //{ 4, 1220516, 0, 1483574400 },
-  
-  // version 5 starts from block 1288616, which is on or around the 15th of April, 2017. Fork time finalised on 2017-03-14.
-  //{ 5, 1288616, 0, 1489520158 },
-
-  // version 6 starts from block 1400000, which is on or around the 16th of September, 2017. Fork time finalised on 2017-08-18.
-  //{ 6, 1400000, 0, 1503046577 },
-
+  // Version 3 starts for private testnet starts from block 20
+  { 3, 100800, 0, 1522557835 },
 
 };
 static const uint64_t mainnet_hard_fork_version_1_till = (uint64_t)-1;
@@ -1029,8 +1019,8 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
     MERROR_VER("coinbase transaction spend too much money (" << print_money(money_in_use) << "). Block reward is " << print_money(base_reward + fee) << "(" << print_money(base_reward) << "+" << print_money(fee) << ")");
     return false;
   }
-  // From hard fork 2, we allow a miner to claim less block reward than is allowed, in case a miner wants less dust
-  if (m_hardfork->get_current_version() < 3)
+  // From hard fork 4, we allow a miner to claim less block reward than is allowed, in case a miner wants less dust
+  if (m_hardfork->get_current_version() < 4)
   {
     if(base_reward + fee != money_in_use && already_generated_coins > 0)
     {
@@ -2305,7 +2295,7 @@ bool Blockchain::check_tx_outputs(const transaction& tx, tx_verification_context
   CRITICAL_REGION_LOCAL(m_blockchain_lock);
 
   // from hard fork 2, we forbid dust and compound outputs
-  if (m_hardfork->get_current_version() >= 3) {
+  if (m_hardfork->get_current_version() >= 4) {
     for (auto &o: tx.vout) {
       if (tx.version == 1)
       {
@@ -2442,9 +2432,9 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
 
   const uint8_t hf_version = m_hardfork->get_current_version();
 
-  // from hard fork 2, we require mixin at least 2 unless one output cannot mix with 2 others
+  // from hard fork 4, we require mixin at least 2 unless one output cannot mix with 2 others
   // if one output cannot mix with 2 others, we accept at most 1 output that can mix
-  if (hf_version >= 3)
+  if (hf_version >= 4)
   {
     size_t n_unmixable = 0, n_mixable = 0;
     size_t mixin = std::numeric_limits<size_t>::max();
