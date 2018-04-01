@@ -90,10 +90,10 @@ static const struct {
   // version 1 from the start of the blockchain
   { 1, 1, 0, 1341378000 },
  
-  // Version 2 starts for private testnet starts from block 10
+  // Version 2 starts from block 67500, fork time decided on 2018-03-09
   { 2, 67500, 0, 1520584977 },
 
-  // Version 3 starts for private testnet starts from block 20
+  // Version 3 starts from block 100800, fork time decided on 2018-04-01 
   { 3, 100800, 0, 1522557835 },
 
 };
