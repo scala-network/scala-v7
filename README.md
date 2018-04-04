@@ -101,7 +101,13 @@ invokes cmake commands as needed.
 
 * Run Stellite with `stellited --detach`
 
-* For wicked fast sync use `./stellited --add-exclusive-node [IP:PORT]` with one of the adddress and ports [here](https://pastebin.com/raw/DCMwYmUm) 
+* For wicked fast sync use `./stellited --add-exclusive-node [IP:PORT]` with one of these address and ports:
+
+* 54.38.44.3:20188
+* 85.25.35.35:20188
+* 107.191.63.92:20188
+* 172.110.10.6:20188
+
 
 * **Optional**: build and run the test suite to verify the binaries:
 
