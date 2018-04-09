@@ -898,6 +898,8 @@ namespace cryptonote
 
     void cancel();
 
+    void on_new_tx_from_block(const cryptonote::transaction &tx);
+
   private:
 
     // TODO: evaluate whether or not each of these typedefs are left over from blockchain_storage
