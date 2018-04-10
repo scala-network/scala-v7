@@ -36,6 +36,7 @@
 #include "include_base_utils.h"
 using namespace epee;
 
+#include <boost/algorithm/string/join.hpp>
 #include "cryptonote_config.h"
 #include "wallet2.h"
 #include "wallet2_api.h"
@@ -426,6 +427,22 @@ static void throw_on_rpc_response_error(const boost::optional<std::string> &stat
   THROW_WALLET_EXCEPTION_IF(*status != CORE_RPC_STATUS_OK, tools::error::wallet_generic_rpc_error, method, *status);
 }
 
+	
+std::string strjoin(const std::vector<size_t> &V, const char *sep)
+{
+  std::stringstream ss;
+  bool first = true;
+  for (const auto &v: V)
+  {
+    if (!first){
+      ss << sep;
+    }
+    ss << std::to_string(v);
+    first = false;
+  }
+  return ss.str();
+}
+	
 } //namespace
 
 namespace tools
@@ -2250,6 +2267,14 @@ crypto::secret_key wallet2::generate(const std::string& wallet_, const std::stri
     m_refresh_from_block_height = height >= blocks_per_month ? height - blocks_per_month : 0;
   }
 
+ if(m_refresh_from_block_height == 0 && !recover){
+    // Wallets created offline don't know blockchain height so hence this patch to fix the restore height.
+    uint64_t approx_blockchain_height = get_approximate_blockchain_height();
+    if(approx_blockchain_height > 0) {
+      m_refresh_from_block_height = approx_blockchain_height >= blocks_per_month ? approx_blockchain_height - blocks_per_month : 0;
+    }
+  }
+
   bool r = store_keys(m_keys_file, password, false);
   THROW_WALLET_EXCEPTION_IF(!r, error::file_save_error, m_keys_file);
 
@@ -3508,10 +3533,10 @@ uint64_t wallet2::get_per_kb_fee()
 int wallet2::get_fee_algorithm()
 {
   // changes at v3 and v5
-  if (use_fork_rules(5, 0))
-    return 2;
-  if (use_fork_rules(3, -720 * 14))
-   return 1;
+  if (use_fork_rules(5, 0)){
+    return 2;}
+  if (use_fork_rules(4, -720 * 14)){
+   return 1;}
   return 0;
 }
 //----------------------------------------------------------------------------------------------------
@@ -4353,7 +4378,7 @@ std::vector<wallet2::pending_tx> wallet2::create_transactions_2(std::vector<cryp
       }
       else
       {
-        THROW_WALLET_EXCEPTION_IF(original_output_index > dsts.size(), error::wallet_internal_error, "original_output_index too large");
+        THROW_WALLET_EXCEPTION_IF(original_output_index > dsts.size(), error::wallet_internal_error, std::string("original_output_index too large: ") + std::to_string(original_output_index) + " > " + std::to_string(dsts.size()));
         if (original_output_index == dsts.size())
           dsts.push_back(tx_destination_entry(0,addr));
         THROW_WALLET_EXCEPTION_IF(memcmp(&dsts[original_output_index].addr, &addr, sizeof(addr)), error::wallet_internal_error, "Mismatched destination address");
@@ -4452,12 +4477,17 @@ std::vector<wallet2::pending_tx> wallet2::create_transactions_2(std::vector<cryp
     TX &tx = txes.back();
 
     LOG_PRINT_L2("Start of loop with " << unused_transfers_indices.size() << " " << unused_dust_indices.size());
-    LOG_PRINT_L2("unused_transfers_indices:");
+    
+    /*LOG_PRINT_L2("unused_transfers_indices:");
     for (auto t: unused_transfers_indices)
       LOG_PRINT_L2("  " << t);
     LOG_PRINT_L2("unused_dust_indices:");
     for (auto t: unused_dust_indices)
       LOG_PRINT_L2("  " << t);
+    */
+    
+    LOG_PRINT_L2("unused_transfers_indices: " << strjoin(unused_transfers_indices, " "));
+    LOG_PRINT_L2("unused_dust_indices:" << strjoin(unused_dust_indices, " "));
     LOG_PRINT_L2("dsts size " << dsts.size() << ", first " << (dsts.empty() ? -1 : dsts[0].amount));
     LOG_PRINT_L2("adding_fee " << adding_fee << ", use_rct " << use_rct);
 
@@ -4631,6 +4661,7 @@ std::vector<wallet2::pending_tx> wallet2::create_transactions_2(std::vector<cryp
         {
           LOG_PRINT_L2("We have more to pay, starting another tx");
           txes.push_back(TX());
+	  original_output_index = 0;
         }
       }
     }
