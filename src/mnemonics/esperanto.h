@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2017, The Stellite Project
 // 
 // All rights reserved.
 // 
@@ -1048,6 +1048,7 @@ namespace Language
       "majstro",
       "maketo",
       "malgranda",
+      "malutila",
       "mamo",
       "mandareno",
       "maorio",
@@ -1094,7 +1095,7 @@ namespace Language
       "mokadi",
       "molaro",
       "momento",
-      "monero",
+      "stellite",
       "mopso",
       "mordi",
       "moskito",
@@ -1480,7 +1481,6 @@ namespace Language
       "sprita",
       "spuro",
       "stabila",
-      "stelfiguro",
       "stimulo",
       "stomako",
       "strato",
