@@ -2240,7 +2240,7 @@ crypto::secret_key wallet2::generate(const std::string& wallet_, const std::stri
   // avg seconds per block
   const int seconds_per_block = DIFFICULTY_TARGET;
   // ~num blocks per month
-  const uint64_t blocks_per_month = 60*60*24*30/seconds_per_block;
+  const uint64_t blocks_per_month = 60*24*30;
 
   // try asking the daemon first
   if(m_refresh_from_block_height == 0 && !recover){
@@ -2880,7 +2880,7 @@ bool wallet2::is_tx_spendtime_unlocked(uint64_t unlock_time, uint64_t block_heig
     uint64_t current_time = static_cast<uint64_t>(time(NULL));
     // XXX: this needs to be fast, so we'd need to get the starting heights
     // from the daemon to be correct once voting kicks in
-    uint64_t v2height = m_testnet ? 624634 : 1009827;
+    uint64_t v2height = m_testnet ? 624634 : 67500;
     uint64_t leeway = CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS;
     if(current_time + leeway >= unlock_time)
       return true;
@@ -5117,9 +5117,9 @@ uint64_t wallet2::get_daemon_blockchain_target_height(string &err)
 uint64_t wallet2::get_approximate_blockchain_height() const
 {
   // time of v2 fork
-  const time_t fork_time = m_testnet ? 1448285909 : 1458748658;
+  const time_t fork_time = m_testnet ? 1448285909 : 1520584977;
   // v2 fork block
-  const uint64_t fork_block = m_testnet ? 624634 : 1009827;
+  const uint64_t fork_block = m_testnet ? 624634 : 67500;
   // avg seconds per block
   const int seconds_per_block = DIFFICULTY_TARGET;
   // Calculated blockchain height
