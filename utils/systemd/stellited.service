@@ -1,0 +1,17 @@
+[Unit]
+Description=Stellite Full Node
+After=network.target
+
+[Service]
+User=stellite
+Group=stellite
+WorkingDirectory=~
+
+Type=forking
+PIDFile=/var/run/stellited.pid
+
+ExecStart=/usr/bin/stellited --config-file /etc/stellited.conf \
+    --detach --pidfile /var/run/stellited.pid
+
+[Install]
+WantedBy=multi-user.target
