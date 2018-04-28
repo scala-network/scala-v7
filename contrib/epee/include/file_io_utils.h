@@ -96,7 +96,7 @@ namespace file_io_utils
 
 			std::ifstream::pos_type file_size = fstream.tellg();
 			
-			if(file_size > 1000000000)
+			if(file_size > 2000000000)
 				return false;//don't go crazy
 			size_t file_size_t = static_cast<size_t>(file_size);
 

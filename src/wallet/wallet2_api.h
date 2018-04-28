@@ -579,6 +579,8 @@ struct Wallet
      */
     virtual std::string getUserNote(const std::string &txid) const = 0;
     virtual std::string getTxKey(const std::string &txid) const = 0;
+    virtual std::string getSpendProof(const std::string &txid, const std::string &message) const = 0;
+    virtual bool checkSpendProof(const std::string &txid, const std::string &message, const std::string &signature, bool &good) const = 0;
 
     /*
      * \brief signMessage - sign a message with the spend private key
