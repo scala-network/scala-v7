@@ -35,6 +35,7 @@
 #include <cstdint>
 #include "include_base_utils.h"
 #include <vector>
+#include <boost/math/special_functions/round.hpp>
 
 #include "common/int-util.h"
 #include "crypto/hash.h"
