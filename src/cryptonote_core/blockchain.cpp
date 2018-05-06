@@ -767,12 +767,12 @@ size_t offset = height - std::min < size_t >(height, static_cast<size_t>(difficu
   if(get_current_hard_fork_version() < 2){
     return next_difficulty(timestamps, difficulties, target);
   }
-  else if(get_current_hard_fork_version() < 4){
+  else {	//if(get_current_hard_fork_version() < 4){
     return next_difficulty_v3(timestamps, difficulties, target, true);
   }
-  else{
-    return next_difficulty_v4(timestamps, difficulties, target);
-  }
+//  else{
+//    return next_difficulty_v4(timestamps, difficulties, target);
+//  }
 
 }
 //------------------------------------------------------------------
@@ -996,12 +996,12 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std:
   if(get_current_hard_fork_version() < 2){
     return next_difficulty(timestamps, cumulative_difficulties, target);
   }
-  else if(get_current_hard_fork_version() < 4){
+  else {  //if(get_current_hard_fork_version() < 4){
     return next_difficulty_v3(timestamps, cumulative_difficulties, target, true);
   }
-  else{
-    return next_difficulty_v4(timestamps, cumulative_difficulties, target);
-  }
+//  else{
+//    return next_difficulty_v4(timestamps, cumulative_difficulties, target);
+//  }
 }
 //------------------------------------------------------------------
 // This function does a sanity check on basic things that all miner
