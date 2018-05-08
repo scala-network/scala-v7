@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -33,8 +33,6 @@
 #include <list>
 #include <set>
 #include <map>
-//#include <boost/bimap.hpp>
-//#include <boost/bimap/multiset_of.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/portable_binary_oarchive.hpp>
 #include <boost/archive/portable_binary_iarchive.hpp>
@@ -190,35 +188,16 @@ namespace nodetool
       if (ver < 6)
         return;
 
-      if(ver < 3)
-        return;
       CRITICAL_REGION_LOCAL(m_peerlist_lock);
-      if(ver < 4)
-      {
-        //loading data from old storage
-        peers_indexed_old pio; 
-        a & pio;
-        peers_indexed_from_old(pio, m_peers_white);
-        return;
-      }
 
 #if 0
       // trouble loading more than one peer, can't find why
       a & m_peers_white;
       a & m_peers_gray;
+      a & m_peers_anchor;
 #else
       serialize_peers(a, m_peers_white, peerlist_entry(), ver);
       serialize_peers(a, m_peers_gray, peerlist_entry(), ver);
-#endif
-
-      if(ver < 5) {
-        return;
-      }
-
-#if 0
-      // trouble loading more than one peer, can't find why
-      a & m_peers_anchor;
-#else
       serialize_peers(a, m_peers_anchor, anchor_peerlist_entry(), ver);
 #endif
     }
