@@ -358,7 +358,7 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
           timespan = 10 * target_seconds;
         }
 	if(i>length-7){
-	  if(timespan < 12){
+	  if(timespan < 15){
 	    nbShortTsLastNBlocks ++;
 	    lastTimeWasShort = true;			
 	  } else {
@@ -371,7 +371,7 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
       }
       // adjust faster if many blocks fount too fast
       if(nbShortTsLastNBlocks >=4 && lastTimeWasShort){
-	weighted_timespans = weighted_timespans *3/4;
+	weighted_timespans = weighted_timespans *3/5;
       }
       // adjust = 0.99 for N=60, leaving the + 1 for now as it's not affecting N
       target = 99 * (((length + 1) / 2) * target_seconds) / 100;
