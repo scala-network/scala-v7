@@ -1142,7 +1142,7 @@ bool Blockchain::create_block_template(block& b, const account_public_address& m
 
   uint64_t median_timestamp;
   if (!check_median_block_timestamp(b, median_timestamp)) {
-     b.timestamp = std::max(median_timestamp, m_db->get_top_block_timestamp() - CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4);
+     b.timestamp = median_timestamp;
   }
 
   diffic = get_difficulty_for_next_block();
@@ -2399,7 +2399,7 @@ bool Blockchain::check_tx_outputs(const transaction& tx, tx_verification_context
   }
 
   // from v4, forbid invalid pubkeys
-  if (m_hardfork->get_current_version() >= 4) {
+  if (m_hardfork->get_current_version() >= 5) {
     for (const auto &o: tx.vout) {
       if (o.target.type() == typeid(txout_to_key)) {
         const txout_to_key& out_to_key = boost::get<txout_to_key>(o.target);
@@ -3089,14 +3089,25 @@ bool Blockchain::check_block_timestamp(std::vector<uint64_t>& timestamps, const 
 
 uint8_t hf_version = get_current_hard_fork_version();
 
+  uint64_t cryptonote_block_future_time_limit;
+  if(get_current_hard_fork_version() < 2){
+    cryptonote_block_future_time_limit = CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT;
+  }
+  else if(get_current_hard_fork_version() < 4){
+    cryptonote_block_future_time_limit = CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V2;
+  }
+  else{
+    cryptonote_block_future_time_limit = CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4;
+  }
+
 size_t blockchain_timestamp_check_window = get_current_hard_fork_version() < 2 ? BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW : BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V2;
 if(get_current_hard_fork_version()>3){
 	blockchain_timestamp_check_window = BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V4;
 }
 
 uint64_t top_block_timestamp = m_db->get_top_block_timestamp();
-if (hf_version > 3 && b.timestamp < top_block_timestamp - CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4){
-MERROR_VER("Timestamp of block with id: " << get_block_hash(b) << ", " << b.timestamp << ", is less than top block timestamp - FTL " << top_block_timestamp - CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4);
+if (hf_version > 3 && (b.timestamp > get_adjusted_time() + cryptonote_block_future_time_limit)){
+MERROR_VER("Timestamp of block with id: " << get_block_hash(b) << ", " << b.timestamp << ", is too far in future " << CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4);
 return false;
 }
 
