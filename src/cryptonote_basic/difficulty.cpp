@@ -333,13 +333,13 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
 	std::vector<difficulty_type> first_diffs;
         std::vector<difficulty_type> mid_diffs;
 	std::vector<difficulty_type> last_diffs;
-	for (size_t i = 0; i < (DIFFICULTY_BLOCKS_COUNT_V4/3); i++) {
+	for (size_t i = 0; i < (DIFFICULTY_BLOCKS_COUNT_V4-30); i++) {
 		first_diff.push_back(cumulative_difficulties[i]);
 	}
-	for (size_t i = (DIFFICULTY_BLOCKS_COUNT_V4/3); i < (DIFFICULTY_BLOCKS_COUNT_V4*2/3); i++) {
+	for (size_t i = (DIFFICULTY_BLOCKS_COUNT_V4-30); i < (DIFFICULTY_BLOCKS_COUNT_V4-10); i++) {
 		mid_diffs.push_back(cumulative_difficulties[i]);
 	}
-	for (size_t i = (DIFFICULTY_BLOCKS_COUNT_V4*2/3); i < DIFFICULTY_BLOCKS_COUNT_V4; i++) {
+	for (size_t i = (DIFFICULTY_BLOCKS_COUNT_V4*-10); i < DIFFICULTY_BLOCKS_COUNT_V4; i++) {
 		last_diffs.push_back(cumulative_difficulties[i]);
 	}
 	difficulty_type median_first = epee::misc_utils::median(first_diff);
@@ -348,8 +348,8 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
 
         // if                       TENDANCE == DOWN                           OR                        TENDANCE == UP   THEN CUT OLD BLOCK FOR DIFF COMPUTING  
 	if((median_first > (median_mid*3/2) && median_mid > (median_last*3/2)) || (median_mid > (median_first*3/2) && median_last > (median_mid*3/2)){
-		timestamps.resize(DIFFICULTY_BLOCKS_COUNT_V4*2/3);
-      		cumulative_difficulties.resize(DIFFICULTY_BLOCKS_COUNT_V4*2/3);	
+		timestamps.resize(30);
+      		cumulative_difficulties.resize(30);	
 	}
     }
 
