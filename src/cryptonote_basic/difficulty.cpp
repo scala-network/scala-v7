@@ -328,8 +328,8 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
     }
 
     size_t length_cumul_diff = cumulative_difficulties.size();
-    std::vector<difficulty_type>
-  if(length >= DIFFICULTY_BLOCKS_COUNT_V4 - 1){
+
+  if(length_cumul_diff >= DIFFICULTY_BLOCKS_COUNT_V4 - 1){
 	std::vector<difficulty_type> first_diffs;
   std::vector<difficulty_type> mid_diffs;
 	std::vector<difficulty_type> last_diffs;
