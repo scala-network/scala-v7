@@ -327,11 +327,39 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
       cumulative_difficulties.resize(DIFFICULTY_BLOCKS_COUNT_V4);
     }
 
+    size_t length_cumul_diff = cumulative_difficulties.size()
+    std::vector<difficulty_type>
+    if(length >= DIFFICULTY_BLOCKS_COUNT_V4-1){
+	std::vector<difficulty_type> first_diffs;
+        std::vector<difficulty_type> mid_diffs;
+	std::vector<difficulty_type> last_diffs;
+	for (size_t i = 0; i < (DIFFICULTY_BLOCKS_COUNT_V4/3); i++) {
+		first_diff.push_back(cumulative_difficulties[i]);
+	}
+	for (size_t i = (DIFFICULTY_BLOCKS_COUNT_V4/3); i < (DIFFICULTY_BLOCKS_COUNT_V4*2/3); i++) {
+		mid_diffs.push_back(cumulative_difficulties[i]);
+	}
+	for (size_t i = (DIFFICULTY_BLOCKS_COUNT_V4*2/3); i < DIFFICULTY_BLOCKS_COUNT_V4; i++) {
+		last_diffs.push_back(cumulative_difficulties[i]);
+	}
+	difficulty_type median_first = epee::misc_utils::median(first_diff);
+	difficulty_type median_mid = epee::misc_utils::median(mid_diffs);
+	difficulty_type median_last = epee::misc_utils::median(last_diffs);
+
+        // if                       TENDANCE == DOWN                           OR                        TENDANCE == UP   THEN CUT OLD BLOCK FOR DIFF COMPUTING  
+	if((median_first > (median_mid*3/2) && median_mid > (median_last*3/2)) || (median_mid > (median_first*3/2) && median_last > (median_mid*3/2)){
+		timestamps.resize(DIFFICULTY_BLOCKS_COUNT_V4*2/3);
+      		cumulative_difficulties.resize(DIFFICULTY_BLOCKS_COUNT_V4*2/3);	
+	}
+    }
+
+
     size_t length = timestamps.size();
     assert(length == cumulative_difficulties.size());
     if (length <= 1) {
       return 1;
     }
+
 
     uint64_t weighted_timespans = 0;
     uint64_t target;
