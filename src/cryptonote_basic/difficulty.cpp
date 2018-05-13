@@ -345,15 +345,15 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
 	difficulty_type median_mid = epee::misc_utils::median(mid_diffs);
 	difficulty_type median_last = epee::misc_utils::median(last_diffs);
 
-// CHECK TENDNACE
-	if(median_first > (median_mid*5/4) && median_mid > (median_last*4/3))
+
+	if(median_first > (median_mid*6/5) && median_mid > (median_last*10/9))
   {
-		timestamps.resize(30);
-      		cumulative_difficulties.resize(30);
+		timestamps.resize(25);
+      		cumulative_difficulties.resize(25);
 	}
-	else if(median_mid > (median_first*5/4) && median_last > (median_mid*4/3)){
-		timestamps.resize(30);
-  		cumulative_difficulties.resize(30);
+	else if(median_mid > (median_first*6/5) && median_last > (median_mid*10/9)){
+		timestamps.resize(25);
+  		cumulative_difficulties.resize(25);
 	}
 
     }
