@@ -370,9 +370,14 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
 
     int nbShortTsLastNBlocks = 0;
     bool lastTimeWasShort=false;
+    int lastShortTimeInARaw = 0;
+
+    int nbLongTsLastNBlocks = 0;
+    bool lastTimeWasLong=false;
 
     if (true) {
       uint64_t previous_max = timestamps[0];
+      
       for (size_t i = 1; i < length; i++) {
         uint64_t timespan;
         uint64_t max_timestamp;
@@ -386,15 +391,23 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
         timespan = max_timestamp - previous_max;
         if (timespan == 0) {
           timespan = 1;
-        } else if (timespan > 10 * target_seconds) {
-          timespan = 10 * target_seconds;
+        } else if (timespan > 11 * target_seconds) {
+          timespan = 11 * target_seconds;
         }
 	if(i>=(length-7)){
 	  if(timespan < 30){
 	    nbShortTsLastNBlocks ++;
 	    lastTimeWasShort = true;
+	    lastShortTimeInARaw ++;
 	  } else {
 	    lastTimeWasShort = false;
+	    lastShortTimeInARaw=0;
+	  }
+	  if(timespan >100){
+	    nbLongTsLastNBlocks ++;
+	    lastTimeWasLong = true;
+	  } else {
+	    lastTimeWasLong = false;
 	  }
 	}
 
@@ -402,17 +415,41 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
         previous_max = max_timestamp;
       }
       // adjust faster if many blocks fount too fast
+      
       if(lastTimeWasShort){
 	if(nbShortTsLastNBlocks >= 7){
 	     weighted_timespans = weighted_timespans *1/2;
 	} else if(nbShortTsLastNBlocks == 6){
 	     weighted_timespans = weighted_timespans *3/5;
+	     if(lastShortTimeInARaw ==6){
+		weighted_timespans = weighted_timespans *7/8;
+	     }
 	} else if(nbShortTsLastNBlocks == 5){
 	     weighted_timespans = weighted_timespans *4/5;
+	     if(lastShortTimeInARaw ==5){
+		weighted_timespans = weighted_timespans *7/8;
+	     }
 	} else if(nbShortTsLastNBlocks == 4){
 	     weighted_timespans = weighted_timespans *9/10;
-	} else if(nbShortTsLastNBlocks == 3){
+	     if(lastShortTimeInARaw ==4){
+		weighted_timespans = weighted_timespans *7/8;
+	     }
+	} else if(nbShortTsLastNBlocks == 3  ){
 	     weighted_timespans = weighted_timespans *11/12;
+	     if(lastShortTimeInARaw ==3){
+		weighted_timespans = weighted_timespans *7/8;
+	     }
+	}
+      }
+      if(lastTimeWasLong){
+	if(nbShortTsLastNBlocks >= 7){
+		weighted_timespans = weighted_timespans *5/4;
+	}else if(nbShortTsLastNBlocks >= 6){
+		weighted_timespans = weighted_timespans *8/7;
+	}else if(nbShortTsLastNBlocks >= 5){
+		weighted_timespans = weighted_timespans *10/9;
+	}else if(nbShortTsLastNBlocks >= 4){
+		weighted_timespans = weighted_timespans *12/11;
 	}
       }
       // adjust = 0.99 for N=60, leaving the + 1 for now as it's not affecting N
