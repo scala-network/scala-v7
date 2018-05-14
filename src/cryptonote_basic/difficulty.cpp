@@ -442,13 +442,13 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
 	}
       }
       if(lastTimeWasLong){
-	if(nbShortTsLastNBlocks >= 7){
+	if(nbLongTsLastNBlocks >= 7){
 		weighted_timespans = weighted_timespans *5/4;
-	}else if(nbShortTsLastNBlocks >= 6){
+	}else if(nbLongTsLastNBlocks >= 6){
 		weighted_timespans = weighted_timespans *8/7;
-	}else if(nbShortTsLastNBlocks >= 5){
+	}else if(nbLongTsLastNBlocks >= 5){
 		weighted_timespans = weighted_timespans *10/9;
-	}else if(nbShortTsLastNBlocks >= 4){
+	}else if(nbLongTsLastNBlocks >= 4){
 		weighted_timespans = weighted_timespans *12/11;
 	}
       }
