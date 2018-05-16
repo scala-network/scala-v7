@@ -1045,7 +1045,7 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
     money_in_use += o.amount;
   partial_block_reward = false;
 
-  if (version == 3) {
+  if (version >= 3) {
     for (auto &o: b.miner_tx.vout) {
       if (!is_valid_decomposed_amount(o.amount)) {
         MERROR_VER("miner tx output " << print_money(o.amount) << " is not a valid decomposed amount");
@@ -2958,7 +2958,7 @@ uint64_t Blockchain::get_dynamic_per_kb_fee_estimate(uint64_t grace_blocks) cons
   const uint8_t version = get_current_hard_fork_version();
 
   if (version < HF_VERSION_DYNAMIC_FEE){
-	if(version <= 4){
+	if(version < 4){
 	return FEE_PER_KB;
 	}
 	else{
