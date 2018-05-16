@@ -2958,7 +2958,7 @@ uint64_t Blockchain::get_dynamic_per_kb_fee_estimate(uint64_t grace_blocks) cons
   const uint8_t version = get_current_hard_fork_version();
 
   if (version < HF_VERSION_DYNAMIC_FEE){
-	if(version <= 4){
+	if(version < 4){
 	return FEE_PER_KB;
 	}
 	else{
