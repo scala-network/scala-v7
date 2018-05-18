@@ -399,6 +399,9 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
 	    nbShortTsLastNBlocks ++;
 	    lastTimeWasShort = true;
 	    lastShortTimeInARaw ++;
+	  } else if(timespan < target_seconds){
+	    lastTimeWasShort = true;
+	    lastShortTimeInARaw=0;
 	  } else {
 	    lastTimeWasShort = false;
 	    lastShortTimeInARaw=0;
