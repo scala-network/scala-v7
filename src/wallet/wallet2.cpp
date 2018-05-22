@@ -2222,7 +2222,7 @@ bool wallet2::verify_password(const std::string& keys_file_name, const std::stri
  * \return                The secret key of the generated wallet
  */
 crypto::secret_key wallet2::generate(const std::string& wallet_, const std::string& password,
-  const crypto::secret_key& recovery_param, bool recover, bool two_random)
+  const crypto::secret_key& recovery_param, bool recover, bool two_random, uint64_t restore_height)
 {
   clear();
   prepare_file_names(wallet_);
@@ -2270,10 +2270,10 @@ crypto::secret_key wallet2::generate(const std::string& wallet_, const std::stri
  if(m_refresh_from_block_height == 0 && !recover){
     // Wallets created offline don't know blockchain height so hence this patch to fix the restore height.
     uint64_t approx_blockchain_height = get_approximate_blockchain_height();
-    if(approx_blockchain_height > 0) {
-      m_refresh_from_block_height = approx_blockchain_height >= blocks_per_month ? approx_blockchain_height - blocks_per_month : 0;
-    }
   }
+else{
+m_refresh_from_block_height = restore_height;
+}
 
   bool r = store_keys(m_keys_file, password, false);
   THROW_WALLET_EXCEPTION_IF(!r, error::file_save_error, m_keys_file);
@@ -5124,14 +5124,9 @@ uint64_t wallet2::get_daemon_blockchain_target_height(string &err)
 
 uint64_t wallet2::get_approximate_blockchain_height() const
 {
-  // time of v2 fork
-  const time_t fork_time = m_testnet ? 1448285909 : 1520584977;
-  // v2 fork block
-  const uint64_t fork_block = m_testnet ? 624634 : 67500;
-  // avg seconds per block
-  const int seconds_per_block = DIFFICULTY_TARGET;
-  // Calculated blockchain height
-  uint64_t approx_blockchain_height = fork_block + (time(NULL) - fork_time)/seconds_per_block;
+  const time_t init_time = 1516060800;
+  uint64_t approx_blockchain_height = (time(NULL) - init_time) / 60;
+
   LOG_PRINT_L2("Calculated blockchain height: " << approx_blockchain_height);
   return approx_blockchain_height;
 }

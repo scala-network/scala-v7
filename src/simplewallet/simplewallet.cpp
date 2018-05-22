@@ -1579,7 +1579,7 @@ bool simple_wallet::new_wallet(const boost::program_options::variables_map& vm,
   crypto::secret_key recovery_val;
   try
   {
-    recovery_val = m_wallet->generate(m_wallet_file, std::move(rc.second).password(), recovery_key, recover, two_random);
+    recovery_val = m_wallet->generate(m_wallet_file, std::move(rc.second).password(), recovery_key, recover, two_random, m_restore_height);
     message_writer(console_color_white, true) << tr("Generated new wallet: ")
       << m_wallet->get_account().get_public_address_str(m_wallet->testnet());
     std::cout << tr("View key: ") << string_tools::pod_to_hex(m_wallet->get_account().get_keys().m_view_secret_key) << ENDL;
@@ -4314,6 +4314,12 @@ bool simple_wallet::run()
 {
   // check and display warning, but go on anyway
   try_connect_to_daemon();
+
+  uint64_t target_height = m_wallet->estimate_blockchain_height();
+  uint64_t refresh_from_height = m_wallet->get_refresh_from_block_height();
+  if (refresh_from_height > target_height) {
+    m_wallet->set_refresh_from_block_height(0);
+  }
 
   refresh_main(0, false);
 
