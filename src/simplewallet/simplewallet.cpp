@@ -4315,7 +4315,7 @@ bool simple_wallet::run()
   // check and display warning, but go on anyway
   try_connect_to_daemon();
 
-  uint64_t target_height = m_wallet->estimate_blockchain_height();
+  uint64_t target_height = m_wallet->get_approximate_blockchain_height();
   uint64_t refresh_from_height = m_wallet->get_refresh_from_block_height();
   if (refresh_from_height > target_height) {
     m_wallet->set_refresh_from_block_height(0);
