@@ -311,6 +311,7 @@ difficulty_type next_difficulty_v3(std::vector<std::uint64_t> timestamps, std::v
 
     uint64_t low, high;
     mul(total_work, target, low, high);
+
     if (high != 0) {
       return 0;
     }
@@ -441,17 +442,7 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
 	     }
 	}
       }
-      if(lastTimeWasLong){
-	if(nbLongTsLastNBlocks >= 7){
-		weighted_timespans = weighted_timespans *5/4;
-	}else if(nbLongTsLastNBlocks >= 6){
-		weighted_timespans = weighted_timespans *8/7;
-	}else if(nbLongTsLastNBlocks >= 5){
-		weighted_timespans = weighted_timespans *10/9;
-	}else if(nbLongTsLastNBlocks >= 4){
-		weighted_timespans = weighted_timespans *12/11;
-	}
-      }
+
       // adjust = 0.99 for N=60, leaving the + 1 for now as it's not affecting N
       target = 99 * (((length + 1) / 2) * target_seconds) / 100;
     }
@@ -466,7 +457,9 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
 
     uint64_t low, high;
     mul(total_work, target, low, high);
+    
     if (high != 0) {
+
       return 0;
     }
     return (low / weighted_timespans);
