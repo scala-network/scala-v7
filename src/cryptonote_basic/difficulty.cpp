@@ -28,26 +28,21 @@
 //
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include "include_base_utils.h"
-#include <vector>
-#include <boost/math/special_functions/round.hpp>
 
-#include "common/int-util.h"
+#include < algorithm > #include < cassert > #include < cstddef > #include < cstdint > #include "include_base_utils.h"
+#include < vector > #include < boost / math / special_functions / round.hpp >
+
+  #include "common/int-util.h"
 #include "crypto/hash.h"
 #include "cryptonote_config.h"
 #include "misc_language.h"
 #include "difficulty.h"
 #include "warnings.h"
 
-#define MAX_AVERAGE_TIMESPAN          (uint64_t) DIFFICULTY_TARGET*6
-#define MIN_AVERAGE_TIMESPAN          (uint64_t) DIFFICULTY_TARGET/24
+#
+define MAX_AVERAGE_TIMESPAN(uint64_t) DIFFICULTY_TARGET * 6# define MIN_AVERAGE_TIMESPAN(uint64_t) DIFFICULTY_TARGET / 24
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "difficulty"
+# undef MONERO_DEFAULT_LOG_CATEGORY# define MONERO_DEFAULT_LOG_CATEGORY "difficulty"
 
 namespace cryptonote {
 
@@ -55,14 +50,16 @@ namespace cryptonote {
   using std::uint64_t;
   using std::vector;
 
-#if defined(__x86_64__)
-  static inline void mul(uint64_t a, uint64_t b, uint64_t &low, uint64_t &high) {
-    low = mul128(a, b, &high);
+  #
+  if defined(__x86_64__)
+  static inline void mul(uint64_t a, uint64_t b, uint64_t & low, uint64_t & high) {
+    low = mul128(a, b, & high);
   }
 
-#else
+  #
+  else
 
-  static inline void mul(uint64_t a, uint64_t b, uint64_t &low, uint64_t &high) {
+    static inline void mul(uint64_t a, uint64_t b, uint64_t & low, uint64_t & high) {
     // __int128 isn't part of the standard, so the previous function wasn't portable. mul128() in Windows is fine,
     // but this portable function should be used elsewhere. Credit for this function goes to latexi95.
 
@@ -99,41 +96,40 @@ namespace cryptonote {
     high = d3 | (r << 32);
   }
 
-#endif
+  #
+  endif
 
   static inline bool cadd(uint64_t a, uint64_t b) {
     return a + b < a;
   }
 
   static inline bool cadc(uint64_t a, uint64_t b, bool c) {
-    return a + b < a || (c && a + b == (uint64_t) -1);
+    return a + b < a || (c && a + b == (uint64_t) - 1);
   }
 
-  bool check_hash(const crypto::hash &hash, difficulty_type difficulty) {
+  bool check_hash(const crypto::hash & hash, difficulty_type difficulty) {
     uint64_t low, high, top, cur;
     // First check the highest word, this will most likely fail for a random hash.
-    mul(swap64le(((const uint64_t *) &hash)[3]), difficulty, top, high);
+    mul(swap64le(((const uint64_t * ) & hash)[3]), difficulty, top, high);
     if (high != 0) {
       return false;
     }
-    mul(swap64le(((const uint64_t *) &hash)[0]), difficulty, low, cur);
-    mul(swap64le(((const uint64_t *) &hash)[1]), difficulty, low, high);
+    mul(swap64le(((const uint64_t * ) & hash)[0]), difficulty, low, cur);
+    mul(swap64le(((const uint64_t * ) & hash)[1]), difficulty, low, high);
     bool carry = cadd(cur, low);
     cur = high;
-    mul(swap64le(((const uint64_t *) &hash)[2]), difficulty, low, high);
+    mul(swap64le(((const uint64_t * ) & hash)[2]), difficulty, low, high);
     carry = cadc(cur, low, carry);
     carry = cadc(high, top, carry);
     return !carry;
   }
 
-  difficulty_type next_difficulty(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds) {
+  difficulty_type next_difficulty(std::vector < std::uint64_t > timestamps, std::vector < difficulty_type > cumulative_difficulties, size_t target_seconds) {
 
-    if(timestamps.size() > DIFFICULTY_WINDOW)
-    {
+    if (timestamps.size() > DIFFICULTY_WINDOW) {
       timestamps.resize(DIFFICULTY_WINDOW);
       cumulative_difficulties.resize(DIFFICULTY_WINDOW);
     }
-
 
     size_t length = timestamps.size();
     assert(length == cumulative_difficulties.size());
@@ -152,7 +148,7 @@ namespace cryptonote {
       cut_begin = (length - (DIFFICULTY_WINDOW - 2 * DIFFICULTY_CUT) + 1) / 2;
       cut_end = cut_begin + (DIFFICULTY_WINDOW - 2 * DIFFICULTY_CUT);
     }
-    assert(/*cut_begin >= 0 &&*/ cut_begin + 2 <= cut_end && cut_end <= length);
+    assert( /*cut_begin >= 0 &&*/ cut_begin + 2 <= cut_end && cut_end <= length);
     uint64_t time_span = timestamps[cut_end - 1] - timestamps[cut_begin];
     if (time_span == 0) {
       time_span = 1;
@@ -170,10 +166,9 @@ namespace cryptonote {
   }
 
   //Was good but not as good as v3.
-difficulty_type next_difficulty_v2(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds) {
+  difficulty_type next_difficulty_v2(std::vector < std::uint64_t > timestamps, std::vector < difficulty_type > cumulative_difficulties, size_t target_seconds) {
 
-    if (timestamps.size() > DIFFICULTY_BLOCKS_COUNT_V2)
-    {
+    if (timestamps.size() > DIFFICULTY_BLOCKS_COUNT_V2) {
       timestamps.resize(DIFFICULTY_BLOCKS_COUNT_V2);
       cumulative_difficulties.resize(DIFFICULTY_BLOCKS_COUNT_V2);
     }
@@ -190,21 +185,20 @@ difficulty_type next_difficulty_v2(std::vector<std::uint64_t> timestamps, std::v
     if (length <= DIFFICULTY_BLOCKS_COUNT_V2 - 2 * DIFFICULTY_CUT_V2) {
       cut_begin = 0;
       cut_end = length;
-    }
-    else {
+    } else {
       cut_begin = (length - (DIFFICULTY_BLOCKS_COUNT_V2 - 2 * DIFFICULTY_CUT_V2) + 1) / 2;
       cut_end = cut_begin + (DIFFICULTY_BLOCKS_COUNT_V2 - 2 * DIFFICULTY_CUT_V2);
     }
-    assert(/*cut_begin >= 0 &&*/ cut_begin + 2 <= cut_end && cut_end <= length);
+    assert( /*cut_begin >= 0 &&*/ cut_begin + 2 <= cut_end && cut_end <= length);
     uint64_t total_timespan = timestamps[cut_end - 1] - timestamps[cut_begin];
     if (total_timespan == 0) {
       total_timespan = 1;
     }
 
     uint64_t timespan_median = 0;
-    if (cut_begin > 0 && length >= cut_begin * 2 + 3){
-      std::vector<std::uint64_t> time_spans;
-      for (size_t i = length - cut_begin * 2 - 3; i < length - 1; i++){
+    if (cut_begin > 0 && length >= cut_begin * 2 + 3) {
+      std::vector < std::uint64_t > time_spans;
+      for (size_t i = length - cut_begin * 2 - 3; i < length - 1; i++) {
         uint64_t time_span = timestamps[i + 1] - timestamps[i];
         if (time_span == 0) {
           time_span = 1;
@@ -221,10 +215,10 @@ difficulty_type next_difficulty_v2(std::vector<std::uint64_t> timestamps, std::v
 
     uint64_t total_timespan_median = timespan_median > 0 ? timespan_median * timespan_length : total_timespan * 7 / 10;
     uint64_t adjusted_total_timespan = (total_timespan * 8 + total_timespan_median * 3) / 10; //  0.8A + 0.3M (the median of a poisson distribution is 70% of the mean, so 0.25A = 0.25/0.7 = 0.285M)
-    if (adjusted_total_timespan > MAX_AVERAGE_TIMESPAN * timespan_length){
+    if (adjusted_total_timespan > MAX_AVERAGE_TIMESPAN * timespan_length) {
       adjusted_total_timespan = MAX_AVERAGE_TIMESPAN * timespan_length;
     }
-    if (adjusted_total_timespan < MIN_AVERAGE_TIMESPAN * timespan_length){
+    if (adjusted_total_timespan < MIN_AVERAGE_TIMESPAN * timespan_length) {
       adjusted_total_timespan = MIN_AVERAGE_TIMESPAN * timespan_length;
     }
 
@@ -244,10 +238,9 @@ difficulty_type next_difficulty_v2(std::vector<std::uint64_t> timestamps, std::v
     return next_diff;
   }
 
-difficulty_type next_difficulty_v3(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds, bool v4) {
+  difficulty_type next_difficulty_v3(std::vector < std::uint64_t > timestamps, std::vector < difficulty_type > cumulative_difficulties, size_t target_seconds, bool v4) {
 
-    if (timestamps.size() > DIFFICULTY_BLOCKS_COUNT_V3)
-    {
+    if (timestamps.size() > DIFFICULTY_BLOCKS_COUNT_V3) {
       timestamps.resize(DIFFICULTY_BLOCKS_COUNT_V3);
       cumulative_difficulties.resize(DIFFICULTY_BLOCKS_COUNT_V3);
     }
@@ -318,44 +311,38 @@ difficulty_type next_difficulty_v3(std::vector<std::uint64_t> timestamps, std::v
     return low / weighted_timespans;
   }
 
+  difficulty_type next_difficulty_v4(std::vector < std::uint64_t > timestamps, std::vector < difficulty_type > cumulative_difficulties, size_t target_seconds) {
 
-
-difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds) {
-
-    if (timestamps.size() > DIFFICULTY_BLOCKS_COUNT_V4)
-    {
+    if (timestamps.size() > DIFFICULTY_BLOCKS_COUNT_V4) {
       timestamps.resize(DIFFICULTY_BLOCKS_COUNT_V4);
       cumulative_difficulties.resize(DIFFICULTY_BLOCKS_COUNT_V4);
     }
 
     size_t length_cumul_diff = cumulative_difficulties.size();
-    if(length_cumul_diff >= DIFFICULTY_BLOCKS_COUNT_V4 - 1){
-	std::vector<difficulty_type> first_diffs;
-  std::vector<difficulty_type> mid_diffs;
-	std::vector<difficulty_type> last_diffs;
-	for (size_t i = 0; i < (DIFFICULTY_BLOCKS_COUNT_V4-30); i++) {
-		first_diffs.push_back(cumulative_difficulties[i]);
-	}
-	for (size_t i = (DIFFICULTY_BLOCKS_COUNT_V4-30); i < (DIFFICULTY_BLOCKS_COUNT_V4-10); i++) {
-		mid_diffs.push_back(cumulative_difficulties[i]);
-	}
-	for (size_t i = (DIFFICULTY_BLOCKS_COUNT_V4*-10); i < DIFFICULTY_BLOCKS_COUNT_V4; i++) {
-		last_diffs.push_back(cumulative_difficulties[i]);
-	}
-	difficulty_type median_first = epee::misc_utils::median(first_diffs);
-	difficulty_type median_mid = epee::misc_utils::median(mid_diffs);
-	difficulty_type median_last = epee::misc_utils::median(last_diffs);
+    if (length_cumul_diff >= DIFFICULTY_BLOCKS_COUNT_V4 - 1) {
+      std::vector < difficulty_type > first_diffs;
+      std::vector < difficulty_type > mid_diffs;
+      std::vector < difficulty_type > last_diffs;
+      for (size_t i = 0; i < (DIFFICULTY_BLOCKS_COUNT_V4 - 30); i++) {
+        first_diffs.push_back(cumulative_difficulties[i]);
+      }
+      for (size_t i = (DIFFICULTY_BLOCKS_COUNT_V4 - 30); i < (DIFFICULTY_BLOCKS_COUNT_V4 - 10); i++) {
+        mid_diffs.push_back(cumulative_difficulties[i]);
+      }
+      for (size_t i = (DIFFICULTY_BLOCKS_COUNT_V4 * -10); i < DIFFICULTY_BLOCKS_COUNT_V4; i++) {
+        last_diffs.push_back(cumulative_difficulties[i]);
+      }
+      difficulty_type median_first = epee::misc_utils::median(first_diffs);
+      difficulty_type median_mid = epee::misc_utils::median(mid_diffs);
+      difficulty_type median_last = epee::misc_utils::median(last_diffs);
 
-
-	if(median_first > (median_mid*6/5) && median_mid > (median_last*10/9))
-  {
-		timestamps.resize(25);
-      		cumulative_difficulties.resize(25);
-	}
-	else if(median_mid > (median_first*6/5) && median_last > (median_mid*10/9)){
-		timestamps.resize(25);
-  		cumulative_difficulties.resize(25);
-	}
+      if (median_first > (median_mid * 6 / 5) && median_mid > (median_last * 10 / 9)) {
+        timestamps.resize(25);
+        cumulative_difficulties.resize(25);
+      } else if (median_mid > (median_first * 6 / 5) && median_last > (median_mid * 10 / 9)) {
+        timestamps.resize(25);
+        cumulative_difficulties.resize(25);
+      }
 
     }
 
@@ -365,20 +352,19 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
       return 1;
     }
 
-
     uint64_t weighted_timespans = 0;
     uint64_t target;
 
     int nbShortTsLastNBlocks = 0;
-    bool lastTimeWasShort=false;
+    bool lastTimeWasShort = false;
     int lastShortTimeInARaw = 0;
 
     int nbLongTsLastNBlocks = 0;
-    bool lastTimeWasLong=false;
+    bool lastTimeWasLong = false;
 
     if (true) {
       uint64_t previous_max = timestamps[0];
-      
+
       for (size_t i = 1; i < length; i++) {
         uint64_t timespan;
         uint64_t max_timestamp;
@@ -395,52 +381,52 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
         } else if (timespan > 11 * target_seconds) {
           timespan = 11 * target_seconds;
         }
-	if(i>=(length-7)){
-	  if(timespan < 30){
-	    nbShortTsLastNBlocks ++;
-	    lastTimeWasShort = true;
-	    lastShortTimeInARaw ++;
-	  } else {
-	    lastTimeWasShort = false;
-	    lastShortTimeInARaw=0;
-	  }
-	  if(timespan >100){
-	    nbLongTsLastNBlocks ++;
-	    lastTimeWasLong = true;
-	  } else {
-	    lastTimeWasLong = false;
-	  }
-	}
+        if (i >= (length - 7)) {
+          if (timespan < 30) {
+            nbShortTsLastNBlocks++;
+            lastTimeWasShort = true;
+            lastShortTimeInARaw++;
+          } else {
+            lastTimeWasShort = false;
+            lastShortTimeInARaw = 0;
+          }
+          if (timespan > 100) {
+            nbLongTsLastNBlocks++;
+            lastTimeWasLong = true;
+          } else {
+            lastTimeWasLong = false;
+          }
+        }
 
         weighted_timespans += i * timespan;
         previous_max = max_timestamp;
       }
       // adjust faster if many blocks fount too fast
-      
-      if(lastTimeWasShort){
-	if(nbShortTsLastNBlocks >= 7){
-	     weighted_timespans = weighted_timespans *1/2;
-	} else if(nbShortTsLastNBlocks == 6){
-	     weighted_timespans = weighted_timespans *3/5;
-	     if(lastShortTimeInARaw ==6){
-		weighted_timespans = weighted_timespans *7/8;
-	     }
-	} else if(nbShortTsLastNBlocks == 5){
-	     weighted_timespans = weighted_timespans *4/5;
-	     if(lastShortTimeInARaw ==5){
-		weighted_timespans = weighted_timespans *7/8;
-	     }
-	} else if(nbShortTsLastNBlocks == 4){
-	     weighted_timespans = weighted_timespans *9/10;
-	     if(lastShortTimeInARaw ==4){
-		weighted_timespans = weighted_timespans *7/8;
-	     }
-	} else if(nbShortTsLastNBlocks == 3  ){
-	     weighted_timespans = weighted_timespans *11/12;
-	     if(lastShortTimeInARaw ==3){
-		weighted_timespans = weighted_timespans *7/8;
-	     }
-	}
+
+      if (lastTimeWasShort) {
+        if (nbShortTsLastNBlocks >= 7) {
+          weighted_timespans = weighted_timespans * 1 / 2;
+        } else if (nbShortTsLastNBlocks == 6) {
+          weighted_timespans = weighted_timespans * 3 / 5;
+          if (lastShortTimeInARaw == 6) {
+            weighted_timespans = weighted_timespans * 7 / 8;
+          }
+        } else if (nbShortTsLastNBlocks == 5) {
+          weighted_timespans = weighted_timespans * 4 / 5;
+          if (lastShortTimeInARaw == 5) {
+            weighted_timespans = weighted_timespans * 7 / 8;
+          }
+        } else if (nbShortTsLastNBlocks == 4) {
+          weighted_timespans = weighted_timespans * 9 / 10;
+          if (lastShortTimeInARaw == 4) {
+            weighted_timespans = weighted_timespans * 7 / 8;
+          }
+        } else if (nbShortTsLastNBlocks == 3) {
+          weighted_timespans = weighted_timespans * 11 / 12;
+          if (lastShortTimeInARaw == 3) {
+            weighted_timespans = weighted_timespans * 7 / 8;
+          }
+        }
       }
 
       // adjust = 0.99 for N=60, leaving the + 1 for now as it's not affecting N
@@ -457,7 +443,7 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
 
     uint64_t low, high;
     mul(total_work, target, low, high);
-    
+
     if (high != 0) {
 
       return 0;
@@ -491,24 +477,24 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
 
   // Cryptonote clones:  #define DIFFICULTY_BLOCKS_COUNT_V2 DIFFICULTY_WINDOW_V2 + 1
 
-difficulty_type next_difficulty_v5(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds) {
+  difficulty_type next_difficulty_v5(std::vector < std::uint64_t > timestamps, std::vector < difficulty_type > cumulative_difficulties, size_t target_seconds) {
 
-    const int64_t T = static_cast<int64_t>(target_seconds);
+    const int64_t T = static_cast < int64_t > (target_seconds);
     size_t N = DIFFICULTY_WINDOW_V4;
-    int64_t FTL = static_cast<int64_t>(CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4);
+    int64_t FTL = static_cast < int64_t > (CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4);
 
     // Return a difficulty of 1 for first 3 blocks if it's the start of the chain.
     if (timestamps.size() < 4) {
       return 1;
     }
     // Otherwise, use a smaller N if the start of the chain is less than N+1.
-    else if ( timestamps.size() < N+1 ) {
+    else if (timestamps.size() < N + 1) {
       N = timestamps.size() - 1;
     }
     // Otherwise make sure timestamps and cumulative_difficulties are correct size.
     else {
-      timestamps.resize(N+1);
-      cumulative_difficulties.resize(N+1);
+      timestamps.resize(N + 1);
+      cumulative_difficulties.resize(N + 1);
     }
     // To get an average solvetime to within +/- ~0.1%, use an adjustment factor.
     // adjust=0.998 for N = 60
@@ -522,24 +508,24 @@ difficulty_type next_difficulty_v5(std::vector<std::uint64_t> timestamps, std::v
 
     // Loop through N most recent blocks. N is most recently solved block.
     for (size_t i = 1; i <= N; i++) {
-      solveTime = static_cast<int64_t>(timestamps[i]) - static_cast<int64_t>(timestamps[i - 1]);
-      solveTime = std::min<int64_t>((T * 10), std::max<int64_t>(solveTime, -FTL));
+      solveTime = static_cast < int64_t > (timestamps[i]) - static_cast < int64_t > (timestamps[i - 1]);
+      solveTime = std::min < int64_t > ((T * 10), std::max < int64_t > (solveTime, -FTL));
       difficulty = cumulative_difficulties[i] - cumulative_difficulties[i - 1];
       LWMA += (int64_t)(solveTime * i) / k;
-      sum_inverse_D += 1 / static_cast<double>(difficulty);
+      sum_inverse_D += 1 / static_cast < double > (difficulty);
     }
 
     harmonic_mean_D = N / sum_inverse_D;
 
     // Limit LWMA same as Bitcoin's 1/4 in case something unforeseen occurs.
-    if (static_cast<int64_t>(boost::math::round(LWMA)) < T / 4)
-      LWMA = static_cast<double>(T / 4);
+    if (static_cast < int64_t > (boost::math::round(LWMA)) < T / 4)
+      LWMA = static_cast < double > (T / 4);
 
     nextDifficulty = harmonic_mean_D * T / LWMA * adjust;
 
     // No limits should be employed, but this is correct way to employ a 20% symmetrical limit:
     // nextDifficulty=max(previous_Difficulty*0.8,min(previous_Difficulty/0.8, next_Difficulty));
-    next_difficulty = static_cast<uint64_t>(nextDifficulty);
+    next_difficulty = static_cast < uint64_t > (nextDifficulty);
     return next_difficulty;
   }
 }
