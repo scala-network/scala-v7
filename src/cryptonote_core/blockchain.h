@@ -1239,6 +1239,9 @@ namespace cryptonote
      */
     bool check_block_timestamp(const block& b) const;
 
+    bool check_block_timestamp(std::vector<uint64_t>& timestamps, const block& b, uint64_t& median_ts) const;
+    bool check_median_block_timestamp(const block& b, uint64_t& median_ts) const;
+
     /**
      * @brief checks a block's timestamp
      *

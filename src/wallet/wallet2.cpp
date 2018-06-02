@@ -2222,7 +2222,7 @@ bool wallet2::verify_password(const std::string& keys_file_name, const std::stri
  * \return                The secret key of the generated wallet
  */
 crypto::secret_key wallet2::generate(const std::string& wallet_, const std::string& password,
-  const crypto::secret_key& recovery_param, bool recover, bool two_random)
+  const crypto::secret_key& recovery_param, bool recover, bool two_random, uint64_t restore_height)
 {
   clear();
   prepare_file_names(wallet_);
@@ -2270,10 +2270,10 @@ crypto::secret_key wallet2::generate(const std::string& wallet_, const std::stri
  if(m_refresh_from_block_height == 0 && !recover){
     // Wallets created offline don't know blockchain height so hence this patch to fix the restore height.
     uint64_t approx_blockchain_height = get_approximate_blockchain_height();
-    if(approx_blockchain_height > 0) {
-      m_refresh_from_block_height = approx_blockchain_height >= blocks_per_month ? approx_blockchain_height - blocks_per_month : 0;
-    }
   }
+else{
+m_refresh_from_block_height = restore_height;
+}
 
   bool r = store_keys(m_keys_file, password, false);
   THROW_WALLET_EXCEPTION_IF(!r, error::file_save_error, m_keys_file);
@@ -3524,9 +3524,17 @@ uint64_t wallet2::get_dynamic_per_kb_fee_estimate()
 uint64_t wallet2::get_per_kb_fee()
 {
   bool use_dyn_fee = use_fork_rules(HF_VERSION_DYNAMIC_FEE, -720 * 1);
-  if (!use_dyn_fee)
-    return FEE_PER_KB;
+  if (!use_dyn_fee){
 
+	bool v4 = use_fork_rules(4, 0);
+	if(v4){
+	return FEE_PER_KB_V4;
+	}
+	else{
+	return FEE_PER_KB;
+		}
+  
+     }
   return get_dynamic_per_kb_fee_estimate();
 }
 //----------------------------------------------------------------------------------------------------
@@ -3535,7 +3543,7 @@ int wallet2::get_fee_algorithm()
   // changes at v3 and v5
   if (use_fork_rules(5, 0)){
     return 2;}
-  if (use_fork_rules(4, -720 * 14)){
+  if (use_fork_rules(6, -720 * 14)){
    return 1;}
   return 0;
 }
@@ -4390,7 +4398,7 @@ std::vector<wallet2::pending_tx> wallet2::create_transactions_2(std::vector<cryp
   bool adding_fee; // true if new outputs go towards fee, rather than destinations
   uint64_t needed_fee, available_for_fee = 0;
   uint64_t upper_transaction_size_limit = get_upper_transaction_size_limit();
-  const bool use_rct = use_fork_rules(4, 0);
+  const bool use_rct = use_fork_rules(6, 0);
 
   const uint64_t fee_per_kb  = get_per_kb_fee();
   const uint64_t fee_multiplier = get_fee_multiplier(priority, get_fee_algorithm());
@@ -4698,7 +4706,7 @@ std::vector<wallet2::pending_tx> wallet2::create_transactions_all(uint64_t below
 {
   std::vector<size_t> unused_transfers_indices;
   std::vector<size_t> unused_dust_indices;
-  const bool use_rct = use_fork_rules(4, 0);
+  const bool use_rct = use_fork_rules(6, 0);
 
   // gather all our dust and non dust outputs
   for (size_t i = 0; i < m_transfers.size(); ++i)
@@ -4734,7 +4742,7 @@ std::vector<wallet2::pending_tx> wallet2::create_transactions_from(const crypton
   uint64_t upper_transaction_size_limit = get_upper_transaction_size_limit();
   std::vector<std::vector<get_outs_entry>> outs;
 
-  const bool use_rct = fake_outs_count > 0 && use_fork_rules(4, 0);
+  const bool use_rct = fake_outs_count > 0 && use_fork_rules(6, 0);
   const uint64_t fee_per_kb  = get_per_kb_fee();
   const uint64_t fee_multiplier = get_fee_multiplier(priority, get_fee_algorithm());
 
@@ -4893,7 +4901,7 @@ uint64_t wallet2::get_upper_transaction_size_limit()
 {
   if (m_upper_transaction_size_limit > 0)
     return m_upper_transaction_size_limit;
-  uint64_t full_reward_zone = use_fork_rules(5, 10) ? CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V5 : use_fork_rules(1, 10) ? CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2 : CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1;
+  uint64_t full_reward_zone = use_fork_rules(4, 10) ? CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V5 : use_fork_rules(1, 10) ? CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2 : CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1;
   return full_reward_zone - CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
 }
 //----------------------------------------------------------------------------------------------------
@@ -5116,14 +5124,9 @@ uint64_t wallet2::get_daemon_blockchain_target_height(string &err)
 
 uint64_t wallet2::get_approximate_blockchain_height() const
 {
-  // time of v2 fork
-  const time_t fork_time = m_testnet ? 1448285909 : 1520584977;
-  // v2 fork block
-  const uint64_t fork_block = m_testnet ? 624634 : 67500;
-  // avg seconds per block
-  const int seconds_per_block = DIFFICULTY_TARGET;
-  // Calculated blockchain height
-  uint64_t approx_blockchain_height = fork_block + (time(NULL) - fork_time)/seconds_per_block;
+  const time_t init_time = 1516060800;
+  uint64_t approx_blockchain_height = (time(NULL) - init_time) / 60;
+
   LOG_PRINT_L2("Calculated blockchain height: " << approx_blockchain_height);
   return approx_blockchain_height;
 }

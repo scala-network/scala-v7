@@ -46,10 +46,12 @@
 #define CURRENT_BLOCK_MINOR_VERSION                     0
 #define CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT              60*60*2
 #define CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V2           60*15
+#define CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4           60*4
 #define CRYPTONOTE_DEFAULT_TX_SPENDABLE_AGE             10
 
 #define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW               60
-#define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V2	          60
+#define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V2	        60
+#define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V4		30
 
 // MONEY_SUPPLY - total number coins to be generated
 #define MONEY_SUPPLY                                    ((uint64_t)(2100000000000))
@@ -59,13 +61,14 @@
 #define CRYPTONOTE_REWARD_BLOCKS_WINDOW                 100
 #define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2    60000 //size of block (bytes) after which reward for block calculated using block size
 #define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1    20000 //size of block (bytes) after which reward for block calculated using block size - before first fork
-#define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V5    300000 //size of block (bytes) after which reward for block calculated using block size - second change, from v5
+#define CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V5    150000 //size of block (bytes) after which reward for block calculated using block size - second change, from v5
 #define CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE          600
 #define CRYPTONOTE_DISPLAY_DECIMAL_POINT                2
 // COIN - number of smallest units in one coin
 #define COIN                                            ((uint64_t)1000000000000) // pow(10, 12)
 
 #define FEE_PER_KB                                      ((uint64_t)1)
+#define FEE_PER_KB_V4                                   ((uint64_t)15)
 #define DYNAMIC_FEE_PER_KB_BASE_FEE                     ((uint64_t)2000000000) // 2 * pow(10,9)
 #define DYNAMIC_FEE_PER_KB_BASE_BLOCK_REWARD            ((uint64_t)10000000000000) // 10 * pow(10,12)
 #define DYNAMIC_FEE_PER_KB_BASE_FEE_V5                  ((uint64_t)2000000000 * (uint64_t)CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2 / CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V5)
@@ -86,6 +89,9 @@
 #define DIFFICULTY_WINDOW_V3                            90
 #define DIFFICULTY_BLOCKS_COUNT_V3                      DIFFICULTY_WINDOW_V3
 
+#define DIFFICULTY_WINDOW_V4				90
+#define DIFFICULTY_BLOCKS_COUNT_V4                      DIFFICULTY_WINDOW_V4
+
 #define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS      DIFFICULTY_TARGET * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS
 #define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS       1
 
@@ -94,11 +100,11 @@
 
 
 #define BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT          10000  //by default, blocks ids count in synchronizing
-#define BLOCKS_SYNCHRONIZING_DEFAULT_COUNT_PRE_V4       100    //by default, blocks count in blocks downloading
+#define BLOCKS_SYNCHRONIZING_DEFAULT_COUNT_PRE_V4       100   //by default, blocks count in blocks downloading
 #define BLOCKS_SYNCHRONIZING_DEFAULT_COUNT              20     //by default, blocks count in blocks downloading
 #define CRYPTONOTE_PROTOCOL_HOP_RELAX_COUNT             3      //value of hop, after which we use only announce of new block
 
-#define CRYPTONOTE_MEMPOOL_TX_LIVETIME                    86400 //seconds, one day
+#define CRYPTONOTE_MEMPOOL_TX_LIVETIME                  (86400*2) //seconds, two day
 #define CRYPTONOTE_MEMPOOL_TX_FROM_ALT_BLOCK_LIVETIME     604800 //seconds, one week
 
 #define COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT           1000
@@ -136,7 +142,7 @@
 
 #define THREAD_STACK_SIZE                       5 * 1024 * 1024
 
-#define HF_VERSION_DYNAMIC_FEE                  4
+#define HF_VERSION_DYNAMIC_FEE                  6
 #define HF_VERSION_MIN_MIXIN_4                  6
 #define HF_VERSION_ENFORCE_RCT                  6
 
@@ -156,7 +162,7 @@ namespace config
   uint16_t const P2P_DEFAULT_PORT = 20188;
   uint16_t const RPC_DEFAULT_PORT = 20189;
   boost::uuids::uuid const NETWORK_ID = { {
-	0x39, 0xF8, 0x23, 0xE1, 0x8E, 0xC2, 0xE3, 0xF8, 0xEA, 0x5D, 0xD1, 0x2C, 0x85, 0x8E, 0xC8, 0x39
+	0x39, 0x39, 0xF8, 0xD1, 0xF8, 0x39, 0x39, 0xF8, 0xEA, 0x5D, 0xD1, 0x2C, 0x85, 0x8E, 0xC8, 0x39
     } };
   std::string const GENESIS_TX = "011201ff00011e026bc5c7db8a664f652d78adb587ac4d759c6757258b64ef9cba3c0354e64fb2e42101abca6a39c561d0897be183eb0143990eba201aa7d2c652ab0555d28bb4b70728";
   uint32_t const GENESIS_NONCE = 10000;

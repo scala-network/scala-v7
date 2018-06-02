@@ -41,6 +41,7 @@ namespace cryptonote
   {
 
     cryptonote_connection_context(): m_state(state_before_handshake), m_remote_blockchain_height(0), m_last_response_height(0) {}
+
     enum state
     {
       state_before_handshake = 0, //default state
