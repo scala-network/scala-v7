@@ -417,6 +417,7 @@ namespace nodetool
       full_addrs.insert("85.25.35.35:20188");
       full_addrs.insert("107.191.63.92:20188");
       full_addrs.insert("172.110.10.6:20188");
+      full_addrs.insert("51.38.235.241");
     }
     return full_addrs;
   }
