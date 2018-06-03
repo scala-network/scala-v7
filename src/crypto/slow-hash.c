@@ -53,14 +53,14 @@ extern int aesb_pseudo_round(const uint8_t *in, uint8_t *out, const uint8_t *exp
 
 #endif
 #define VARIANT1_1(p) \
-  if (variant > 1) \
+  if (variant == 2) \
   { \
     const uint8_t tmp = ((const uint8_t*)(p))[11]; \
     static const uint32_t table = 0x75312; \
     const uint8_t index = (((tmp >> 4) & 6) | (tmp & 1)) << 1; \
     ((uint8_t*)(p))[11] = tmp ^ ((table >> index) & 0x30); \
   }  \
-  else{ \
+  else if(variant == 1){ \
     const uint8_t tmp = ((const uint8_t*)(p))[11]; \
     static const uint32_t table = 0x75310; \
     const uint8_t index = (((tmp >> 3) & 6) | (tmp & 1)) << 1; \
