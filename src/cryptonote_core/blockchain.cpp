@@ -98,7 +98,7 @@ mainnet_hard_forks[] = {
   { 3, 100800, 0, 1522557835 },
 
   // Version 4 starts from block 194600, fork time decided about midday UTC on 2018-06-08
-  { 4, CHANGE_THIS_TO_V4, 0, 1522557836 },
+  { 4, 194600, 0, 1522557836 },
 
 };
 static const uint64_t mainnet_hard_fork_version_1_till = (uint64_t)-1;
@@ -710,10 +710,6 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
   std::vector<difficulty_type> difficulties;
   auto height = m_db->height();
   //size_t difficult_block_count = get_current_hard_fork_version() < 2 ? DIFFICULTY_BLOCKS_COUNT : DIFFICULTY_BLOCKS_COUNT_V3;
-
-  if (!m_testnet && (uint64_t)height >= CHANGE_THIS_TO_V4 && (uint64_t)height <= CHANGE_THIS_TO_V4 + (uint64_t)DIFFICULTY_BLOCKS_COUNT_V4){
-    return (difficulty_type) 15000;
-  }
 
   size_t difficult_block_count;
 
