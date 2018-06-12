@@ -804,9 +804,9 @@ namespace cryptonote
   //-----------------------------------------------------------------------------------------------
   size_t core::get_block_sync_size(uint64_t height) const
   {
-    static const uint64_t quick_height = 1337121; //we need to define V4 fork height here so that the chain will do the rest.
-    if (block_sync_size > 0)
-      return block_sync_size;
+    static const uint64_t quick_height = m_testnet ? 1 : 194600;
+    if (block_sync_size > 0){
+      return block_sync_size;}
     if (height >= quick_height){
       return BLOCKS_SYNCHRONIZING_DEFAULT_COUNT;}
     return BLOCKS_SYNCHRONIZING_DEFAULT_COUNT_PRE_V4;
