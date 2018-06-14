@@ -329,35 +329,7 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
     }
 
     size_t length_cumul_diff = cumulative_difficulties.size();
-    if(length_cumul_diff >= DIFFICULTY_BLOCKS_COUNT_V4 - 1) {
-        std::vector<difficulty_type> first_diffs;
-        std::vector<difficulty_type> mid_diffs;
-        std::vector<difficulty_type> last_diffs;
-        for (size_t i = 0; i < (DIFFICULTY_BLOCKS_COUNT_V4-30); i++) {
-            first_diffs.push_back(cumulative_difficulties[i]);
-        }
-        for (size_t i = (DIFFICULTY_BLOCKS_COUNT_V4-30); i < (DIFFICULTY_BLOCKS_COUNT_V4-10); i++) {
-            mid_diffs.push_back(cumulative_difficulties[i]);
-        }
-        for (size_t i = (DIFFICULTY_BLOCKS_COUNT_V4*-10); i < DIFFICULTY_BLOCKS_COUNT_V4; i++) {
-            last_diffs.push_back(cumulative_difficulties[i]);
-        }
-        difficulty_type median_first = epee::misc_utils::median(first_diffs);
-        difficulty_type median_mid = epee::misc_utils::median(mid_diffs);
-        difficulty_type median_last = epee::misc_utils::median(last_diffs);
-
-
-        if(median_first > (median_mid*6/5) && median_mid > (median_last*10/9))
-        {
-            timestamps.resize(25);
-            cumulative_difficulties.resize(25);
-        }
-        else if(median_mid > (median_first*6/5) && median_last > (median_mid*10/9)) {
-            timestamps.resize(25);
-            cumulative_difficulties.resize(25);
-        }
-
-    }
+ 
 
     size_t length = timestamps.size();
     assert(length == cumulative_difficulties.size());
@@ -373,8 +345,7 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
     bool lastTimeWasShort=false;
     int lastShortTimeInARaw = 0;
 
-    int nbLongTsLastNBlocks = 0;
-    bool lastTimeWasLong=false;
+
 
     if (true) {
         uint64_t previous_max = timestamps[0];
@@ -404,12 +375,6 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
                     lastTimeWasShort = false;
                     lastShortTimeInARaw=0;
                 }
-                if(timespan >100) {
-                    nbLongTsLastNBlocks ++;
-                    lastTimeWasLong = true;
-                } else {
-                    lastTimeWasLong = false;
-                }
             }
 
             weighted_timespans += i * timespan;
@@ -418,29 +383,16 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
         // adjust faster if many blocks fount too fast
 
         if(lastTimeWasShort) {
-            if(nbShortTsLastNBlocks >= 7) {
-                weighted_timespans = weighted_timespans *1/2;
-            } else if(nbShortTsLastNBlocks == 6) {
-                weighted_timespans = weighted_timespans *3/5;
-                if(lastShortTimeInARaw ==6) {
-                    weighted_timespans = weighted_timespans *7/8;
-                }
-            } else if(nbShortTsLastNBlocks == 5) {
-                weighted_timespans = weighted_timespans *4/5;
-                if(lastShortTimeInARaw ==5) {
-                    weighted_timespans = weighted_timespans *7/8;
-                }
-            } else if(nbShortTsLastNBlocks == 4) {
-                weighted_timespans = weighted_timespans *9/10;
-                if(lastShortTimeInARaw ==4) {
-                    weighted_timespans = weighted_timespans *7/8;
-                }
-            } else if(nbShortTsLastNBlocks == 3  ) {
-                weighted_timespans = weighted_timespans *11/12;
-                if(lastShortTimeInARaw ==3) {
-                    weighted_timespans = weighted_timespans *7/8;
-                }
-            }
+        	
+        	// From 3 blocks amound latest previous ones, add malus with increase of 10% per short block fount 
+        	if(nbShortTsLastNBlocks >= 3) {
+        		weighted_timespans = weighted_timespans * (1-(0.10*(nbShortTsLastNBlocks-2)));
+        	}
+
+        	// add second mallus 5% if short block are latest in a raw
+        	if(lastShortTimeInARaw == nbShortTsLastNBlocks && lastShortTimeInARaw<7){
+        		weighted_timespans = weighted_timespans * 0.95;
+        	}
         }
 
         // adjust = 0.99 for N=60, leaving the + 1 for now as it's not affecting N
