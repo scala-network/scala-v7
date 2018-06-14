@@ -35,6 +35,7 @@
 #include "include_base_utils.h"
 #include <vector>
 #include <boost/math/special_functions/round.hpp>
+#include <boost/algorithm/clamp.hpp>
 
 #include "common/int-util.h"
 #include "crypto/hash.h"
@@ -328,78 +329,63 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
         cumulative_difficulties.resize(DIFFICULTY_BLOCKS_COUNT_V4);
     }
 
-    size_t length_cumul_diff = cumulative_difficulties.size();
- 
-
-    size_t length = timestamps.size();
-    assert(length == cumulative_difficulties.size());
-    if (length <= 1) {
+    size_t timestamp_count = timestamps.size();
+    assert(timestamp_count == cumulative_difficulties.size());
+    if (timestamp_count <= 1) {
         return 1;
     }
-
 
     uint64_t weighted_timespans = 0;
     uint64_t target;
 
     int nbShortTsLastNBlocks = 0;
-    bool lastTimeWasShort=false;
+    bool lastTimeWasShort = false;
     int lastShortTimeInARaw = 0;
 
 
+    /**
+     * beg
+     */
+    uint64_t prev_max_timestamp = timestamps[0];
+    for (size_t i = 1; i < timestamp_count; ++i) {
+        uint64_t max_timestamp = std::max(prev_max_timestamp, timestamps[i]);
+        uint64_t timespan = boost::algorithm::clamp<uint64_t>(max_timestamp - prev_max_timestamp, 1, 11 * target_seconds);
 
-    if (true) {
-        uint64_t previous_max = timestamps[0];
-
-        for (size_t i = 1; i < length; i++) {
-            uint64_t timespan;
-            uint64_t max_timestamp;
-
-            if (timestamps[i] > previous_max) {
-                max_timestamp = timestamps[i];
+        // not sure if I get this part
+        if (i >= (timestamp_count - 7))
+        {
+            if (timespan < 30) {
+                nbShortTsLastNBlocks++;
+                lastTimeWasShort = true;
+                lastShortTimeInARaw++;
             } else {
-                max_timestamp = previous_max;
+                lastTimeWasShort = false;
+                lastShortTimeInARaw = 0;
             }
-
-            timespan = max_timestamp - previous_max;
-            if (timespan == 0) {
-                timespan = 1;
-            } else if (timespan > 11 * target_seconds) {
-                timespan = 11 * target_seconds;
-            }
-            if(i>=(length-7)) {
-                if(timespan < 30) {
-                    nbShortTsLastNBlocks ++;
-                    lastTimeWasShort = true;
-                    lastShortTimeInARaw ++;
-                } else {
-                    lastTimeWasShort = false;
-                    lastShortTimeInARaw=0;
-                }
-            }
-
-            weighted_timespans += i * timespan;
-            previous_max = max_timestamp;
-        }
-        // adjust faster if many blocks fount too fast
-
-        if(lastTimeWasShort) {
-        	
-        	// From 3 blocks amound latest previous ones, add malus with increase of 10% per short block fount 
-        	if(nbShortTsLastNBlocks >= 3) {
-        		weighted_timespans = weighted_timespans * (1-(0.10*(nbShortTsLastNBlocks-2)));
-        	}
-
-        	// add second mallus 5% if short block are latest in a raw
-        	if(lastShortTimeInARaw == nbShortTsLastNBlocks && lastShortTimeInARaw<7){
-        		weighted_timespans = weighted_timespans * 0.95;
-        	}
         }
 
-        // adjust = 0.99 for N=60, leaving the + 1 for now as it's not affecting N
-        target = 99 * (((length + 1) / 2) * target_seconds) / 100;
+        weighted_timespans += i * timespan;
+        prev_max_timestamp = max_timestamp;
     }
+    // adjust faster if many blocks found too fast
 
-    uint64_t minimum_timespan = target_seconds * length / 2;
+    if (lastTimeWasShort) {
+        // From 3 blocks amound latest previous ones, add malus with increase of 10% per short block fount
+        if (nbShortTsLastNBlocks >= 3) {
+            weighted_timespans = weighted_timespans * (1 - ((nbShortTsLastNBlocks - 2) / 10));
+        }
+        // add second mallus 5% if short block are latest in a raw
+        if (lastShortTimeInARaw == nbShortTsLastNBlocks && lastShortTimeInARaw < 7) {
+            weighted_timespans = weighted_timespans * 95 / 100;
+        }
+    }
+    // adjust = 0.99 for N=60, leaving the + 1 for now as it's not affecting N
+    target = 99 * (((timestamp_count + 1) / 2) * target_seconds) / 100;
+    /**
+     * end
+     */
+
+    uint64_t minimum_timespan = target_seconds * timestamp_count / 2;
     if (weighted_timespans < minimum_timespan) {
         weighted_timespans = minimum_timespan;
     }
@@ -411,7 +397,6 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
     mul(total_work, target, low, high);
 
     if (high != 0) {
-
         return 0;
     }
     return (low / weighted_timespans);
