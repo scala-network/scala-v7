@@ -323,6 +323,7 @@ difficulty_type next_difficulty_v3(std::vector<std::uint64_t> timestamps, std::v
 
 difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds) {
 
+
     if (timestamps.size() > DIFFICULTY_BLOCKS_COUNT_V4)
     {
         timestamps.resize(DIFFICULTY_BLOCKS_COUNT_V4);
@@ -335,55 +336,43 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
         return 1;
     }
 
+    uint64_t prev_max_timestamp = timestamps[0];
     uint64_t weighted_timespans = 0;
     uint64_t target;
-
-    int nbShortTsLastNBlocks = 0;
-    bool lastTimeWasShort = false;
-    int lastShortTimeInARaw = 0;
-
-
-    /**
-     * beg
-     */
-    uint64_t prev_max_timestamp = timestamps[0];
+    int short_time_count = 0;
+    int short_time_streak = 0;
+    bool last_was_short_time = false;
     for (size_t i = 1; i < timestamp_count; ++i) {
         uint64_t max_timestamp = std::max(prev_max_timestamp, timestamps[i]);
         uint64_t timespan = boost::algorithm::clamp<uint64_t>(max_timestamp - prev_max_timestamp, 1, 11 * target_seconds);
-
-        // not sure if I get this part
+        last_was_short_time = false;
         if (i >= (timestamp_count - 7))
         {
             if (timespan < 30) {
-                nbShortTsLastNBlocks++;
-                lastTimeWasShort = true;
-                lastShortTimeInARaw++;
+                short_time_count++;
+                short_time_streak++;
+                last_was_short_time = true;
             } else {
-                lastTimeWasShort = false;
-                lastShortTimeInARaw = 0;
+                short_time_streak = 0;
             }
         }
-
         weighted_timespans += i * timespan;
         prev_max_timestamp = max_timestamp;
     }
     // adjust faster if many blocks found too fast
 
-    if (lastTimeWasShort) {
+    if (last_was_short_time) {
         // From 3 blocks amound latest previous ones, add malus with increase of 10% per short block fount
-        if (nbShortTsLastNBlocks >= 3) {
-            weighted_timespans = weighted_timespans * (1 - ((nbShortTsLastNBlocks - 2) / 10));
+        if (short_time_count >= 3) {
+            weighted_timespans = weighted_timespans * (1 - ((short_time_count - 2) / 10));
         }
         // add second mallus 5% if short block are latest in a raw
-        if (lastShortTimeInARaw == nbShortTsLastNBlocks && lastShortTimeInARaw < 7) {
+        if (short_time_streak == short_time_count && short_time_streak < 7) {
             weighted_timespans = weighted_timespans * 95 / 100;
         }
     }
     // adjust = 0.99 for N=60, leaving the + 1 for now as it's not affecting N
     target = 99 * (((timestamp_count + 1) / 2) * target_seconds) / 100;
-    /**
-     * end
-     */
 
     uint64_t minimum_timespan = target_seconds * timestamp_count / 2;
     if (weighted_timespans < minimum_timespan) {

@@ -764,16 +764,15 @@ size_t offset = height - std::min < size_t >(height, static_cast<size_t>(difficu
   size_t target = DIFFICULTY_TARGET;
   //return get_current_hard_fork_version() < 2 ? next_difficulty(timestamps, difficulties, target) : next_difficulty_v3(timestamps, difficulties, target, true);
 
-  if(get_current_hard_fork_version() < 2){
+  if (get_current_hard_fork_version() < 2) {
     return next_difficulty(timestamps, difficulties, target);
   }
-  if(get_current_hard_fork_version() < 4){
+  if (get_current_hard_fork_version() < 4) {
     return next_difficulty_v3(timestamps, difficulties, target, true);
   }
-  else{
+  else {
     return next_difficulty_v4(timestamps, difficulties, target);
   }
-
 }
 //------------------------------------------------------------------
 // This function removes blocks from the blockchain until it gets to the
