@@ -319,10 +319,7 @@ difficulty_type next_difficulty_v3(std::vector<std::uint64_t> timestamps, std::v
     return low / weighted_timespans;
 }
 
-
-
 difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds) {
-
 
     if (timestamps.size() > DIFFICULTY_BLOCKS_COUNT_V4)
     {
