@@ -32,14 +32,17 @@
 #include <numeric>
 #include <boost/utility/value_init.hpp>
 #include <boost/interprocess/detail/atomic.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/limits.hpp>
-#include "misc_language.h"
 #include "include_base_utils.h"
+#include "misc_language.h"
+#include "syncobj.h"
 #include "cryptonote_basic_impl.h"
 #include "cryptonote_format_utils.h"
 #include "file_io_utils.h"
 #include "common/command_line.h"
 #include "string_coding.h"
+#include "string_tools.h"
 #include "storages/portable_storage_template_helper.h"
 #include "boost/logic/tribool.hpp"
 
@@ -228,11 +231,13 @@ namespace cryptonote
 
     if(command_line::has_arg(vm, arg_start_mining))
     {
-      if(!cryptonote::get_account_address_from_str(m_mine_address, testnet, command_line::get_arg(vm, arg_start_mining)))
+      address_parse_info info;
+      if(!cryptonote::get_account_address_from_str(info, testnet, command_line::get_arg(vm, arg_start_mining)) || info.is_subaddress)
       {
         LOG_ERROR("Target account address " << command_line::get_arg(vm, arg_start_mining) << " has wrong format, starting daemon canceled");
         return false;
       }
+      m_mine_address = info.address;
       m_threads_total = 1;
       m_do_mining = true;
       if(command_line::has_arg(vm, arg_mining_threads))
@@ -246,7 +251,7 @@ namespace cryptonote
     if(command_line::has_arg(vm, arg_bg_mining_enable))
       set_is_background_mining_enabled( command_line::get_arg(vm, arg_bg_mining_enable) );
     if(command_line::has_arg(vm, arg_bg_mining_ignore_battery))
-      set_ignore_battery( command_line::get_arg(vm, arg_bg_mining_ignore_battery) );      
+      set_ignore_battery( command_line::get_arg(vm, arg_bg_mining_ignore_battery) );
     if(command_line::has_arg(vm, arg_bg_mining_min_idle_interval_seconds))
       set_min_idle_seconds( command_line::get_arg(vm, arg_bg_mining_min_idle_interval_seconds) );
     if(command_line::has_arg(vm, arg_bg_mining_idle_threshold_percentage))

@@ -45,6 +45,8 @@ class TransactionHistoryImpl;
 class PendingTransactionImpl;
 class UnsignedTransactionImpl;
 class AddressBookImpl;
+class SubaddressImpl;
+class SubaddressAccountImpl;
 struct Wallet2CallbackImpl;
 
 class WalletImpl : public Wallet
@@ -63,6 +65,12 @@ public:
                             const std::string &address_string, 
                             const std::string &viewkey_string,
                             const std::string &spendkey_string = "");
+    bool recoverFromKeysWithPassword(const std::string &path,
+                                     const std::string &password,
+                                     const std::string &language,
+                                     const std::string &address_string,
+                                     const std::string &viewkey_string,
+                                     const std::string &spendkey_string = "");
     bool close();
     std::string seed() const;
     std::string getSeedLanguage() const;
@@ -71,7 +79,7 @@ public:
     int status() const;
     std::string errorString() const;
     bool setPassword(const std::string &password);
-    std::string address() const;
+    std::string address(uint32_t accountIndex = 0, uint32_t addressIndex = 0) const;
     std::string integratedAddress(const std::string &payment_id) const;
     std::string secretViewKey() const;
     std::string publicViewKey() const;
@@ -86,8 +94,8 @@ public:
     ConnectionStatus connected() const;
     void setTrustedDaemon(bool arg);
     bool trustedDaemon() const;
-    uint64_t balance() const;
-    uint64_t unlockedBalance() const;
+    uint64_t balance(uint32_t accountIndex = 0) const;
+    uint64_t unlockedBalance(uint32_t accountIndex = 0) const;
     uint64_t blockChainHeight() const;
     uint64_t approximateBlockChainHeight() const;
     uint64_t daemonBlockChainHeight() const;
@@ -106,9 +114,18 @@ public:
     void hardForkInfo(uint8_t &version, uint64_t &earliest_height) const;
     bool useForkRules(uint8_t version, int64_t early_blocks) const;
 
+    void addSubaddressAccount(const std::string& label);
+    size_t numSubaddressAccounts() const;
+    size_t numSubaddresses(uint32_t accountIndex) const;
+    void addSubaddress(uint32_t accountIndex, const std::string& label);
+    std::string getSubaddressLabel(uint32_t accountIndex, uint32_t addressIndex) const;
+    void setSubaddressLabel(uint32_t accountIndex, uint32_t addressIndex, const std::string &label);
+
     PendingTransaction * createTransaction(const std::string &dst_addr, const std::string &payment_id,
-                                        optional<uint64_t> amount, uint32_t mixin_count,
-                                        PendingTransaction::Priority priority = PendingTransaction::Priority_Low);
+                                           optional<uint64_t> amount, uint32_t mixin_count,
+                                           PendingTransaction::Priority priority = PendingTransaction::Priority_Low,
+                                           uint32_t subaddr_account = 0,
+                                           std::set<uint32_t> subaddr_indices = {});
     virtual PendingTransaction * createSweepUnmixableTransaction();
     bool submitTransaction(const std::string &fileName);
     virtual UnsignedTransaction * loadUnsignedTx(const std::string &unsigned_filename);
@@ -117,6 +134,8 @@ public:
 
     virtual void disposeTransaction(PendingTransaction * t);
     virtual TransactionHistory * history() const;
+    virtual Subaddress * subaddress();
+    virtual SubaddressAccount * subaddressAccount();
     virtual AddressBook * addressBook() const;
     virtual void setListener(WalletListener * l);
     virtual uint32_t defaultMixin() const;
@@ -135,6 +154,9 @@ public:
 
 private:
     void clearStatus() const;
+    void setStatusError(const std::string& message) const;
+    void setStatusCritical(const std::string& message) const;
+    void setStatus(int status, const std::string& message) const;
     void refreshThreadFunc();
     void doRefresh();
     bool daemonSynced() const;
@@ -148,8 +170,11 @@ private:
     friend class TransactionHistoryImpl;
     friend struct Wallet2CallbackImpl;
     friend class AddressBookImpl;
+    friend class SubaddressImpl;
+    friend class SubaddressAccountImpl;
 
     tools::wallet2 * m_wallet;
+    mutable boost::mutex m_statusMutex;
     mutable std::atomic<int>  m_status;
     mutable std::string m_errorString;
     std::string m_password;
@@ -158,6 +183,8 @@ private:
     WalletListener * m_walletListener;
     Wallet2CallbackImpl * m_wallet2Callback;
     AddressBookImpl *  m_addressBook;
+    SubaddressImpl *  m_subaddress;
+    SubaddressAccountImpl *  m_subaddressAccount;
 
     // multi-threaded refresh stuff
     std::atomic<bool> m_refreshEnabled;

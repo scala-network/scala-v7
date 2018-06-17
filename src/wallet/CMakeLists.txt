@@ -35,6 +35,8 @@ set(wallet_sources
   wallet_args.cpp
   node_rpc_proxy.cpp
   api/wallet.cpp
+  api/subaddress.cpp
+  api/subaddress_account.cpp
   api/wallet_manager.cpp
   api/transaction_info.cpp
   api/transaction_history.cpp
@@ -56,6 +58,8 @@ set(wallet_private_headers
   wallet_rpc_server_error_codes.h
   node_rpc_proxy.h
   api/wallet.h
+  api/subaddress.h
+  api/subaddress_account.cpp
   api/wallet_manager.h
   api/transaction_info.h
   api/transaction_history.h

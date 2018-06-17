@@ -159,6 +159,7 @@ namespace config
 
   uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 0x2419;
   uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 0x7096;
+  uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 42;
   uint16_t const P2P_DEFAULT_PORT = 20188;
   uint16_t const RPC_DEFAULT_PORT = 20189;
   boost::uuids::uuid const NETWORK_ID = { {
@@ -171,6 +172,7 @@ namespace config
   {
     uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 0x5520;
     uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 0xd3096;
+    uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 63;
     uint16_t const P2P_DEFAULT_PORT = 30188;
     uint16_t const RPC_DEFAULT_PORT = 30189;
     boost::uuids::uuid const NETWORK_ID = { {

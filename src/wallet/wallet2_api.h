@@ -35,6 +35,7 @@
 #include <vector>
 #include <ctime>
 #include <iostream>
+#include <set>
 
 //  Public interface for libwallet library
 namespace Monero {
@@ -223,6 +224,66 @@ struct AddressBook
     virtual int lookupPaymentID(const std::string &payment_id) const = 0;
 };
 
+    struct SubaddressRow {
+    public:
+        SubaddressRow(std::size_t _rowId, const std::string &_address, const std::string &_label):
+                m_rowId(_rowId),
+                m_address(_address),
+                m_label(_label) {}
+
+    private:
+        std::size_t m_rowId;
+        std::string m_address;
+        std::string m_label;
+    public:
+        std::string extra;
+        std::string getAddress() const {return m_address;}
+        std::string getLabel() const {return m_label;}
+        std::size_t getRowId() const {return m_rowId;}
+    };
+
+    struct Subaddress
+    {
+        virtual ~Subaddress() = 0;
+        virtual std::vector<SubaddressRow*> getAll() const = 0;
+        virtual void addRow(uint32_t accountIndex, const std::string &label) = 0;
+        virtual void setLabel(uint32_t accountIndex, uint32_t addressIndex, const std::string &label) = 0;
+        virtual void refresh(uint32_t accountIndex) = 0;
+    };
+
+    struct SubaddressAccountRow {
+    public:
+        SubaddressAccountRow(std::size_t _rowId, const std::string &_address, const std::string &_label, const std::string &_balance, const std::string &_unlockedBalance):
+                m_rowId(_rowId),
+                m_address(_address),
+                m_label(_label),
+                m_balance(_balance),
+                m_unlockedBalance(_unlockedBalance) {}
+
+    private:
+        std::size_t m_rowId;
+        std::string m_address;
+        std::string m_label;
+        std::string m_balance;
+        std::string m_unlockedBalance;
+    public:
+        std::string extra;
+        std::string getAddress() const {return m_address;}
+        std::string getLabel() const {return m_label;}
+        std::string getBalance() const {return m_balance;}
+        std::string getUnlockedBalance() const {return m_unlockedBalance;}
+        std::size_t getRowId() const {return m_rowId;}
+    };
+
+    struct SubaddressAccount
+    {
+        virtual ~SubaddressAccount() = 0;
+        virtual std::vector<SubaddressAccountRow*> getAll() const = 0;
+        virtual void addRow(const std::string &label) = 0;
+        virtual void setLabel(uint32_t accountIndex, const std::string &label) = 0;
+        virtual void refresh() = 0;
+    };
+
 struct WalletListener
 {
     virtual ~WalletListener() = 0;
@@ -294,7 +355,8 @@ struct Wallet
     //! in case error status, returns error string
     virtual std::string errorString() const = 0;
     virtual bool setPassword(const std::string &password) = 0;
-    virtual std::string address() const = 0;
+    virtual std::string address(uint32_t accountIndex = 0, uint32_t addressIndex = 0) const = 0;
+    std::string mainAddress() const { return address(0, 0); }
     virtual std::string path() const = 0;
     virtual bool testnet() const = 0;
     //! returns current hard fork info
@@ -406,8 +468,20 @@ struct Wallet
     virtual ConnectionStatus connected() const = 0;
     virtual void setTrustedDaemon(bool arg) = 0;
     virtual bool trustedDaemon() const = 0;
-    virtual uint64_t balance() const = 0;
-    virtual uint64_t unlockedBalance() const = 0;
+    virtual uint64_t balance(uint32_t accountIndex = 0) const = 0;
+    uint64_t balanceAll() const {
+        uint64_t result = 0;
+        for (uint32_t i = 0; i < numSubaddressAccounts(); ++i)
+            result += balance(i);
+        return result;
+    }
+    virtual uint64_t unlockedBalance(uint32_t accountIndex = 0) const = 0;
+    uint64_t unlockedBalanceAll() const {
+        uint64_t result = 0;
+        for (uint32_t i = 0; i < numSubaddressAccounts(); ++i)
+            result += unlockedBalance(i);
+        return result;
+    }
 
    /**
     * @brief watchOnly - checks if wallet is watch only
@@ -492,6 +566,39 @@ struct Wallet
      */
     virtual int autoRefreshInterval() const = 0;
 
+    /**
+     * @brief addSubaddressAccount - appends a new subaddress account at the end of the last major index of existing subaddress accounts
+     * @param label - the label for the new account (which is the as the label of the primary address (accountIndex,0))
+     */
+    virtual void addSubaddressAccount(const std::string& label) = 0;
+    /**
+     * @brief numSubaddressAccounts - returns the number of existing subaddress accounts
+     */
+    virtual size_t numSubaddressAccounts() const = 0;
+    /**
+     * @brief numSubaddresses - returns the number of existing subaddresses associated with the specified subaddress account
+     * @param accountIndex - the major index specifying the subaddress account
+     */
+    virtual size_t numSubaddresses(uint32_t accountIndex) const = 0;
+    /**
+     * @brief addSubaddress - appends a new subaddress at the end of the last minor index of the specified subaddress account
+     * @param accountIndex - the major index specifying the subaddress account
+     * @param label - the label for the new subaddress
+     */
+    virtual void addSubaddress(uint32_t accountIndex, const std::string& label) = 0;
+    /**
+     * @brief getSubaddressLabel - gets the label of the specified subaddress
+     * @param accountIndex - the major index specifying the subaddress account
+     * @param addressIndex - the minor index specifying the subaddress
+     */
+    virtual std::string getSubaddressLabel(uint32_t accountIndex, uint32_t addressIndex) const = 0;
+    /**
+     * @brief setSubaddressLabel - sets the label of the specified subaddress
+     * @param accountIndex - the major index specifying the subaddress account
+     * @param addressIndex - the minor index specifying the subaddress
+     * @param label - the new label for the specified subaddress
+     */
+    virtual void setSubaddressLabel(uint32_t accountIndex, uint32_t addressIndex, const std::string &label) = 0;
 
     /*!
      * \brief createTransaction creates transaction. if dst_addr is an integrated address, payment_id is ignored
@@ -506,7 +613,9 @@ struct Wallet
 
     virtual PendingTransaction * createTransaction(const std::string &dst_addr, const std::string &payment_id,
                                                    optional<uint64_t> amount, uint32_t mixin_count,
-                                                   PendingTransaction::Priority = PendingTransaction::Priority_Low) = 0;
+                                                   PendingTransaction::Priority = PendingTransaction::Priority_Low,
+                                                   uint32_t subaddr_account = 0,
+                                                   std::set<uint32_t> subaddr_indices = {}) = 0;
 
     /*!
      * \brief createSweepUnmixableTransaction creates transaction with unmixable outputs.
@@ -553,6 +662,8 @@ struct Wallet
 
     virtual TransactionHistory * history() const = 0;
     virtual AddressBook * addressBook() const = 0;
+    virtual Subaddress * subaddress() = 0;
+    virtual SubaddressAccount * subaddressAccount() = 0;
     virtual void setListener(WalletListener *) = 0;
     /*!
      * \brief defaultMixin - returns number of mixins used in transactions
@@ -694,19 +805,6 @@ struct WalletManager
      */
     virtual std::vector<std::string> findWallets(const std::string &path) = 0;
 
-    /*!
-     * \brief checkPayment - checks a payment was made using a txkey
-     * \param address - the address the payment was sent to
-     * \param txid - the transaction id for that payment
-     * \param txkey - the transaction's secret key
-     * \param daemon_address - the address (host and port) to the daemon to request transaction data
-     * \param received - if succesful, will hold the amount of monero received
-     * \param height - if succesful, will hold the height of the transaction (0 if only in the pool)
-     * \param error - if unsuccesful, will hold an error string with more information about the error
-     * \return - true is succesful, false otherwise
-     */
-    virtual bool checkPayment(const std::string &address, const std::string &txid, const std::string &txkey, const std::string &daemon_address, uint64_t &received, uint64_t &height, std::string &error) const = 0;
-
     //! returns verbose error string regarding last error;
     virtual std::string errorString() const = 0;
 
@@ -748,25 +846,24 @@ struct WalletManager
 };
 
 
-struct WalletManagerFactory
-{
-    // logging levels for underlying library
-    enum LogLevel {
-        LogLevel_Silent = -1,
-        LogLevel_0 = 0,
-        LogLevel_1 = 1,
-        LogLevel_2 = 2,
-        LogLevel_3 = 3,
-        LogLevel_4 = 4,
-        LogLevel_Min = LogLevel_Silent,
-        LogLevel_Max = LogLevel_4
+    struct WalletManagerFactory
+    {
+        // logging levels for underlying library
+        enum LogLevel {
+            LogLevel_Silent = -1,
+            LogLevel_0 = 0,
+            LogLevel_1 = 1,
+            LogLevel_2 = 2,
+            LogLevel_3 = 3,
+            LogLevel_4 = 4,
+            LogLevel_Min = LogLevel_Silent,
+            LogLevel_Max = LogLevel_4
+        };
+
+        static WalletManager * getWalletManager();
+        static void setLogLevel(int level);
+        static void setLogCategories(const std::string &categories);
     };
-
-    static WalletManager * getWalletManager();
-    static void setLogLevel(int level);
-    static void setLogCategories(const std::string &categories);
-};
-
 
 }
 

@@ -50,6 +50,20 @@
 #define DEFAULT_MAX_CONCURRENCY 0
 #endif
 
+namespace
+{
+    class Print
+    {
+    public:
+        Print(const std::function<void(const std::string&, bool)> &p, bool em = false): print(p), emphasis(em) {}
+        ~Print() { print(ss.str(), emphasis); }
+        template<typename T> std::ostream &operator<<(const T &t) { ss << t; return ss; }
+    private:
+        const std::function<void(const std::string&, bool)> &print;
+        std::stringstream ss;
+        bool emphasis;
+    };
+}
 
 namespace wallet_args
 {

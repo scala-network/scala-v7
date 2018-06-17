@@ -36,7 +36,6 @@
 #include <cstring>  // memcmp
 #include <sstream>
 #include <atomic>
-#include "serialization/serialization.h"
 #include "serialization/variant.h"
 #include "serialization/vector.h"
 #include "serialization/binary_archive.h"
@@ -50,14 +49,10 @@
 #include "misc_language.h"
 #include "tx_extra.h"
 #include "ringct/rctTypes.h"
+#include "device/device.hpp"
 
 namespace cryptonote
 {
-
-  const static crypto::hash null_hash = AUTO_VAL_INIT(null_hash);
-  const static crypto::hash8 null_hash8 = AUTO_VAL_INIT(null_hash8);
-  const static crypto::public_key null_pkey = AUTO_VAL_INIT(null_pkey);
-
   typedef std::vector<crypto::signature> ring_signature;
 
 
@@ -416,6 +411,17 @@ namespace cryptonote
       KV_SERIALIZE_VAL_POD_AS_BLOB_FORCE(m_spend_public_key)
       KV_SERIALIZE_VAL_POD_AS_BLOB_FORCE(m_view_public_key)
     END_KV_SERIALIZE_MAP()
+
+      bool operator==(const account_public_address& rhs) const
+      {
+        return m_spend_public_key == rhs.m_spend_public_key &&
+               m_view_public_key == rhs.m_view_public_key;
+      }
+
+      bool operator!=(const account_public_address& rhs) const
+      {
+        return !(*this == rhs);
+      }
   };
 
   struct keypair

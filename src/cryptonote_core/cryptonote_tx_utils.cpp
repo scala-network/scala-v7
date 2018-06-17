@@ -321,17 +321,17 @@ namespace cryptonote
 
       std::stringstream ss_ring_s;
       size_t i = 0;
-      for(const tx_source_entry& src_entr:  sources)
+      for (const tx_source_entry& src_entr:  sources)
       {
         ss_ring_s << "pub_keys:" << ENDL;
         std::vector<const crypto::public_key*> keys_ptrs;
         std::vector<crypto::public_key> keys(src_entr.outputs.size());
         size_t ii = 0;
-        for(const tx_source_entry::output_entry& o: src_entr.outputs)
+        for (const tx_source_entry::output_entry& o: src_entr.outputs)
         {
           keys[ii] = rct2pk(o.second.dest);
           keys_ptrs.push_back(&keys[ii]);
-          ss_ring_s << o.second.dest << ENDL;
+          //ss_ring_s << o.second.dest << ENDL;
           ++ii;
         }
 

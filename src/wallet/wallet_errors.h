@@ -267,6 +267,28 @@ namespace tools
       {
       }
     };
+      //----------------------------------------------------------------------------------------------------
+      struct index_outofbound : public wallet_logic_error
+      {
+          explicit index_outofbound(std::string&& loc, const std::string& message)
+                  : wallet_logic_error(std::move(loc), message)
+          {
+          }
+      };
+      struct account_index_outofbound : public index_outofbound
+      {
+          explicit account_index_outofbound(std::string&& loc)
+                  : index_outofbound(std::move(loc), "account index is out of bound")
+          {
+          }
+      };
+      struct address_index_outofbound: public index_outofbound
+      {
+          explicit address_index_outofbound(std::string&& loc)
+                  : index_outofbound(std::move(loc), "address index is out of bound")
+          {
+          }
+      };
     //----------------------------------------------------------------------------------------------------
     struct acc_outs_lookup_error : public refresh_error
     {
@@ -355,6 +377,32 @@ namespace tools
     };
     //----------------------------------------------------------------------------------------------------
     typedef failed_rpc_request<transfer_error, get_random_outs_error_message_index> get_random_outs_error;
+      //----------------------------------------------------------------------------------------------------
+      struct not_enough_unlocked_money : public transfer_error
+      {
+          explicit not_enough_unlocked_money(std::string&& loc, uint64_t available, uint64_t tx_amount, uint64_t fee)
+                  : transfer_error(std::move(loc), "not enough unlocked money")
+                  , m_available(available)
+                  , m_tx_amount(tx_amount)
+          {
+          }
+
+          uint64_t available() const { return m_available; }
+          uint64_t tx_amount() const { return m_tx_amount; }
+
+          std::string to_string() const
+          {
+              std::ostringstream ss;
+              ss << transfer_error::to_string() <<
+                 ", available = " << cryptonote::print_money(m_available) <<
+                 ", tx_amount = " << cryptonote::print_money(m_tx_amount);
+              return ss.str();
+          }
+
+      private:
+          uint64_t m_available;
+          uint64_t m_tx_amount;
+      };
     //----------------------------------------------------------------------------------------------------
     struct not_enough_money : public transfer_error
     {
@@ -492,7 +540,7 @@ namespace tools
         for (size_t i = 0; i < m_destinations.size(); ++i)
         {
           const cryptonote::tx_destination_entry& dst = m_destinations[i];
-          ss << "\n  " << i << ": " << cryptonote::get_account_address_as_str(m_testnet, dst.addr) << " " <<
+          ss << "\n  " << i << ": " << cryptonote::get_account_address_as_str(m_testnet, dst.is_subaddress, dst.addr) << " " <<
             cryptonote::print_money(dst.amount);
         }
 
@@ -567,7 +615,7 @@ namespace tools
           ", destinations:";
         for (const auto& dst : m_destinations)
         {
-          ss << '\n' << cryptonote::print_money(dst.amount) << " -> " << cryptonote::get_account_address_as_str(m_testnet, dst.addr);
+          ss << '\n' << cryptonote::print_money(dst.amount) << " -> " << cryptonote::get_account_address_as_str(m_testnet, dst.is_subaddress, dst.addr);
         }
         return ss.str();
       }

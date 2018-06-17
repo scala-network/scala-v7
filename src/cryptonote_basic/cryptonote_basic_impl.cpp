@@ -164,11 +164,13 @@ namespace cryptonote {
   //-----------------------------------------------------------------------
   std::string get_account_address_as_str(
       bool testnet
+    , bool subaddress
     , account_public_address const & adr
     )
   {
     uint64_t address_prefix = testnet ?
-      config::testnet::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX : config::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX;
+                              (subaddress ? config::testnet::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX : config::testnet::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX) :
+                              (subaddress ? config::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX : config::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX);
 
     return tools::base58::encode_addr(address_prefix, t_serializable_object_to_blob(adr));
   }

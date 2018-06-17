@@ -42,12 +42,16 @@ namespace cryptonote
     account_public_address m_account_address;
     crypto::secret_key   m_spend_secret_key;
     crypto::secret_key   m_view_secret_key;
+    hw::device *m_device = &hw::get_device("default");
 
-    BEGIN_KV_SERIALIZE_MAP()
+  BEGIN_KV_SERIALIZE_MAP()
       KV_SERIALIZE(m_account_address)
       KV_SERIALIZE_VAL_POD_AS_BLOB_FORCE(m_spend_secret_key)
       KV_SERIALIZE_VAL_POD_AS_BLOB_FORCE(m_view_secret_key)
     END_KV_SERIALIZE_MAP()
+
+      hw::device& get_device() const;
+      void set_device( hw::device &hwdev);
   };
 
   /************************************************************************/
@@ -63,6 +67,9 @@ namespace cryptonote
     const account_keys& get_keys() const;
     std::string get_public_address_str(bool testnet) const;
     std::string get_public_integrated_address_str(const crypto::hash8 &payment_id, bool testnet) const;
+
+    hw::device& get_device() const  { return m_keys.get_device(); }
+    void set_device( hw::device &hwdev) { m_keys.set_device(hwdev); }
 
     uint64_t get_createtime() const { return m_creation_timestamp; }
     void set_createtime(uint64_t val) { m_creation_timestamp = val; }

@@ -8,7 +8,7 @@ Public domain.
 #include <stdio.h>
 #include <sys/param.h>
 
-#include "chacha8.h"
+#include "chacha.h"
 #include "common/int-util.h"
 #include "warnings.h"
 

@@ -31,12 +31,21 @@
 #pragma once
 
 #include <cstddef>
+#include <iostream>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/lock_guard.hpp>
+#include <boost/utility/value_init.hpp>
+#include <boost/utility/value_init.hpp>
+#include <boost/optional.hpp>
+#include <type_traits>
 #include <vector>
 
 #include "common/pod-class.h"
+#include "common/util.h"
+#include "memwipe.h"
 #include "generic-ops.h"
+#include "hex.h"
+#include "span.h"
 #include "hash.h"
 
 namespace crypto {
@@ -94,7 +103,9 @@ namespace crypto {
   };
 #pragma pack(pop)
 
-  static_assert(sizeof(ec_point) == 32 && sizeof(ec_scalar) == 32 &&
+    //void hash_to_scalar(const void *data, size_t length, ec_scalar &res);
+
+    static_assert(sizeof(ec_point) == 32 && sizeof(ec_scalar) == 32 &&
     sizeof(public_key) == 32 && sizeof(secret_key) == 32 &&
     sizeof(key_derivation) == 32 && sizeof(key_image) == 32 &&
     sizeof(signature) == 64, "Invalid structure size");
@@ -139,7 +150,9 @@ namespace crypto {
       const public_key *const *, std::size_t, const signature *);
   };
 
-  /* Generate N random bytes
+    void generate_random_bytes_thread_safe(size_t N, uint8_t *bytes);
+
+    /* Generate N random bytes
    */
   inline void rand(size_t N, uint8_t *bytes) {
     boost::lock_guard<boost::mutex> lock(random_lock);
@@ -248,8 +261,28 @@ namespace crypto {
     const signature *sig) {
     return check_ring_signature(prefix_hash, image, pubs.data(), pubs.size(), sig);
   }
+
+    inline std::ostream &operator <<(std::ostream &o, const crypto::public_key &v) {
+      epee::to_hex::formatted(o, epee::as_byte_span(v)); return o;
+    }
+    inline std::ostream &operator <<(std::ostream &o, const crypto::secret_key &v) {
+      epee::to_hex::formatted(o, epee::as_byte_span(v)); return o;
+    }
+    inline std::ostream &operator <<(std::ostream &o, const crypto::key_derivation &v) {
+      epee::to_hex::formatted(o, epee::as_byte_span(v)); return o;
+    }
+    inline std::ostream &operator <<(std::ostream &o, const crypto::key_image &v) {
+      epee::to_hex::formatted(o, epee::as_byte_span(v)); return o;
+    }
+    inline std::ostream &operator <<(std::ostream &o, const crypto::signature &v) {
+      epee::to_hex::formatted(o, epee::as_byte_span(v)); return o;
+    }
+
+    const static crypto::public_key null_pkey = boost::value_initialized<crypto::public_key>();
+    const static crypto::secret_key null_skey = boost::value_initialized<crypto::secret_key>();
 }
 
 CRYPTO_MAKE_HASHABLE(public_key)
+CRYPTO_MAKE_HASHABLE(secret_key)
 CRYPTO_MAKE_HASHABLE(key_image)
 CRYPTO_MAKE_COMPARABLE(signature)
