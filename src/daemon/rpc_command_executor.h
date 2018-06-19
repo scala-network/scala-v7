@@ -6,7 +6,7 @@
 
 */
 
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -95,7 +95,7 @@ public:
 
   bool print_block_by_height(uint64_t height);
 
-  bool print_transaction(crypto::hash transaction_hash);
+  bool print_transaction(crypto::hash transaction_hash, bool include_hex, bool include_json);
 
   bool is_key_image_spent(const crypto::key_image &ki);
 
@@ -105,7 +105,7 @@ public:
 
   bool print_transaction_pool_stats();
 
-  bool start_mining(cryptonote::account_public_address address, uint64_t num_threads, bool testnet, bool do_background_mining = false, bool ignore_battery = false);
+  bool start_mining(cryptonote::account_public_address address, uint64_t num_threads, cryptonote::network_type nettype, bool do_background_mining = false, bool ignore_battery = false);
 
   bool stop_mining();
 
@@ -119,14 +119,12 @@ public:
 
   bool get_limit_down();
 
-  bool set_limit(int limit);
-
-  bool set_limit_up(int limit);
-
-  bool set_limit_down(int limit);
+  bool set_limit(int64_t limit_down, int64_t limit_up);
 
   bool out_peers(uint64_t limit);
-  
+
+  bool in_peers(uint64_t limit);
+
   bool start_save_graph();
   
   bool stop_save_graph();
@@ -141,7 +139,7 @@ public:
 
   bool flush_txpool(const std::string &txid);
 
-  bool output_histogram(uint64_t min_count, uint64_t max_count);
+  bool output_histogram(const std::vector<uint64_t> &amounts, uint64_t min_count, uint64_t max_count);
 
   bool print_coinbase_tx_sum(uint64_t height, uint64_t count);
 

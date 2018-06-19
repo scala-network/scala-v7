@@ -1,6 +1,6 @@
 // Word list created by Monero contributor Shrikez
 // 
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -51,7 +51,7 @@ namespace Language
   class Italian: public Base
   {
   public:
-    Italian(): Base("Italiano", std::vector<std::string>({
+    Italian(): Base("Italiano", "Italian", std::vector<std::string>({
         "abbinare",
         "abbonato",
         "abisso",

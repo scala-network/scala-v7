@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -46,6 +46,11 @@ bool isAddressLocal(const std::string &address)
         MERROR("error: " << e.what());
         return false;
     }
+}
+
+void onStartup()
+{
+    tools::on_startup();
 }
 
 }

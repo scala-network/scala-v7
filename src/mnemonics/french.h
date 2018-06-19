@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -49,7 +49,7 @@ namespace Language
   class French: public Base
   {
   public:
-    French(): Base("Français", std::vector<std::string>({
+    French(): Base("Français", "French", std::vector<std::string>({
         "abandon",
         "abattre",
         "aboi",

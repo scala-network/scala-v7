@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, The Monero Project
+# Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
 #
@@ -27,14 +27,16 @@
 # THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 set(unit_tests_sources
+  apply_permutation.cpp
   address_from_url.cpp
   ban.cpp
   base58.cpp
   blockchain_db.cpp
   block_queue.cpp
   block_reward.cpp
+  bulletproofs.cpp
   canonical_amounts.cpp
-  chacha8.cpp
+  chacha.cpp
   checkpoints.cpp
   command_line.cpp
   crypto.cpp
@@ -45,24 +47,30 @@ set(unit_tests_sources
   epee_utils.cpp
   fee.cpp
   get_xtype_from_string.cpp
+  hashchain.cpp
   http.cpp
   main.cpp
+  memwipe.cpp
   mnemonics.cpp
   mul_div.cpp
+  multisig.cpp
   parse_amount.cpp
   serialization.cpp
+  sha256.cpp
   slow_memmem.cpp
+  subaddress.cpp
   test_tx_utils.cpp
   test_peerlist.cpp
   test_protocol_pack.cpp
-  thread_group.cpp
+  threadpool.cpp
   hardfork.cpp
   unbound.cpp
   uri.cpp
   varint.cpp
   ringct.cpp
   output_selection.cpp
-  vercmp.cpp)
+  vercmp.cpp
+  ringdb.cpp)
 
 set(unit_tests_headers
   unit_tests_utils.h)
@@ -79,6 +87,7 @@ target_link_libraries(unit_tests
     rpc
     wallet
     p2p
+    version
     epee
     ${Boost_CHRONO_LIBRARY}
     ${Boost_THREAD_LIBRARY}
@@ -96,6 +105,10 @@ if (NOT MSVC)
       COMPILE_FLAGS " -Wno-undef -Wno-sign-compare")
 endif ()
 
+SET_PROPERTY(SOURCE main.cpp PROPERTY COMPILE_FLAGS -DDEFAULT_DATA_DIR="\\"${CMAKE_SOURCE_DIR}/tests/data\\"")
+
+SET_PROPERTY(SOURCE memwipe.cpp PROPERTY COMPILE_FLAGS -Ofast)
+
 add_test(
   NAME    unit_tests
-  COMMAND unit_tests)
+  COMMAND unit_tests --data-dir "${TEST_DATA_DIR}")

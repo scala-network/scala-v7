@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -36,11 +36,10 @@
 #include <boost/program_options/variables_map.hpp>
 #include <boost/interprocess/sync/file_lock.hpp>
 
-#include "p2p/net_node_common.h"
 #include "cryptonote_protocol/cryptonote_protocol_handler_common.h"
 #include "storages/portable_storage_template_helper.h"
 #include "common/download.h"
-#include "common/thread_group.h"
+#include "common/command_line.h"
 #include "tx_pool.h"
 #include "blockchain.h"
 #include "cryptonote_basic/miner.h"
@@ -57,6 +56,11 @@ namespace cryptonote
    struct test_options {
      const std::pair<uint8_t, uint64_t> *hard_forks;
    };
+
+  extern const command_line::arg_descriptor<std::string, false, true, 2> arg_data_dir;
+  extern const command_line::arg_descriptor<bool, false> arg_testnet_on;
+  extern const command_line::arg_descriptor<bool, false> arg_stagenet_on;
+  extern const command_line::arg_descriptor<bool> arg_offline;
 
   /************************************************************************/
   /*                                                                      */
@@ -236,11 +240,12 @@ namespace cryptonote
       * a miner instance with parameters given on the command line (or defaults)
       *
       * @param vm command line parameters
+      * @param config_subdir subdirectory for config storage
       * @param test_options configuration options for testing
       *
       * @return false if one of the init steps fails, otherwise true
       */
-     bool init(const boost::program_options::variables_map& vm, const test_options *test_options = NULL);
+     bool init(const boost::program_options::variables_map& vm, const char *config_subdir = NULL, const test_options *test_options = NULL);
 
      /**
       * @copydoc Blockchain::reset_and_set_genesis_block
@@ -299,10 +304,8 @@ namespace cryptonote
       *
       * @param height return-by-reference height of the block
       * @param top_id return-by-reference hash of the block
-      *
-      * @return true
       */
-     bool get_blockchain_top(uint64_t& height, crypto::hash& top_id) const;
+     void get_blockchain_top(uint64_t& height, crypto::hash& top_id) const;
 
      /**
       * @copydoc Blockchain::get_blocks(uint64_t, size_t, std::list<std::pair<cryptonote::blobdata,block>>&, std::list<transaction>&) const
@@ -422,11 +425,12 @@ namespace cryptonote
 
      /**
       * @copydoc tx_memory_pool::get_transactions
+      * @param include_unrelayed_txes include unrelayed txes in result
       *
       * @note see tx_memory_pool::get_transactions
       */
-     bool get_pool_transactions(std::list<transaction>& txs) const;
-     
+     bool get_pool_transactions(std::list<transaction>& txs, bool include_unrelayed_txes = true) const;
+
      /**
       * @copydoc tx_memory_pool::get_txpool_backlog
       *
@@ -436,17 +440,19 @@ namespace cryptonote
      
      /**
       * @copydoc tx_memory_pool::get_transactions
+      * @param include_unrelayed_txes include unrelayed txes in result
       *
       * @note see tx_memory_pool::get_transactions
       */
-     bool get_pool_transaction_hashes(std::vector<crypto::hash>& txs) const;
+     bool get_pool_transaction_hashes(std::vector<crypto::hash>& txs, bool include_unrelayed_txes = true) const;
 
      /**
       * @copydoc tx_memory_pool::get_transactions
+      * @param include_unrelayed_txes include unrelayed txes in result
       *
       * @note see tx_memory_pool::get_transactions
       */
-     bool get_pool_transaction_stats(struct txpool_stats& stats) const;
+     bool get_pool_transaction_stats(struct txpool_stats& stats, bool include_unrelayed_txes = true) const;
 
      /**
       * @copydoc tx_memory_pool::get_transaction
@@ -457,10 +463,18 @@ namespace cryptonote
 
      /**
       * @copydoc tx_memory_pool::get_pool_transactions_and_spent_keys_info
+      * @param include_unrelayed_txes include unrelayed txes in result
       *
       * @note see tx_memory_pool::get_pool_transactions_and_spent_keys_info
       */
-     bool get_pool_transactions_and_spent_keys_info(std::vector<tx_info>& tx_infos, std::vector<spent_key_image_info>& key_image_infos) const;
+     bool get_pool_transactions_and_spent_keys_info(std::vector<tx_info>& tx_infos, std::vector<spent_key_image_info>& key_image_infos, bool include_unrelayed_txes = true) const;
+
+     /**
+      * @copydoc tx_memory_pool::get_pool_for_rpc
+      *
+      * @note see tx_memory_pool::get_pool_for_rpc
+      */
+     bool get_pool_for_rpc(std::vector<cryptonote::rpc::tx_in_pool>& tx_infos, cryptonote::rpc::key_images_with_tx_hashes& key_image_infos) const;
 
      /**
       * @copydoc tx_memory_pool::get_transactions_count
@@ -502,7 +516,7 @@ namespace cryptonote
       *
       * @note see Blockchain::find_blockchain_supplement(const uint64_t, const std::list<crypto::hash>&, std::list<std::pair<cryptonote::blobdata, std::list<transaction> > >&, uint64_t&, uint64_t&, size_t) const
       */
-     bool find_blockchain_supplement(const uint64_t req_start_block, const std::list<crypto::hash>& qblock_ids, std::list<std::pair<cryptonote::blobdata, std::list<cryptonote::blobdata> > >& blocks, uint64_t& total_height, uint64_t& start_height, size_t max_count) const;
+     bool find_blockchain_supplement(const uint64_t req_start_block, const std::list<crypto::hash>& qblock_ids, std::list<std::pair<cryptonote::blobdata, std::list<cryptonote::blobdata> > >& blocks, uint64_t& total_height, uint64_t& start_height, bool pruned, size_t max_count) const;
 
      /**
       * @brief gets some stats about the daemon
@@ -556,6 +570,12 @@ namespace cryptonote
       */
      bool get_random_rct_outs(const COMMAND_RPC_GET_RANDOM_RCT_OUTPUTS::request& req, COMMAND_RPC_GET_RANDOM_RCT_OUTPUTS::response& res) const;
 
+     /**
+      * @copydoc Blockchain::get_output_distribution
+      *
+      * @brief get per block distribution of outputs of a given amount
+      */
+     bool get_output_distribution(uint64_t amount, uint64_t from_height, uint64_t to_height, uint64_t &start_height, std::vector<uint64_t> &distribution, uint64_t &base) const;
 
      /**
       * @copydoc miner::pause
@@ -586,32 +606,11 @@ namespace cryptonote
      const Blockchain& get_blockchain_storage()const{return m_blockchain_storage;}
 
      /**
-      * @copydoc Blockchain::print_blockchain
-      *
-      * @note see Blockchain::print_blockchain
-      */
-     void print_blockchain(uint64_t start_index, uint64_t end_index) const;
-
-     /**
-      * @copydoc Blockchain::print_blockchain_index
-      *
-      * @note see Blockchain::print_blockchain_index
-      */
-     void print_blockchain_index() const;
-
-     /**
       * @copydoc tx_memory_pool::print_pool
       *
       * @note see tx_memory_pool::print_pool
       */
      std::string print_pool(bool short_format) const;
-
-     /**
-      * @copydoc Blockchain::print_blockchain_outs
-      *
-      * @note see Blockchain::print_blockchain_outs
-      */
-     void print_blockchain_outs(const std::string& file);
 
      /**
       * @copydoc miner::on_synchronized
@@ -642,6 +641,13 @@ namespace cryptonote
      uint64_t get_target_blockchain_height() const;
 
      /**
+      * @brief returns the newest hardfork version known to the blockchain
+      *
+      * @return the version
+      */
+     uint8_t get_ideal_hard_fork_version() const;
+
+     /**
       * @brief return the ideal hard fork version for a given block height
       *
       * @return what it says above
@@ -654,6 +660,13 @@ namespace cryptonote
       * @return what it says above
       */
      uint8_t get_hard_fork_version(uint64_t height) const;
+
+     /**
+      * @brief return the earliest block a given version may activate
+      *
+      * @return what it says above
+      */
+     uint64_t get_earliest_ideal_height_for_version(uint8_t version) const;
 
      /**
       * @brief gets start_time
@@ -708,6 +721,16 @@ namespace cryptonote
      bool are_key_images_spent(const std::vector<crypto::key_image>& key_im, std::vector<bool> &spent) const;
 
      /**
+      * @brief check if multiple key images are spent in the transaction pool
+      *
+      * @param key_im list of key images to check
+      * @param spent return-by-reference result for each image checked
+      *
+      * @return true
+      */
+     bool are_key_images_spent_in_pool(const std::vector<crypto::key_image>& key_im, std::vector<bool> &spent) const;
+
+     /**
       * @brief get the number of blocks to sync in one go
       *
       * @return the number of blocks to sync in one go
@@ -722,11 +745,11 @@ namespace cryptonote
      std::pair<uint64_t, uint64_t> get_coinbase_tx_sum(const uint64_t start_offset, const size_t count);
      
      /**
-      * @brief get whether we're on testnet or not
+      * @brief get the network type we're on
       *
-      * @return are we on testnet?
+      * @return which network are we on?
       */     
-     bool get_testnet() const { return m_testnet; };
+     network_type get_nettype() const { return m_nettype; };
 
      /**
       * @brief get whether fluffy blocks are enabled
@@ -734,6 +757,27 @@ namespace cryptonote
       * @return whether fluffy blocks are enabled
       */
      bool fluffy_blocks_enabled() const { return m_fluffy_blocks_enabled; }
+
+     /**
+      * @brief check a set of hashes against the precompiled hash set
+      *
+      * @return number of usable blocks
+      */
+     uint64_t prevalidate_block_hashes(uint64_t height, const std::list<crypto::hash> &hashes);
+
+     /**
+      * @brief get free disk space on the blockchain partition
+      *
+      * @return free space in bytes
+      */
+     uint64_t get_free_space() const;
+
+     /**
+      * @brief get whether the core is running offline
+      *
+      * @return whether the core is running offline
+      */
+     bool offline() const { return m_offline; }
 
    private:
 
@@ -894,6 +938,13 @@ namespace cryptonote
       */
      bool check_updates();
 
+     /**
+      * @brief checks free disk space
+      *
+      * @return true on success, false otherwise
+      */
+     bool check_disk_space();
+
      bool m_test_drop_download = true; //!< whether or not to drop incoming blocks (for testing)
 
      uint64_t m_test_drop_download_height = 0; //!< height under which to drop incoming blocks, if doing so
@@ -917,14 +968,13 @@ namespace cryptonote
      epee::math_helper::once_a_time_seconds<60*60*2, true> m_fork_moaner; //!< interval for checking HardFork status
      epee::math_helper::once_a_time_seconds<60*2, false> m_txpool_auto_relayer; //!< interval for checking re-relaying txpool transactions
      epee::math_helper::once_a_time_seconds<60*60*12, true> m_check_updates_interval; //!< interval for checking for new versions
+     epee::math_helper::once_a_time_seconds<60*10, true> m_check_disk_space_interval; //!< interval for checking for disk space
 
      std::atomic<bool> m_starter_message_showed; //!< has the "daemon will sync now" message been shown?
 
      uint64_t m_target_blockchain_height; //!< blockchain height target
 
-     bool m_testnet; //!< are we on testnet?
-
-     bool m_fakechain; //!< are we using a fake chain (for testing purposes)?
+     network_type m_nettype; //!< which network are we on?
 
      std::string m_checkpoints_path; //!< path to json checkpoints file
      time_t m_last_dns_checkpoints_update; //!< time when dns checkpoints were last updated
@@ -940,8 +990,6 @@ namespace cryptonote
      std::unordered_set<crypto::hash> bad_semantics_txes[2];
      boost::mutex bad_semantics_txes_lock;
 
-     tools::thread_group m_threadpool;
-
      enum {
        UPDATES_DISABLED,
        UPDATES_NOTIFY,
@@ -954,6 +1002,7 @@ namespace cryptonote
      boost::mutex m_update_mutex;
 
      bool m_fluffy_blocks_enabled;
+     bool m_offline;
    };
 }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -47,64 +47,79 @@ namespace epee {
     unsigned int g_test_dbg_lock_sleep = 0;
 }
 
-namespace {
-    template<typename Request, typename Response>
-    bool connect_and_invoke(const std::string& address, const std::string& path, const Request& request, Response& response)
-    {
-        epee::net_utils::http::http_simple_client client{};
-        return client.set_server(address, boost::none) && epee::net_utils::invoke_http_json(path, request, response, client);
-    }
-}
-
 namespace Monero {
 
 Wallet *WalletManagerImpl::createWallet(const std::string &path, const std::string &password,
-                                    const std::string &language, bool testnet)
+                                    const std::string &language, NetworkType nettype)
 {
-    WalletImpl * wallet = new WalletImpl(testnet);
+    WalletImpl * wallet = new WalletImpl(nettype);
     wallet->create(path, password, language);
     return wallet;
 }
 
-Wallet *WalletManagerImpl::openWallet(const std::string &path, const std::string &password, bool testnet)
+Wallet *WalletManagerImpl::openWallet(const std::string &path, const std::string &password, NetworkType nettype)
 {
-    WalletImpl * wallet = new WalletImpl(testnet);
+    WalletImpl * wallet = new WalletImpl(nettype);
     wallet->open(path, password);
     //Refresh addressBook
     wallet->addressBook()->refresh(); 
     return wallet;
 }
 
-Wallet *WalletManagerImpl::recoveryWallet(const std::string &path, const std::string &memo, bool testnet, uint64_t restoreHeight)
+Wallet *WalletManagerImpl::recoveryWallet(const std::string &path, const std::string &mnemonic, NetworkType nettype, uint64_t restoreHeight)
 {
-    WalletImpl * wallet = new WalletImpl(testnet);
-    if(restoreHeight > 0){
-        wallet->setRefreshFromBlockHeight(restoreHeight);
-    }
-    wallet->recover(path, memo);
-    return wallet;
+    return recoveryWallet(path, "", mnemonic, nettype, restoreHeight);
 }
 
-Wallet *WalletManagerImpl::createWalletFromKeys(const std::string &path, 
+Wallet *WalletManagerImpl::createWalletFromKeys(const std::string &path,
                                                 const std::string &language,
-                                                bool testnet, 
+                                                NetworkType nettype,
                                                 uint64_t restoreHeight,
                                                 const std::string &addressString,
                                                 const std::string &viewKeyString,
                                                 const std::string &spendKeyString)
 {
-    WalletImpl * wallet = new WalletImpl(testnet);
+    return createWalletFromKeys(path, "", language, nettype, restoreHeight,
+                                addressString, viewKeyString, spendKeyString);
+}
+
+Wallet *WalletManagerImpl::recoveryWallet(const std::string &path,
+                                                const std::string &password,
+                                                const std::string &mnemonic,
+                                                NetworkType nettype,
+                                                uint64_t restoreHeight)
+{
+    WalletImpl * wallet = new WalletImpl(nettype);
     if(restoreHeight > 0){
         wallet->setRefreshFromBlockHeight(restoreHeight);
     }
-    wallet->recoverFromKeys(path, language, addressString, viewKeyString, spendKeyString);
+    wallet->recover(path, password, mnemonic);
     return wallet;
 }
 
-bool WalletManagerImpl::closeWallet(Wallet *wallet)
+Wallet *WalletManagerImpl::createWalletFromKeys(const std::string &path,
+                                                const std::string &password,
+                                                const std::string &language,
+                                                NetworkType nettype, 
+                                                uint64_t restoreHeight,
+                                                const std::string &addressString,
+                                                const std::string &viewKeyString,
+                                                const std::string &spendKeyString)
+{
+    WalletImpl * wallet = new WalletImpl(nettype);
+    if(restoreHeight > 0){
+        wallet->setRefreshFromBlockHeight(restoreHeight);
+    }
+    wallet->recoverFromKeysWithPassword(path, password, language, addressString, viewKeyString, spendKeyString);
+    return wallet;
+}
+
+bool WalletManagerImpl::closeWallet(Wallet *wallet, bool store)
 {
     WalletImpl * wallet_ = dynamic_cast<WalletImpl*>(wallet);
-    bool result = wallet_->close();
+    if (!wallet_)
+        return false;
+    bool result = wallet_->close(store);
     if (!result) {
         m_errorString = wallet_->errorString();
     } else {
@@ -124,9 +139,9 @@ bool WalletManagerImpl::walletExists(const std::string &path)
     return false;
 }
 
-bool WalletManagerImpl::verifyWalletPassword(const std::string &keys_file_name, const std::string &password, bool watch_only) const
+bool WalletManagerImpl::verifyWalletPassword(const std::string &keys_file_name, const std::string &password, bool no_spend_key) const
 {
-	    return tools::wallet2::verify_password(keys_file_name, password, watch_only);
+	    return tools::wallet2::verify_password(keys_file_name, password, no_spend_key, hw::get_device("default"));
 }
 
 std::vector<std::string> WalletManagerImpl::findWallets(const std::string &path)
@@ -169,16 +184,19 @@ std::string WalletManagerImpl::errorString() const
 void WalletManagerImpl::setDaemonAddress(const std::string &address)
 {
     m_daemonAddress = address;
+    if(m_http_client.is_connected())
+        m_http_client.disconnect();
+    m_http_client.set_server(address, boost::none);
 }
 
-bool WalletManagerImpl::connected(uint32_t *version) const
+bool WalletManagerImpl::connected(uint32_t *version)
 {
     epee::json_rpc::request<cryptonote::COMMAND_RPC_GET_VERSION::request> req_t = AUTO_VAL_INIT(req_t);
     epee::json_rpc::response<cryptonote::COMMAND_RPC_GET_VERSION::response, std::string> resp_t = AUTO_VAL_INIT(resp_t);
     req_t.jsonrpc = "2.0";
     req_t.id = epee::serialization::storage_entry(0);
     req_t.method = "get_version";
-    if (!connect_and_invoke(m_daemonAddress, "/json_rpc", req_t, resp_t))
+    if (!epee::net_utils::invoke_http_json("/json_rpc", req_t, resp_t, m_http_client))
       return false;
 
     if (version)
@@ -186,65 +204,65 @@ bool WalletManagerImpl::connected(uint32_t *version) const
     return true;
 }
 
-uint64_t WalletManagerImpl::blockchainHeight() const
+uint64_t WalletManagerImpl::blockchainHeight()
 {
     cryptonote::COMMAND_RPC_GET_INFO::request ireq;
     cryptonote::COMMAND_RPC_GET_INFO::response ires;
 
-    if (!connect_and_invoke(m_daemonAddress, "/getinfo", ireq, ires))
+    if (!epee::net_utils::invoke_http_json("/getinfo", ireq, ires, m_http_client))
       return 0;
     return ires.height;
 }
 
-uint64_t WalletManagerImpl::blockchainTargetHeight() const
+uint64_t WalletManagerImpl::blockchainTargetHeight()
 {
     cryptonote::COMMAND_RPC_GET_INFO::request ireq;
     cryptonote::COMMAND_RPC_GET_INFO::response ires;
 
-    if (!connect_and_invoke(m_daemonAddress, "/getinfo", ireq, ires))
+    if (!epee::net_utils::invoke_http_json("/getinfo", ireq, ires, m_http_client))
       return 0;
     return ires.target_height >= ires.height ? ires.target_height : ires.height;
 }
 
-uint64_t WalletManagerImpl::networkDifficulty() const
+uint64_t WalletManagerImpl::networkDifficulty()
 {
     cryptonote::COMMAND_RPC_GET_INFO::request ireq;
     cryptonote::COMMAND_RPC_GET_INFO::response ires;
 
-    if (!connect_and_invoke(m_daemonAddress, "/getinfo", ireq, ires))
+    if (!epee::net_utils::invoke_http_json("/getinfo", ireq, ires, m_http_client))
       return 0;
     return ires.difficulty;
 }
 
-double WalletManagerImpl::miningHashRate() const
+double WalletManagerImpl::miningHashRate()
 {
     cryptonote::COMMAND_RPC_MINING_STATUS::request mreq;
     cryptonote::COMMAND_RPC_MINING_STATUS::response mres;
 
     epee::net_utils::http::http_simple_client http_client;
-    if (!connect_and_invoke(m_daemonAddress, "/mining_status", mreq, mres))
+    if (!epee::net_utils::invoke_http_json("/mining_status", mreq, mres, m_http_client))
       return 0.0;
     if (!mres.active)
       return 0.0;
     return mres.speed;
 }
 
-uint64_t WalletManagerImpl::blockTarget() const
+uint64_t WalletManagerImpl::blockTarget()
 {
     cryptonote::COMMAND_RPC_GET_INFO::request ireq;
     cryptonote::COMMAND_RPC_GET_INFO::response ires;
 
-    if (!connect_and_invoke(m_daemonAddress, "/getinfo", ireq, ires))
+    if (!epee::net_utils::invoke_http_json("/getinfo", ireq, ires, m_http_client))
         return 0;
     return ires.target;
 }
 
-bool WalletManagerImpl::isMining() const
+bool WalletManagerImpl::isMining()
 {
     cryptonote::COMMAND_RPC_MINING_STATUS::request mreq;
     cryptonote::COMMAND_RPC_MINING_STATUS::response mres;
 
-    if (!connect_and_invoke(m_daemonAddress, "/mining_status", mreq, mres))
+    if (!epee::net_utils::invoke_http_json("/mining_status", mreq, mres, m_http_client))
       return false;
     return mres.active;
 }
@@ -259,7 +277,7 @@ bool WalletManagerImpl::startMining(const std::string &address, uint32_t threads
     mreq.ignore_battery = ignore_battery;
     mreq.do_background_mining = background_mining;
 
-    if (!connect_and_invoke(m_daemonAddress, "/start_mining", mreq, mres))
+    if (!epee::net_utils::invoke_http_json("/start_mining", mreq, mres, m_http_client))
       return false;
     return mres.status == CORE_RPC_STATUS_OK;
 }
@@ -269,7 +287,7 @@ bool WalletManagerImpl::stopMining()
     cryptonote::COMMAND_RPC_STOP_MINING::request mreq;
     cryptonote::COMMAND_RPC_STOP_MINING::response mres;
 
-    if (!connect_and_invoke(m_daemonAddress, "/stop_mining", mreq, mres))
+    if (!epee::net_utils::invoke_http_json("/stop_mining", mreq, mres, m_http_client))
       return false;
     return mres.status == CORE_RPC_STATUS_OK;
 }
@@ -282,12 +300,14 @@ std::string WalletManagerImpl::resolveOpenAlias(const std::string &address, bool
     return addresses.front();
 }
 
-std::tuple<bool, std::string, std::string, std::string, std::string> WalletManager::checkUpdates(const std::string &software, const std::string &subdir)
+std::tuple<bool, std::string, std::string, std::string, std::string> WalletManager::checkUpdates(const std::string &software, std::string subdir)
 {
 #ifdef BUILD_TAG
     static const char buildtag[] = BOOST_PP_STRINGIZE(BUILD_TAG);
 #else
     static const char buildtag[] = "source";
+    // Override the subdir string when built from source
+    subdir = "source";
 #endif
 
     std::string version, hash;

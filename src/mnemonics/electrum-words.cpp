@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -62,9 +62,13 @@
 #include "japanese.h"
 #include "russian.h"
 #include "esperanto.h"
+#include "lojban.h"
 #include "english_old.h"
 #include "language_base.h"
 #include "singleton.h"
+
+#undef MONERO_DEFAULT_LOG_CATEGORY
+#define MONERO_DEFAULT_LOG_CATEGORY "mnemonic"
 
 namespace
 {
@@ -97,6 +101,7 @@ namespace
       Language::Singleton<Language::Japanese>::instance(),
       Language::Singleton<Language::Russian>::instance(),
       Language::Singleton<Language::Esperanto>::instance(),
+      Language::Singleton<Language::Lojban>::instance(),
       Language::Singleton<Language::EnglishOld>::instance()
     });
     Language::Base *fallback = NULL;
@@ -150,6 +155,7 @@ namespace
       if (full_match)
       {
         *language = *it1;
+        MINFO("Full match for language " << (*language)->get_english_language_name());
         return true;
       }
       // Some didn't match. Clear the index array.
@@ -162,9 +168,11 @@ namespace
     if (fallback)
     {
       *language = fallback;
+      MINFO("Fallback match for language " << (*language)->get_english_language_name());
       return true;
     }
 
+    MINFO("No match found");
     return false;
   }
 
@@ -203,6 +211,8 @@ namespace
    */
   bool checksum_test(std::vector<std::string> seed, uint32_t unique_prefix_length)
   {
+    if (seed.empty())
+      return false;
     // The last word is the checksum.
     std::string last_word = seed.back();
     seed.pop_back();
@@ -213,7 +223,9 @@ namespace
       checksum;
     std::string trimmed_last_word = last_word.length() > unique_prefix_length ? Language::utf8prefix(last_word, unique_prefix_length) :
       last_word;
-    return trimmed_checksum == trimmed_last_word;
+    bool ret = trimmed_checksum == trimmed_last_word;
+    MINFO("Checksum is %s" << (ret ? "valid" : "invalid"));
+    return ret;
   }
 }
 
@@ -234,11 +246,13 @@ namespace crypto
     /*!
      * \brief Converts seed words to bytes (secret key).
      * \param  words           String containing the words separated by spaces.
-     * \param  dst             To put the secret key restored from the words.
+     * \param  dst             To put the secret data restored from the words.
+     * \param  len             The number of bytes to expect, 0 if unknown
+     * \param  duplicate       If true and len is not zero, we accept half the data, and duplicate it
      * \param  language_name   Language of the seed as found gets written here.
      * \return                 false if not a multiple of 3 words, or if word is not in the words list
      */
-    bool words_to_bytes(std::string words, crypto::secret_key& dst,
+    bool words_to_bytes(std::string words, std::string& dst, size_t len, bool duplicate,
       std::string &language_name)
     {
       std::vector<std::string> seed;
@@ -246,20 +260,33 @@ namespace crypto
       boost::algorithm::trim(words);
       boost::split(seed, words, boost::is_any_of(" "), boost::token_compress_on);
 
-      // error on non-compliant word list
-      if (seed.size() != seed_length/2 && seed.size() != seed_length &&
-        seed.size() != seed_length + 1)
+      if (len % 4)
       {
+        MERROR("Invalid seed: not a multiple of 4");
         return false;
       }
 
-      // If it is seed with a checksum.
-      bool has_checksum = seed.size() == (seed_length + 1);
+      bool has_checksum = true;
+      if (len)
+      {
+        // error on non-compliant word list
+        const size_t expected = len * 8 * 3 / 32;
+        if (seed.size() != expected/2 && seed.size() != expected &&
+          seed.size() != expected + 1)
+        {
+          MERROR("Invalid seed: unexpected number of words");
+          return false;
+        }
+
+        // If it is seed with a checksum.
+        has_checksum = seed.size() == (expected + 1);
+      }
 
       std::vector<uint32_t> matched_indices;
       Language::Base *language;
       if (!find_seed_language(seed, has_checksum, matched_indices, &language))
       {
+        MERROR("Invalid seed: language not found");
         return false;
       }
       language_name = language->get_language_name();
@@ -270,6 +297,7 @@ namespace crypto
         if (!checksum_test(seed, language->get_unique_prefix_length()))
         {
           // Checksum fail
+          MERROR("Invalid seed: invalid checksum");
           return false;
         }
         seed.pop_back();
@@ -286,19 +314,52 @@ namespace crypto
         val = w1 + word_list_length * (((word_list_length - w1) + w2) % word_list_length) +
           word_list_length * word_list_length * (((word_list_length - w2) + w3) % word_list_length);
 
-        if (!(val % word_list_length == w1)) return false;
+        if (!(val % word_list_length == w1))
+        {
+          MERROR("Invalid seed: mumble mumble");
+          return false;
+        }
 
-        memcpy(dst.data + i * 4, &val, 4);  // copy 4 bytes to position
+        dst.append((const char*)&val, 4);  // copy 4 bytes to position
       }
 
-      std::string wlist_copy = words;
-      if (seed.size() == seed_length/2)
+      if (len > 0 && duplicate)
       {
-        memcpy(dst.data+16, dst.data, 16);  // if electrum 12-word seed, duplicate
-        wlist_copy += ' ';
-        wlist_copy += words;
+        const size_t expected = len * 3 / 32;
+        std::string wlist_copy = words;
+        if (seed.size() == expected/2)
+        {
+          dst.append(dst);                    // if electrum 12-word seed, duplicate
+          wlist_copy += ' ';
+          wlist_copy += words;
+        }
       }
 
+      return true;
+    }
+
+    /*!
+     * \brief Converts seed words to bytes (secret key).
+     * \param  words           String containing the words separated by spaces.
+     * \param  dst             To put the secret key restored from the words.
+     * \param  language_name   Language of the seed as found gets written here.
+     * \return                 false if not a multiple of 3 words, or if word is not in the words list
+     */
+    bool words_to_bytes(std::string words, crypto::secret_key& dst,
+      std::string &language_name)
+    {
+      std::string s;
+      if (!words_to_bytes(words, s, sizeof(dst), true, language_name))
+      {
+        MERROR("Invalid seed: failed to convert words to bytes");
+        return false;
+      }
+      if (s.size() != sizeof(dst))
+      {
+        MERROR("Invalid seed: wrong output size");
+        return false;
+      }
+      dst = *(const crypto::secret_key*)s.data();
       return true;
     }
 
@@ -309,11 +370,11 @@ namespace crypto
      * \param  language_name Seed language name
      * \return               true if successful false if not. Unsuccessful if wrong key size.
      */
-    bool bytes_to_words(const crypto::secret_key& src, std::string& words,
+    bool bytes_to_words(const char *src, size_t len, std::string& words,
       const std::string &language_name)
     {
 
-      if (sizeof(src.data) % 4 != 0 || sizeof(src.data) == 0) return false;
+      if (len % 4 != 0 || len == 0) return false;
 
       Language::Base *language;
       if (language_name == "English")
@@ -360,6 +421,10 @@ namespace crypto
       {
         language = Language::Singleton<Language::Esperanto>::instance();
       }
+      else if (language_name == "Lojban")
+      {
+        language = Language::Singleton<Language::Lojban>::instance();
+      }
       else
       {
         return false;
@@ -369,14 +434,14 @@ namespace crypto
       std::vector<std::string> words_store;
 
       uint32_t word_list_length = word_list.size();
-      // 8 bytes -> 3 words.  8 digits base 16 -> 3 digits base 1626
-      for (unsigned int i=0; i < sizeof(src.data)/4; i++, words += ' ')
+      // 4 bytes -> 3 words.  8 digits base 16 -> 3 digits base 1626
+      for (unsigned int i=0; i < len/4; i++, words += ' ')
       {
         uint32_t w1, w2, w3;
         
         uint32_t val;
 
-        memcpy(&val, (src.data) + (i * 4), 4);
+        memcpy(&val, src + (i * 4), 4);
 
         w1 = val % word_list_length;
         w2 = ((val / word_list_length) + w1) % word_list_length;
@@ -398,13 +463,15 @@ namespace crypto
       return true;
     }
 
-    /*!
-     * \brief Gets a list of seed languages that are supported.
-     * \param languages The vector is set to the list of languages.
-     */
-    void get_language_list(std::vector<std::string> &languages)
+    bool bytes_to_words(const crypto::secret_key& src, std::string& words,
+      const std::string &language_name)
     {
-      std::vector<Language::Base*> language_instances({
+      return bytes_to_words(src.data, sizeof(src), words, language_name);
+    }
+
+    std::vector<const Language::Base*> get_language_list()
+    {
+      static const std::vector<const Language::Base*> language_instances({
         Language::Singleton<Language::German>::instance(),
         Language::Singleton<Language::English>::instance(),
         Language::Singleton<Language::Spanish>::instance(),
@@ -415,12 +482,23 @@ namespace crypto
         Language::Singleton<Language::Russian>::instance(),
         Language::Singleton<Language::Japanese>::instance(),
         Language::Singleton<Language::Chinese_Simplified>::instance(),
-        Language::Singleton<Language::Esperanto>::instance()
+        Language::Singleton<Language::Esperanto>::instance(),
+        Language::Singleton<Language::Lojban>::instance()
       });
-      for (std::vector<Language::Base*>::iterator it = language_instances.begin();
+      return language_instances;
+    }
+
+    /*!
+     * \brief Gets a list of seed languages that are supported.
+     * \param languages The vector is set to the list of languages.
+     */
+    void get_language_list(std::vector<std::string> &languages, bool english)
+    {
+      const std::vector<const Language::Base*> language_instances = get_language_list();
+      for (std::vector<const Language::Base*>::const_iterator it = language_instances.begin();
         it != language_instances.end(); it++)
       {
-        languages.push_back((*it)->get_language_name());
+        languages.push_back(english ? (*it)->get_english_language_name() : (*it)->get_language_name());
       }
     }
 
@@ -435,6 +513,18 @@ namespace crypto
       boost::algorithm::trim(seed);
       boost::split(word_list, seed, boost::is_any_of(" "), boost::token_compress_on);
       return word_list.size() != (seed_length + 1);
+    }
+
+    std::string get_english_name_for(const std::string &name)
+    {
+      const std::vector<const Language::Base*> language_instances = get_language_list();
+      for (std::vector<const Language::Base*>::const_iterator it = language_instances.begin();
+        it != language_instances.end(); it++)
+      {
+        if ((*it)->get_language_name() == name)
+          return (*it)->get_english_language_name();
+      }
+      return "<language not found>";
     }
 
   }

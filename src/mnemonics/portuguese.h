@@ -21,7 +21,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Code surrounding the word list is Copyright (c) 2014-2017, The Monero Project
+// Code surrounding the word list is Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -72,7 +72,7 @@ namespace Language
   class Portuguese: public Base
   {
   public:
-    Portuguese(): Base("Português", std::vector<std::string>({
+    Portuguese(): Base("Português", "Portuguese", std::vector<std::string>({
         "abaular",
         "abdominal",
         "abeto",

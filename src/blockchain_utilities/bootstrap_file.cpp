@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -134,8 +134,7 @@ bool BootstrapFile::initialize_file()
   bbi.block_last_pos = 0;
 
   buffer_type buffer2;
-  boost::iostreams::stream<boost::iostreams::back_insert_device<buffer_type>>* output_stream_header;
-  output_stream_header = new boost::iostreams::stream<boost::iostreams::back_insert_device<buffer_type>>(buffer2);
+  boost::iostreams::stream<boost::iostreams::back_insert_device<buffer_type>> output_stream_header(buffer2);
 
   uint32_t bd_size = 0;
 
@@ -147,8 +146,8 @@ bool BootstrapFile::initialize_file()
   {
     throw std::runtime_error("Error in serialization of bootstrap::file_info size");
   }
-  *output_stream_header << blob;
-  *output_stream_header << bd;
+  output_stream_header << blob;
+  output_stream_header << bd;
 
   bd = t_serializable_object_to_blob(bbi);
   MDEBUG("bootstrap::blocks_info size: " << bd.size());
@@ -158,12 +157,12 @@ bool BootstrapFile::initialize_file()
   {
     throw std::runtime_error("Error in serialization of bootstrap::blocks_info size");
   }
-  *output_stream_header << blob;
-  *output_stream_header << bd;
+  output_stream_header << blob;
+  output_stream_header << bd;
 
-  output_stream_header->flush();
-  *output_stream_header << std::string(header_size-buffer2.size(), 0); // fill in rest with null bytes
-  output_stream_header->flush();
+  output_stream_header.flush();
+  output_stream_header << std::string(header_size-buffer2.size(), 0); // fill in rest with null bytes
+  output_stream_header.flush();
   std::copy(buffer2.begin(), buffer2.end(), std::ostreambuf_iterator<char>(*m_raw_data_file));
 
   return true;
@@ -221,7 +220,7 @@ void BootstrapFile::write_block(block& block)
   // now add all regular transactions
   for (const auto& tx_id : block.tx_hashes)
   {
-    if (tx_id == null_hash)
+    if (tx_id == crypto::null_hash)
     {
       throw std::runtime_error("Aborting: tx == null_hash");
     }
@@ -375,39 +374,15 @@ uint64_t BootstrapFile::seek_to_first_chunk(std::ifstream& import_file)
   return full_header_size;
 }
 
-uint64_t BootstrapFile::count_blocks(const std::string& import_file_path)
+uint64_t BootstrapFile::count_bytes(std::ifstream& import_file, uint64_t blocks, uint64_t& h, bool& quit)
 {
-  boost::filesystem::path raw_file_path(import_file_path);
-  boost::system::error_code ec;
-  if (!boost::filesystem::exists(raw_file_path, ec))
-  {
-    MFATAL("bootstrap file not found: " << raw_file_path);
-    throw std::runtime_error("Aborting");
-  }
-  std::ifstream import_file;
-  import_file.open(import_file_path, std::ios_base::binary | std::ifstream::in);
-
-  uint64_t h = 0;
-  if (import_file.fail())
-  {
-    MFATAL("import_file.open() fail");
-    throw std::runtime_error("Aborting");
-  }
-
-  uint64_t full_header_size; // 4 byte magic + length of header structures
-  full_header_size = seek_to_first_chunk(import_file);
-
-  MINFO("Scanning blockchain from bootstrap file...");
-  block b;
-  bool quit = false;
   uint64_t bytes_read = 0;
-  int progress_interval = 10;
-
+  uint32_t chunk_size;
+  char buf1[sizeof(chunk_size)];
   std::string str1;
-  char buf1[2048];
-  while (! quit)
+  h = 0;
+  while (1)
   {
-    uint32_t chunk_size;
     import_file.read(buf1, sizeof(chunk_size));
     if (!import_file) {
       std::cout << refresh_string;
@@ -415,15 +390,7 @@ uint64_t BootstrapFile::count_blocks(const std::string& import_file_path)
       quit = true;
       break;
     }
-    h += NUM_BLOCKS_PER_CHUNK;
-    if ((h-1) % progress_interval == 0)
-    {
-      std::cout << "\r" << "block height: " << h-1 <<
-        "    " <<
-        std::flush;
-    }
     bytes_read += sizeof(chunk_size);
-
     str1.assign(buf1, sizeof(chunk_size));
     if (! ::serialization::parse_binary(str1, chunk_size))
       throw std::runtime_error("Error in deserialization of chunk_size");
@@ -456,6 +423,64 @@ uint64_t BootstrapFile::count_blocks(const std::string& import_file_path)
       throw std::runtime_error("Aborting");
     }
     bytes_read += chunk_size;
+    h += NUM_BLOCKS_PER_CHUNK;
+    if (h >= blocks)
+      break;
+  }
+  return bytes_read;
+}
+
+uint64_t BootstrapFile::count_blocks(const std::string& import_file_path)
+{
+  std::streampos dummy_pos;
+  uint64_t dummy_height = 0;
+  return count_blocks(import_file_path, dummy_pos, dummy_height);
+}
+
+// If seek_height is non-zero on entry, return a stream position <= this height when finished.
+// And return the actual height corresponding to this position. Allows the caller to locate its
+// starting position without having to reread the entire file again.
+uint64_t BootstrapFile::count_blocks(const std::string& import_file_path, std::streampos &start_pos, uint64_t& seek_height)
+{
+  boost::filesystem::path raw_file_path(import_file_path);
+  boost::system::error_code ec;
+  if (!boost::filesystem::exists(raw_file_path, ec))
+  {
+    MFATAL("bootstrap file not found: " << raw_file_path);
+    throw std::runtime_error("Aborting");
+  }
+  std::ifstream import_file;
+  import_file.open(import_file_path, std::ios_base::binary | std::ifstream::in);
+
+  uint64_t start_height = seek_height;
+  uint64_t h = 0;
+  if (import_file.fail())
+  {
+    MFATAL("import_file.open() fail");
+    throw std::runtime_error("Aborting");
+  }
+
+  uint64_t full_header_size; // 4 byte magic + length of header structures
+  full_header_size = seek_to_first_chunk(import_file);
+
+  MINFO("Scanning blockchain from bootstrap file...");
+  bool quit = false;
+  uint64_t bytes_read = 0, blocks;
+  int progress_interval = 10;
+
+  while (! quit)
+  {
+    if (start_height && h + progress_interval >= start_height - 1)
+    {
+      start_height = 0;
+      start_pos = import_file.tellg();
+      seek_height = h;
+    }
+    bytes_read += count_bytes(import_file, progress_interval, blocks, quit);
+    h += blocks;
+    std::cout << "\r" << "block height: " << h-1 <<
+      "    " <<
+      std::flush;
 
     // std::cout << refresh_string;
     MDEBUG("Number bytes scanned: " << bytes_read);

@@ -1,4 +1,4 @@
-// Copyright (c) 2017, The Monero Project
+// Copyright (c) 2017-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -27,9 +27,8 @@
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "include_base_utils.h"
-#include "common/command_line.h"
 #include "file_io_utils.h"
-#include "cryptonote_protocol/blobdatatype.h"
+#include "cryptonote_basic/blobdatatype.h"
 #include "cryptonote_basic/cryptonote_basic.h"
 #include "cryptonote_basic/cryptonote_format_utils.h"
 #include "wallet/wallet2.h"
@@ -38,7 +37,7 @@
 class ColdTransactionFuzzer: public Fuzzer
 {
 public:
-  ColdTransactionFuzzer(): wallet(true) {}
+  ColdTransactionFuzzer(): wallet(cryptonote::TESTNET) {}
   virtual int init();
   virtual int run(const std::string &filename);
 
@@ -55,16 +54,9 @@ int ColdTransactionFuzzer::init()
 
   try
   {
-    boost::filesystem::remove("/tmp/cold-transaction-test.keys");
-    boost::filesystem::remove("/tmp/cold-transaction-test.address.txt");
-    boost::filesystem::remove("/tmp/cold-transaction-test");
-
     wallet.init("");
-    wallet.generate("/tmp/cold-transaction-test", "", spendkey, true, false);
-
-    boost::filesystem::remove("/tmp/cold-transaction-test.keys");
-    boost::filesystem::remove("/tmp/cold-transaction-test.address.txt");
-    boost::filesystem::remove("/tmp/cold-transaction-test");
+    wallet.set_subaddress_lookahead(1, 1);
+    wallet.generate("", "", spendkey, true, false);
   }
   catch (const std::exception &e)
   {

@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, The Monero Project
+# Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
 #
@@ -37,8 +37,7 @@ set(common_sources
   i18n.cpp
   password.cpp
   perf_timer.cpp
-  task_region.cpp
-  thread_group.cpp
+  threadpool.cpp
   updates.cpp)
 
 if (STACK_TRACE)
@@ -48,6 +47,7 @@ endif()
 set(common_headers)
 
 set(common_private_headers
+  apply_permutation.h
   base58.h
   boost_serialization_helper.h
   command_line.h
@@ -66,8 +66,7 @@ set(common_private_headers
   password.h
   perf_timer.h
   stack_trace.h
-  task_region.h
-  thread_group.h
+  threadpool.h
   updates.h)
 
 monero_private_headers(common
@@ -75,7 +74,8 @@ monero_private_headers(common
 monero_add_library(common
   ${common_sources}
   ${common_headers}
-  ${common_private_headers})
+  ${common_private_headers}
+  DEPENDS generate_translations_header)
 target_link_libraries(common
   PUBLIC
     epee
@@ -87,6 +87,7 @@ target_link_libraries(common
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
     ${Boost_REGEX_LIBRARY}
+    ${Boost_CHRONO_LIBRARY}
   PRIVATE
     ${OPENSSL_LIBRARIES}
     ${EXTRA_LIBRARIES})

@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -49,20 +49,15 @@ extern "C" {
     if ((length & 31) != 0) {
       throw ios_base::failure("Invalid input length for tree_hash");
     }
-    tree_hash((const char (*)[32]) data, length >> 5, hash);
+    tree_hash((const char (*)[crypto::HASH_SIZE]) data, length >> 5, hash);
   }
-}
-
   static void cn_slow_hash_0(const void *data, size_t length, char *hash) {
-    return cn_slow_hash(data, length, hash, 0);
+    return cn_slow_hash(data, length, hash, 0/*variant*/, 0/*prehashed*/);
   }
   static void cn_slow_hash_1(const void *data, size_t length, char *hash) {
-    return cn_slow_hash(data, length, hash, 1);
+    return cn_slow_hash(data, length, hash, 1/*variant*/, 0/*prehashed*/);
   }
-  static void cn_slow_hash_2(const void *data, size_t length, char *hash) {
-    return cn_slow_hash(data, length, hash, 2);
-  }  
-
+}
 POP_WARNINGS
 
 extern "C" typedef void hash_f(const void *, size_t, char *);
@@ -72,7 +67,7 @@ struct hash_func {
 } hashes[] = {{"fast", cn_fast_hash}, {"slow", cn_slow_hash_0}, {"tree", hash_tree},
   {"extra-blake", hash_extra_blake}, {"extra-groestl", hash_extra_groestl},
   {"extra-jh", hash_extra_jh}, {"extra-skein", hash_extra_skein},
-  {"slow-1", cn_slow_hash_1},{"slow-2", cn_slow_hash_2}};
+  {"slow-1", cn_slow_hash_1}};
 
 int main(int argc, char *argv[]) {
   hash_f *f;

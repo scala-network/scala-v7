@@ -21,7 +21,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Code surrounding the word list is Copyright (c) 2014-2017, The Monero Project
+// Code surrounding the word list is Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -72,7 +72,7 @@ namespace Language
   class Chinese_Simplified: public Base
   {
   public:
-    Chinese_Simplified(): Base("简体中文 (中国)", std::vector<std::string>({
+    Chinese_Simplified(): Base("简体中文 (中国)", "Chinese (simplified)", std::vector<std::string>({
       "的",
       "一",
       "是",

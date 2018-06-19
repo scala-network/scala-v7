@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -34,7 +34,7 @@ using namespace epee;
 #include "cryptonote_basic_impl.h"
 #include "string_tools.h"
 #include "serialization/binary_utils.h"
-#include "serialization/vector.h"
+#include "serialization/container.h"
 #include "cryptonote_format_utils.h"
 #include "cryptonote_config.h"
 #include "misc_language.h"
@@ -69,11 +69,11 @@ namespace cryptonote {
   //-----------------------------------------------------------------------------------------------
   size_t get_min_block_size(uint8_t version)
   {
-    if (version < 4){
-      return CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1;}
-    if (version < 6){
-      return CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V5;}
+    if (version < 2)
+      return CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1;
+    if (version < 5)
       return CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2;
+    return CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V5;
   }
   //-----------------------------------------------------------------------------------------------
   size_t get_max_block_size()
@@ -87,16 +87,10 @@ namespace cryptonote {
   }
   //-----------------------------------------------------------------------------------------------
   bool get_block_reward(size_t median_size, size_t current_block_size, uint64_t already_generated_coins, uint64_t &reward, uint8_t version) {
-    static_assert(DIFFICULTY_TARGET%60==0,"difficulty targets must be a multiple of 60");
-    const int target = DIFFICULTY_TARGET;
+    static_assert(DIFFICULTY_TARGET_V2 % 60 == 0 && DIFFICULTY_TARGET_V1 % 60 == 0,"difficulty targets must be a multiple of 60");
+    const int target = version < 2 ? DIFFICULTY_TARGET_V1 : DIFFICULTY_TARGET_V2;
     const int target_minutes = target / 60;
     const int emission_speed_factor = EMISSION_SPEED_FACTOR_PER_MINUTE - (target_minutes-1);
-
-    const uint64_t premine = 12600000000U;
-    if (median_size > 0 && already_generated_coins < premine) {
-      reward = premine;
-      return true;
-    }
 
     uint64_t base_reward = (MONEY_SUPPLY - already_generated_coins) >> emission_speed_factor;
     if (base_reward < FINAL_SUBSIDY_PER_MINUTE*target_minutes)
@@ -163,26 +157,26 @@ namespace cryptonote {
   }
   //-----------------------------------------------------------------------
   std::string get_account_address_as_str(
-      bool testnet
+      network_type nettype
     , bool subaddress
     , account_public_address const & adr
     )
   {
-    uint64_t address_prefix = testnet ?
-                              (subaddress ? config::testnet::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX : config::testnet::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX) :
-                              (subaddress ? config::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX : config::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX);
+    uint64_t address_prefix = nettype == TESTNET ?
+      (subaddress ? config::testnet::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX : config::testnet::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX) : nettype == STAGENET ?
+      (subaddress ? config::stagenet::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX : config::stagenet::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX) :
+      (subaddress ? config::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX : config::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX);
 
     return tools::base58::encode_addr(address_prefix, t_serializable_object_to_blob(adr));
   }
   //-----------------------------------------------------------------------
   std::string get_account_integrated_address_as_str(
-      bool testnet
+      network_type nettype
     , account_public_address const & adr
     , crypto::hash8 const & payment_id
     )
   {
-    uint64_t integrated_address_prefix = testnet ?
-      config::testnet::CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX : config::CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX;
+    uint64_t integrated_address_prefix = nettype == TESTNET ? config::testnet::CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX : nettype == STAGENET ? config::stagenet::CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX : config::CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX;
 
     integrated_address iadr = {
       adr, payment_id
@@ -201,18 +195,21 @@ namespace cryptonote {
     return true;
   }
   //-----------------------------------------------------------------------
-  bool get_account_integrated_address_from_str(
-      account_public_address& adr
-    , bool& has_payment_id
-    , crypto::hash8& payment_id
-    , bool testnet
+  bool get_account_address_from_str(
+      address_parse_info& info
+    , network_type nettype
     , std::string const & str
     )
   {
-    uint64_t address_prefix = testnet ?
-      config::testnet::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX : config::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX;
-    uint64_t integrated_address_prefix = testnet ?
-      config::testnet::CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX : config::CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX;
+    uint64_t address_prefix = nettype == TESTNET ?
+      config::testnet::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX : nettype == STAGENET ?
+      config::stagenet::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX : config::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX;
+    uint64_t integrated_address_prefix = nettype == TESTNET ?
+      config::testnet::CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX : nettype == STAGENET ?
+      config::stagenet::CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX : config::CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX;
+    uint64_t subaddress_prefix = nettype == TESTNET ?
+      config::testnet::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX : nettype == STAGENET ?
+      config::stagenet::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX : config::CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX;
 
     if (2 * sizeof(public_address_outer_blob) != str.size())
     {
@@ -226,18 +223,27 @@ namespace cryptonote {
 
       if (integrated_address_prefix == prefix)
       {
-        has_payment_id = true;
+        info.is_subaddress = false;
+        info.has_payment_id = true;
       }
       else if (address_prefix == prefix)
       {
-        has_payment_id = false;
+        info.is_subaddress = false;
+        info.has_payment_id = false;
+      }
+      else if (subaddress_prefix == prefix)
+      {
+        info.is_subaddress = true;
+        info.has_payment_id = false;
       }
       else {
-        LOG_PRINT_L1("Wrong address prefix: " << prefix << ", expected " << address_prefix << " or " << integrated_address_prefix);
+        LOG_PRINT_L1("Wrong address prefix: " << prefix << ", expected " << address_prefix 
+          << " or " << integrated_address_prefix
+          << " or " << subaddress_prefix);
         return false;
       }
 
-      if (has_payment_id)
+      if (info.has_payment_id)
       {
         integrated_address iadr;
         if (!::serialization::parse_binary(data, iadr))
@@ -245,19 +251,19 @@ namespace cryptonote {
           LOG_PRINT_L1("Account public address keys can't be parsed");
           return false;
         }
-        adr = iadr.adr;
-        payment_id = iadr.payment_id;
+        info.address = iadr.adr;
+        info.payment_id = iadr.payment_id;
       }
       else
       {
-        if (!::serialization::parse_binary(data, adr))
+        if (!::serialization::parse_binary(data, info.address))
         {
           LOG_PRINT_L1("Account public address keys can't be parsed");
           return false;
         }
       }
 
-      if (!crypto::check_key(adr.m_spend_public_key) || !crypto::check_key(adr.m_view_public_key))
+      if (!crypto::check_key(info.address.m_spend_public_key) || !crypto::check_key(info.address.m_view_public_key))
       {
         LOG_PRINT_L1("Failed to validate address keys");
         return false;
@@ -292,51 +298,27 @@ namespace cryptonote {
       }
 
       //we success
-      adr = blob.m_address;
-      has_payment_id = false;
+      info.address = blob.m_address;
+      info.is_subaddress = false;
+      info.has_payment_id = false;
     }
 
     return true;
   }
-  //-----------------------------------------------------------------------
-  bool get_account_address_from_str(
-      account_public_address& adr
-    , bool testnet
-    , std::string const & str
-    )
-  {
-    bool has_payment_id;
-    crypto::hash8 payment_id;
-    return get_account_integrated_address_from_str(adr, has_payment_id, payment_id, testnet, str);
-  }
   //--------------------------------------------------------------------------------
   bool get_account_address_from_str_or_url(
-      cryptonote::account_public_address& address
-    , bool& has_payment_id
-    , crypto::hash8& payment_id
-    , bool testnet
+      address_parse_info& info
+    , network_type nettype
     , const std::string& str_or_url
     , std::function<std::string(const std::string&, const std::vector<std::string>&, bool)> dns_confirm
     )
   {
-    if (get_account_integrated_address_from_str(address, has_payment_id, payment_id, testnet, str_or_url))
+    if (get_account_address_from_str(info, nettype, str_or_url))
       return true;
     bool dnssec_valid;
     std::string address_str = tools::dns_utils::get_account_address_as_str_from_url(str_or_url, dnssec_valid, dns_confirm);
     return !address_str.empty() &&
-      get_account_integrated_address_from_str(address, has_payment_id, payment_id, testnet, address_str);
-  }
-  //--------------------------------------------------------------------------------
-  bool get_account_address_from_str_or_url(
-      cryptonote::account_public_address& address
-    , bool testnet
-    , const std::string& str_or_url
-    , std::function<std::string(const std::string&, const std::vector<std::string>&, bool)> dns_confirm
-    )
-  {
-    bool has_payment_id;
-    crypto::hash8 payment_id;
-    return get_account_address_from_str_or_url(address, has_payment_id, payment_id, testnet, str_or_url, dns_confirm);
+      get_account_address_from_str(info, nettype, address_str);
   }
   //--------------------------------------------------------------------------------
   bool operator ==(const cryptonote::transaction& a, const cryptonote::transaction& b) {

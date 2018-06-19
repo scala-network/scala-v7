@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, The Monero Project
+# Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
 #
@@ -34,7 +34,7 @@ endif()
 
 set(cryptonote_basic_sources
   account.cpp
-        cryptonote_basic_impl.cpp
+  cryptonote_basic_impl.cpp
   cryptonote_format_utils.cpp
   difficulty.cpp
   hardfork.cpp
@@ -45,7 +45,7 @@ set(cryptonote_basic_headers)
 set(cryptonote_basic_private_headers
   account.h
   account_boost_serialization.h
-        connection_context.h
+  connection_context.h
   cryptonote_basic.h
   cryptonote_basic_impl.h
   cryptonote_boost_serialization.h
@@ -58,7 +58,7 @@ set(cryptonote_basic_private_headers
   verification_context.h)
 
 monero_private_headers(cryptonote_basic
-  ${crypto_private_headers})
+  ${cryptonote_basic_private_headers})
 monero_add_library(cryptonote_basic
   ${cryptonote_basic_sources}
   ${cryptonote_basic_headers}
@@ -67,6 +67,8 @@ target_link_libraries(cryptonote_basic
   PUBLIC
     common
     cncrypto
+    checkpoints
+    device
     ${Boost_DATE_TIME_LIBRARY}
     ${Boost_PROGRAM_OPTIONS_LIBRARY}
     ${Boost_SERIALIZATION_LIBRARY}

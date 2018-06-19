@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -42,18 +42,18 @@ namespace Monero {
 AddressBook::~AddressBook() {}
   
 AddressBookImpl::AddressBookImpl(WalletImpl *wallet)
-    : m_wallet(wallet) {}
+    : m_wallet(wallet), m_errorCode(Status_Ok) {}
 
 bool AddressBookImpl::addRow(const std::string &dst_addr , const std::string &payment_id_str, const std::string &description)
 {
   clearStatus();
   
   cryptonote::address_parse_info info;
-    if(!cryptonote::get_account_address_from_str(info, m_wallet->m_wallet->testnet(), dst_addr)) {
-        m_errorString = tr("Invalid destination address");
-        m_errorCode = Invalid_Address;
-        return false;
-    }
+  if(!cryptonote::get_account_address_from_str(info, m_wallet->m_wallet->nettype(), dst_addr)) {
+    m_errorString = tr("Invalid destination address");
+    m_errorCode = Invalid_Address;
+    return false;
+  }
 
   crypto::hash payment_id = crypto::null_hash;
   bool has_long_pid = (payment_id_str.empty())? false : tools::wallet2::parse_long_payment_id(payment_id_str, payment_id); 
@@ -74,7 +74,7 @@ bool AddressBookImpl::addRow(const std::string &dst_addr , const std::string &pa
 
   // integrated + long payment id provided
   if(has_long_pid && info.has_payment_id) {
-    m_errorString = tr("Integrated address and long payment id can't be used at the same time");
+    m_errorString = tr("Integrated address and long payment ID can't be used at the same time");
     m_errorCode = Invalid_Payment_Id;
     return false;
   }
@@ -85,7 +85,7 @@ bool AddressBookImpl::addRow(const std::string &dst_addr , const std::string &pa
     memcpy(payment_id.data, info.payment_id.data, 8);
   }
   
-  bool r =  m_wallet->m_wallet->add_address_book_row(info.address, payment_id, description, info.is_subaddress);
+  bool r =  m_wallet->m_wallet->add_address_book_row(info.address,payment_id,description,info.is_subaddress);
   if (r)
     refresh();
   else
@@ -105,13 +105,13 @@ void AddressBookImpl::refresh()
     tools::wallet2::address_book_row * row = &rows.at(i);
     
     std::string payment_id = (row->m_payment_id == crypto::null_hash)? "" : epee::string_tools::pod_to_hex(row->m_payment_id);
-    std::string address = cryptonote::get_account_address_as_str(m_wallet->m_wallet->testnet(), row->m_is_subaddress, row->m_address);
+    std::string address = cryptonote::get_account_address_as_str(m_wallet->m_wallet->nettype(), row->m_is_subaddress, row->m_address);
     // convert the zero padded short payment id to integrated address
-    if (payment_id.length() > 16 && payment_id.substr(16).find_first_not_of('0') == std::string::npos) {
+    if (!row->m_is_subaddress && payment_id.length() > 16 && payment_id.substr(16).find_first_not_of('0') == std::string::npos) {
         payment_id = payment_id.substr(0,16);
         crypto::hash8 payment_id_short;
         if(tools::wallet2::parse_short_payment_id(payment_id, payment_id_short)) {
-          address = cryptonote::get_account_integrated_address_as_str(m_wallet->m_wallet->testnet(), row->m_address, payment_id_short);
+          address = cryptonote::get_account_integrated_address_as_str(m_wallet->m_wallet->nettype(), row->m_address, payment_id_short);
           // Don't show payment id when integrated address is used
           payment_id = "";
         }

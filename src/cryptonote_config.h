@@ -51,7 +51,7 @@
 
 #define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW               60
 #define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V2	        60
-#define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V4		30
+#define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V4		    30
 
 // MONEY_SUPPLY - total number coins to be generated
 #define MONEY_SUPPLY                                    ((uint64_t)(2100000000000))
@@ -78,21 +78,26 @@
 
 #define DIFFICULTY_TARGET                               60  // seconds
 #define DIFFICULTY_TARGET_V1                            60  // seconds
+
+// Modify this
+#define DIFFICULTY_TARGET_V2                            60  // seconds
+
 #define DIFFICULTY_WINDOW                               720 // blocks
-#define DIFFICULTY_WINDOW_V2 				17
+#define DIFFICULTY_WINDOW_V2 				            17
 #define DIFFICULTY_LAG                                  15  // !!!
 #define DIFFICULTY_CUT                                  60  // timestamps to cut after sorting
-#define DIFFICULTY_CUT_V2				6
+#define DIFFICULTY_CUT_V2				                6
 #define DIFFICULTY_BLOCKS_COUNT                         DIFFICULTY_WINDOW + DIFFICULTY_LAG
-#define DIFFICULTY_BLOCKS_COUNT_V2			DIFFICULTY_WINDOW_V2 + DIFFICULTY_CUT_V2*2
+#define DIFFICULTY_BLOCKS_COUNT_V2			            DIFFICULTY_WINDOW_V2 + DIFFICULTY_CUT_V2*2
 
 #define DIFFICULTY_WINDOW_V3                            90
 #define DIFFICULTY_BLOCKS_COUNT_V3                      DIFFICULTY_WINDOW_V3
 
-#define DIFFICULTY_WINDOW_V4				90
+#define DIFFICULTY_WINDOW_V4				            90
 #define DIFFICULTY_BLOCKS_COUNT_V4                      DIFFICULTY_WINDOW_V4
 
-#define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS      DIFFICULTY_TARGET * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS
+#define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS_V1   DIFFICULTY_TARGET_V1 * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS
+#define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS_V2   DIFFICULTY_TARGET_V2 * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS
 #define CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS       1
 
 
@@ -144,9 +149,17 @@
 
 #define HF_VERSION_DYNAMIC_FEE                  6
 #define HF_VERSION_MIN_MIXIN_4                  6
+
+// Modify this
+#define HF_VERSION_MIN_MIXIN_6                  7
+
 #define HF_VERSION_ENFORCE_RCT                  6
 
 #define PER_KB_FEE_QUANTIZATION_DECIMALS        8
+
+#define HASH_OF_HASHES_STEP                     256
+
+#define DEFAULT_TXPOOL_MAX_SIZE                 648000000ull // 3 days at 300000, in bytes
 
 // New constants are intended to go here
 namespace config
@@ -162,9 +175,10 @@ namespace config
   uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 42;
   uint16_t const P2P_DEFAULT_PORT = 20188;
   uint16_t const RPC_DEFAULT_PORT = 20189;
+  uint16_t const ZMQ_RPC_DEFAULT_PORT = 20190;
   boost::uuids::uuid const NETWORK_ID = { {
 	0x39, 0xF8, 0x23, 0xE1, 0x8E, 0xC2, 0xE3, 0xF8, 0xEA, 0x5D, 0xD1, 0x2C, 0x85, 0x8E, 0xC8, 0x39
-    } };
+  } };
   std::string const GENESIS_TX = "011201ff00011e026bc5c7db8a664f652d78adb587ac4d759c6757258b64ef9cba3c0354e64fb2e42101abca6a39c561d0897be183eb0143990eba201aa7d2c652ab0555d28bb4b70728";
   uint32_t const GENESIS_NONCE = 10000;
 
@@ -175,10 +189,38 @@ namespace config
     uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 63;
     uint16_t const P2P_DEFAULT_PORT = 30188;
     uint16_t const RPC_DEFAULT_PORT = 30189;
+    uint16_t const ZMQ_RPC_DEFAULT_PORT = 30190;
     boost::uuids::uuid const NETWORK_ID = { {
         0x04, 0xF8, 0x23, 0x40, 0x66, 0xC2, 0x04, 0xA4, 0xEA, 0x5D, 0xD1, 0x2C, 0x85, 0x8E, 0xC8, 0x40
-      } };
+    } };
     std::string const GENESIS_TX = "011201ff00011e02ec8750a795fcd2a9d776aaac3a89336feea414718c76c0d6680fe625241d4f522101912cba0ab676306a8c958e97ceeddf2d3d1db24b49cf6a3ee96eb6745e0fb1fb";
     uint32_t const GENESIS_NONCE = 10001;
   }
+
+    namespace stagenet
+    {
+        uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 24;
+        uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 25;
+        uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 36;
+        uint16_t const P2P_DEFAULT_PORT = 20188;
+        uint16_t const RPC_DEFAULT_PORT = 20189;
+        uint16_t const ZMQ_RPC_DEFAULT_PORT = 20190;
+        boost::uuids::uuid const NETWORK_ID = { {
+            0x12 ,0x30, 0xF1, 0x71 , 0x61, 0x04 , 0x41, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x12
+        } }; // Bender's daydream
+        std::string const GENESIS_TX = ""; // add this
+        uint32_t const GENESIS_NONCE = 0; // add this
+    }
+}
+
+namespace cryptonote
+{
+    enum network_type : uint8_t
+    {
+        MAINNET = 0,
+        TESTNET,
+        STAGENET,
+        FAKECHAIN,
+        UNDEFINED = 255
+    };
 }

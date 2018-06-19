@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, The Monero Project
+# Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
 #
@@ -39,5 +39,3 @@ target_link_libraries(cryptonote_protocol
     p2p
   PRIVATE
     ${EXTRA_LIBRARIES})
-add_dependencies(cryptonote_protocol
-  version)

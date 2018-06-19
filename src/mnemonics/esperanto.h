@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Stellite Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -58,7 +58,7 @@ namespace Language
   class Esperanto: public Base
   {
   public:
-    Esperanto(): Base("Esperanto", std::vector<std::string>({
+    Esperanto(): Base("Esperanto", "Esperanto", std::vector<std::string>({
       "abako",
       "abdiki",
       "abelo",
@@ -1048,7 +1048,6 @@ namespace Language
       "majstro",
       "maketo",
       "malgranda",
-      "malutila",
       "mamo",
       "mandareno",
       "maorio",
@@ -1481,6 +1480,7 @@ namespace Language
       "sprita",
       "spuro",
       "stabila",
+      "stelfiguro",
       "stimulo",
       "stomako",
       "strato",

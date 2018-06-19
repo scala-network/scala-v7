@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -97,123 +97,123 @@ bool UnsignedTransactionImpl::sign(const std::string &signedFileName)
 }
 
 //----------------------------------------------------------------------------------------------------
-    bool UnsignedTransactionImpl::checkLoadedTx(const std::function<size_t()> get_num_txes, const std::function<const tools::wallet2::tx_construction_data&(size_t)> &get_tx, const std::string &extra_message)
+bool UnsignedTransactionImpl::checkLoadedTx(const std::function<size_t()> get_num_txes, const std::function<const tools::wallet2::tx_construction_data&(size_t)> &get_tx, const std::string &extra_message)
+{
+  // gather info to ask the user
+  uint64_t amount = 0, amount_to_dests = 0, change = 0;
+  size_t min_ring_size = ~0;
+  std::unordered_map<cryptonote::account_public_address, std::pair<std::string, uint64_t>> dests;
+  int first_known_non_zero_change_index = -1;
+  std::string payment_id_string = "";
+  for (size_t n = 0; n < get_num_txes(); ++n)
+  {
+    const tools::wallet2::tx_construction_data &cd = get_tx(n);
+
+    std::vector<cryptonote::tx_extra_field> tx_extra_fields;
+    bool has_encrypted_payment_id = false;
+    crypto::hash8 payment_id8 = crypto::null_hash8;
+    if (cryptonote::parse_tx_extra(cd.extra, tx_extra_fields))
     {
-        // gather info to ask the user
-        uint64_t amount = 0, amount_to_dests = 0, change = 0;
-        size_t min_ring_size = ~0;
-        std::unordered_map<cryptonote::account_public_address, std::pair<std::string, uint64_t>> dests;
-        int first_known_non_zero_change_index = -1;
-        std::string payment_id_string = "";
-        for (size_t n = 0; n < get_num_txes(); ++n)
+      cryptonote::tx_extra_nonce extra_nonce;
+      if (find_tx_extra_field_by_type(tx_extra_fields, extra_nonce))
+      {
+        crypto::hash payment_id;
+        if(cryptonote::get_encrypted_payment_id_from_tx_extra_nonce(extra_nonce.nonce, payment_id8))
         {
-            const tools::wallet2::tx_construction_data &cd = get_tx(n);
-
-            std::vector<cryptonote::tx_extra_field> tx_extra_fields;
-            bool has_encrypted_payment_id = false;
-            crypto::hash8 payment_id8 = crypto::null_hash8;
-            if (cryptonote::parse_tx_extra(cd.extra, tx_extra_fields))
-            {
-                cryptonote::tx_extra_nonce extra_nonce;
-                if (find_tx_extra_field_by_type(tx_extra_fields, extra_nonce))
-                {
-                    crypto::hash payment_id;
-                    if(cryptonote::get_encrypted_payment_id_from_tx_extra_nonce(extra_nonce.nonce, payment_id8))
-                    {
-                        if (!payment_id_string.empty())
-                            payment_id_string += ", ";
-                        payment_id_string = std::string("encrypted payment ID ") + epee::string_tools::pod_to_hex(payment_id8);
-                        has_encrypted_payment_id = true;
-                    }
-                    else if (cryptonote::get_payment_id_from_tx_extra_nonce(extra_nonce.nonce, payment_id))
-                    {
-                        if (!payment_id_string.empty())
-                            payment_id_string += ", ";
-                        payment_id_string = std::string("unencrypted payment ID ") + epee::string_tools::pod_to_hex(payment_id);
-                    }
-                }
-            }
-
-            for (size_t s = 0; s < cd.sources.size(); ++s)
-            {
-                amount += cd.sources[s].amount;
-                size_t ring_size = cd.sources[s].outputs.size();
-                if (ring_size < min_ring_size)
-                    min_ring_size = ring_size;
-            }
-            for (size_t d = 0; d < cd.splitted_dsts.size(); ++d)
-            {
-                const cryptonote::tx_destination_entry &entry = cd.splitted_dsts[d];
-                std::string address, standard_address = get_account_address_as_str(m_wallet.m_wallet->testnet(), entry.is_subaddress, entry.addr);
-                if (has_encrypted_payment_id && !entry.is_subaddress)
-                {
-                    address = get_account_integrated_address_as_str(m_wallet.m_wallet->testnet(), entry.addr, payment_id8);
-                    address += std::string(" (" + standard_address + " with encrypted payment id " + epee::string_tools::pod_to_hex(payment_id8) + ")");
-                }
-                else
-                    address = standard_address;
-                auto i = dests.find(entry.addr);
-                if (i == dests.end())
-                    dests.insert(std::make_pair(entry.addr, std::make_pair(address, entry.amount)));
-                else
-                    i->second.second += entry.amount;
-                amount_to_dests += entry.amount;
-            }
-            if (cd.change_dts.amount > 0)
-            {
-                auto it = dests.find(cd.change_dts.addr);
-                if (it == dests.end())
-                {
-                    m_status = Status_Error;
-                    m_errorString = tr("Claimed change does not go to a paid address");
-                    return false;
-                }
-                if (it->second.second < cd.change_dts.amount)
-                {
-                    m_status = Status_Error;
-                    m_errorString = tr("Claimed change is larger than payment to the change address");
-                    return  false;
-                }
-                if (cd.change_dts.amount > 0)
-                {
-                    if (first_known_non_zero_change_index == -1)
-                        first_known_non_zero_change_index = n;
-                    if (memcmp(&cd.change_dts.addr, &get_tx(first_known_non_zero_change_index).change_dts.addr, sizeof(cd.change_dts.addr)))
-                    {
-                        m_status = Status_Error;
-                        m_errorString = tr("Change goes to more than one address");
-                        return false;
-                    }
-                }
-                change += cd.change_dts.amount;
-                it->second.second -= cd.change_dts.amount;
-                if (it->second.second == 0)
-                    dests.erase(cd.change_dts.addr);
-            }
+          if (!payment_id_string.empty())
+            payment_id_string += ", ";
+          payment_id_string = std::string("encrypted payment ID ") + epee::string_tools::pod_to_hex(payment_id8);
+          has_encrypted_payment_id = true;
         }
-        std::string dest_string;
-        for (auto i = dests.begin(); i != dests.end(); )
+        else if (cryptonote::get_payment_id_from_tx_extra_nonce(extra_nonce.nonce, payment_id))
         {
-            dest_string += (boost::format(tr("sending %s to %s")) % cryptonote::print_money(i->second.second) % i->second.first).str();
-            ++i;
-            if (i != dests.end())
-                dest_string += ", ";
+          if (!payment_id_string.empty())
+            payment_id_string += ", ";
+          payment_id_string = std::string("unencrypted payment ID ") + epee::string_tools::pod_to_hex(payment_id);
         }
-        if (dest_string.empty())
-            dest_string = tr("with no destinations");
-
-        std::string change_string;
-        if (change > 0)
-        {
-            std::string address = get_account_address_as_str(m_wallet.m_wallet->testnet(), get_tx(0).subaddr_account > 0, get_tx(0).change_dts.addr);
-            change_string += (boost::format(tr("%s change to %s")) % cryptonote::print_money(change) % address).str();
-        }
-        else
-            change_string += tr("no change");
-        uint64_t fee = amount - amount_to_dests;
-        m_confirmationMessage = (boost::format(tr("Loaded %lu transactions, for %s, fee %s, %s, %s, with min ring size %lu. %s")) % (unsigned long)get_num_txes() % cryptonote::print_money(amount) % cryptonote::print_money(fee) % dest_string % change_string % (unsigned long)min_ring_size % extra_message).str();
-        return true;
+      }
     }
+
+    for (size_t s = 0; s < cd.sources.size(); ++s)
+    {
+      amount += cd.sources[s].amount;
+      size_t ring_size = cd.sources[s].outputs.size();
+      if (ring_size < min_ring_size)
+        min_ring_size = ring_size;
+    }
+    for (size_t d = 0; d < cd.splitted_dsts.size(); ++d)
+    {
+      const cryptonote::tx_destination_entry &entry = cd.splitted_dsts[d];
+      std::string address, standard_address = get_account_address_as_str(m_wallet.m_wallet->nettype(), entry.is_subaddress, entry.addr);
+      if (has_encrypted_payment_id && !entry.is_subaddress)
+      {
+        address = get_account_integrated_address_as_str(m_wallet.m_wallet->nettype(), entry.addr, payment_id8);
+        address += std::string(" (" + standard_address + " with encrypted payment id " + epee::string_tools::pod_to_hex(payment_id8) + ")");
+      }
+      else
+        address = standard_address;
+      auto i = dests.find(entry.addr);
+      if (i == dests.end())
+        dests.insert(std::make_pair(entry.addr, std::make_pair(address, entry.amount)));
+      else
+        i->second.second += entry.amount;
+      amount_to_dests += entry.amount;
+    }
+    if (cd.change_dts.amount > 0)
+    {
+      auto it = dests.find(cd.change_dts.addr);
+      if (it == dests.end())
+      {
+        m_status = Status_Error;
+        m_errorString = tr("Claimed change does not go to a paid address");
+        return false;
+      }
+      if (it->second.second < cd.change_dts.amount)
+      {
+        m_status = Status_Error;
+        m_errorString = tr("Claimed change is larger than payment to the change address");
+        return  false;
+      }
+      if (cd.change_dts.amount > 0)
+      {
+        if (first_known_non_zero_change_index == -1)
+          first_known_non_zero_change_index = n;
+        if (memcmp(&cd.change_dts.addr, &get_tx(first_known_non_zero_change_index).change_dts.addr, sizeof(cd.change_dts.addr)))
+        {
+          m_status = Status_Error;
+          m_errorString = tr("Change goes to more than one address");
+          return false;
+        }
+      }
+      change += cd.change_dts.amount;
+      it->second.second -= cd.change_dts.amount;
+      if (it->second.second == 0)
+        dests.erase(cd.change_dts.addr);
+    }
+  }
+  std::string dest_string;
+  for (auto i = dests.begin(); i != dests.end(); )
+  {
+    dest_string += (boost::format(tr("sending %s to %s")) % cryptonote::print_money(i->second.second) % i->second.first).str();
+    ++i;
+    if (i != dests.end())
+      dest_string += ", ";
+  }
+  if (dest_string.empty())
+    dest_string = tr("with no destinations");
+
+  std::string change_string;
+  if (change > 0)
+  {
+    std::string address = get_account_address_as_str(m_wallet.m_wallet->nettype(), get_tx(0).subaddr_account > 0, get_tx(0).change_dts.addr);
+    change_string += (boost::format(tr("%s change to %s")) % cryptonote::print_money(change) % address).str();
+  }
+  else
+    change_string += tr("no change");
+  uint64_t fee = amount - amount_to_dests;
+  m_confirmationMessage = (boost::format(tr("Loaded %lu transactions, for %s, fee %s, %s, %s, with min ring size %lu. %s")) % (unsigned long)get_num_txes() % cryptonote::print_money(amount) % cryptonote::print_money(fee) % dest_string % change_string % (unsigned long)min_ring_size % extra_message).str();
+  return true;
+}
 
 std::vector<uint64_t> UnsignedTransactionImpl::amount() const
 {
@@ -234,13 +234,13 @@ std::vector<uint64_t> UnsignedTransactionImpl::fee() const
         for (const auto &i: utx.sources) fee += i.amount;
         for (const auto &i: utx.splitted_dsts) fee -= i.amount;
         result.push_back(fee);
-    }
+    }   
     return result;
-}
+} 
 
 std::vector<uint64_t> UnsignedTransactionImpl::mixin() const
 {
-    std::vector<uint64_t> result;
+    std::vector<uint64_t> result;    
     for (const auto &utx: m_unsigned_tx_set.txes) {
         size_t min_mixin = ~0;
         // TODO: Is this loop needed or is sources[0] ?
@@ -252,17 +252,17 @@ std::vector<uint64_t> UnsignedTransactionImpl::mixin() const
         result.push_back(min_mixin);
     }
     return result;
-}
+}    
 
 uint64_t UnsignedTransactionImpl::txCount() const
 {
     return m_unsigned_tx_set.txes.size();
 }
 
-std::vector<std::string> UnsignedTransactionImpl::paymentId() const
+std::vector<std::string> UnsignedTransactionImpl::paymentId() const 
 {
     std::vector<string> result;
-    for (const auto &utx: m_unsigned_tx_set.txes) {
+    for (const auto &utx: m_unsigned_tx_set.txes) {     
         crypto::hash payment_id = crypto::null_hash;
         cryptonote::tx_extra_nonce extra_nonce;
         std::vector<cryptonote::tx_extra_field> tx_extra_fields;
@@ -278,7 +278,7 @@ std::vector<std::string> UnsignedTransactionImpl::paymentId() const
           else if (!cryptonote::get_payment_id_from_tx_extra_nonce(extra_nonce.nonce, payment_id))
           {
             payment_id = crypto::null_hash;
-          }
+          }      
         }
         if(payment_id != crypto::null_hash)
             result.push_back(epee::string_tools::pod_to_hex(payment_id));
@@ -288,23 +288,23 @@ std::vector<std::string> UnsignedTransactionImpl::paymentId() const
     return result;
 }
 
-    std::vector<std::string> UnsignedTransactionImpl::recipientAddress() const
-    {
-        // TODO: return integrated address if short payment ID exists
-        std::vector<string> result;
-        for (const auto &utx: m_unsigned_tx_set.txes) {
-            if (utx.dests.empty()) {
-                MERROR("empty destinations, skipped");
-                continue;
-            }
-            result.push_back(cryptonote::get_account_address_as_str(m_wallet.m_wallet->testnet(), utx.dests[0].is_subaddress, utx.dests[0].addr));
+std::vector<std::string> UnsignedTransactionImpl::recipientAddress() const 
+{
+    // TODO: return integrated address if short payment ID exists
+    std::vector<string> result;
+    for (const auto &utx: m_unsigned_tx_set.txes) {
+        if (utx.dests.empty()) {
+          MERROR("empty destinations, skipped");
+          continue;
         }
-        return result;
+        result.push_back(cryptonote::get_account_address_as_str(m_wallet.m_wallet->nettype(), utx.dests[0].is_subaddress, utx.dests[0].addr));
     }
+    return result;
+}
 
 uint64_t UnsignedTransactionImpl::minMixinCount() const
-{
-    uint64_t min_mixin = ~0;
+{    
+    uint64_t min_mixin = ~0;  
     for (const auto &utx: m_unsigned_tx_set.txes) {
         for (size_t s = 0; s < utx.sources.size(); ++s) {
             size_t mixin = utx.sources[s].outputs.size() - 1;

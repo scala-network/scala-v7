@@ -1,6 +1,6 @@
 // Word list created by Monero contributor sammy007
 // 
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -51,7 +51,7 @@ namespace Language
   class Russian: public Base
   {
   public:
-    Russian(): Base("русский язык", std::vector<std::string>({
+    Russian(): Base("русский язык", "Russian", std::vector<std::string>({
         "абажур",
         "абзац",
         "абонент",

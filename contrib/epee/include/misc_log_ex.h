@@ -28,30 +28,12 @@
 #ifndef _MISC_LOG_EX_H_
 #define _MISC_LOG_EX_H_
 
-#include "static_initializer.h"
-#include "string_tools.h"
-#include "time_helper.h"
-#include "misc_os_dependent.h"
-
-#include "syncobj.h"
-
-#include <iostream>
-#include <sstream>
-#include <iomanip>
-#include <fstream>
-#include <algorithm>
-#include <list>
-#include <map>
 #include <string>
-#include <time.h>
-#include <boost/cstdint.hpp>
-#include <boost/thread.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include "easylogging++.h"
 
 #define MONERO_DEFAULT_LOG_CATEGORY "default"
+#define MAX_LOG_FILE_SIZE 104850000 // 100 MB - 7600 bytes
 
 #define MCFATAL(cat,x) CLOG(FATAL,cat) << x
 #define MCERROR(cat,x) CLOG(ERROR,cat) << x
@@ -104,9 +86,9 @@
 #define _dbg2(x) MDEBUG(x)
 #define _dbg1(x) MDEBUG(x)
 #define _info(x) MINFO(x)
-#define _note(x) MINFO(x)
-#define _fact(x) MINFO(x)
-#define _mark(x) MINFO(x)
+#define _note(x) MDEBUG(x)
+#define _fact(x) MDEBUG(x)
+#define _mark(x) MDEBUG(x)
 #define _warn(x) MWARNING(x)
 #define _erro(x) MERROR(x)
 
@@ -123,8 +105,9 @@
 #endif
 
 std::string mlog_get_default_log_path(const char *default_filename);
-void mlog_configure(const std::string &filename_base, bool console);
+void mlog_configure(const std::string &filename_base, bool console, const std::size_t max_log_file_size = MAX_LOG_FILE_SIZE);
 void mlog_set_categories(const char *categories);
+std::string mlog_get_categories();
 void mlog_set_log_level(int level);
 void mlog_set_log(const char *log);
 
@@ -167,7 +150,7 @@ namespace debug
 
 
 #define ASSERT_MES_AND_THROW(message) {LOG_ERROR(message); std::stringstream ss; ss << message; throw std::runtime_error(ss.str());}
-#define CHECK_AND_ASSERT_THROW_MES(expr, message) {if(!(expr)) ASSERT_MES_AND_THROW(message);}
+#define CHECK_AND_ASSERT_THROW_MES(expr, message) do {if(!(expr)) ASSERT_MES_AND_THROW(message);} while(0)
 
 
 #ifndef CHECK_AND_ASSERT

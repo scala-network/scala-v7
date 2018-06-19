@@ -2,7 +2,7 @@
 /// @author rfree (current maintainer in monero.cc project)
 /// @brief This is the place to implement our handlers for protocol network actions, e.g. for ratelimit for download-requests
 
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -70,7 +70,7 @@
 #include <boost/asio/ip/unicast.hpp>
 
 #include "cryptonote_protocol_handler.h"
-#include "p2p/network_throttle.hpp"
+#include "net/network_throttle.hpp"
 
 #include "cryptonote_core/cryptonote_core.h" // e.g. for the send_stop_signal()
 
@@ -140,7 +140,7 @@ void cryptonote_protocol_handler_base::handler_response_blocks_now(size_t packet
 
 		{ 
 	  	CRITICAL_REGION_LOCAL(	network_throttle_manager::m_lock_get_global_throttle_out );
-			delay = network_throttle_manager::get_global_throttle_out().get_sleep_time_after_tick( packet_size ); // decission from global
+			delay = network_throttle_manager::get_global_throttle_out().get_sleep_time_after_tick( packet_size );
 		}
 
 		

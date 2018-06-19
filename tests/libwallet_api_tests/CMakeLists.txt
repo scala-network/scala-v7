@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, The Monero Project
+# Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
 #
@@ -38,8 +38,12 @@ add_executable(libwallet_api_tests
   ${libwallet_api_tests_headers})
 
 target_link_libraries(libwallet_api_tests
+  PUBLIC
+  device
   PRIVATE
+    wallet_api
     wallet
+    version
     epee
     ${Boost_CHRONO_LIBRARY}
     ${Boost_SERIALIZATION_LIBRARY}

@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -44,11 +44,14 @@
 #include "cryptonote_basic/cryptonote_basic_impl.h"
 #include "wallet/wallet2.h"
 #include "console_handler.h"
+#include "common/i18n.h"
 #include "common/password.h"
 #include "crypto/crypto.h"  // for definition of crypto::secret_key
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "wallet.simplewallet"
+// Hardcode Stellite's donation address (see #1447)
+constexpr const char MONERO_DONATION_ADDR[] = "Se3dRf8ZTUXKYivaTFU4KYczPcmMcwPZWEQ5HZmj3RRviFJ3w1mNhtgCWkn6VsnQcMBX1hyCUjZVuSo8X7yJTSYj1joP84WoT";
 
 /*!
  * \namespace cryptonote
@@ -77,6 +80,7 @@ namespace cryptonote
     //wallet *create_wallet();
     bool process_command(const std::vector<std::string> &args);
     std::string get_commands_str();
+    std::string get_command_usage(const std::vector<std::string> &args);
   private:
     bool handle_command_line(const boost::program_options::variables_map& vm);
 
@@ -91,12 +95,16 @@ namespace cryptonote
         bool recover, bool two_random, const std::string &old_language);
     bool new_wallet(const boost::program_options::variables_map& vm, const cryptonote::account_public_address& address,
         const boost::optional<crypto::secret_key>& spendkey, const crypto::secret_key& viewkey);
+    bool new_wallet(const boost::program_options::variables_map& vm,
+        const std::string &multisig_keys, const std::string &old_language);
+    bool new_wallet(const boost::program_options::variables_map& vm, const std::string& device_name);
     bool open_wallet(const boost::program_options::variables_map& vm);
     bool close_wallet();
 
     bool viewkey(const std::vector<std::string> &args = std::vector<std::string>());
     bool spendkey(const std::vector<std::string> &args = std::vector<std::string>());
     bool seed(const std::vector<std::string> &args = std::vector<std::string>());
+    bool encrypted_seed(const std::vector<std::string> &args = std::vector<std::string>());
 
     /*!
      * \brief Sets seed language.
@@ -121,13 +129,21 @@ namespace cryptonote
     bool set_min_output_value(const std::vector<std::string> &args = std::vector<std::string>());
     bool set_merge_destinations(const std::vector<std::string> &args = std::vector<std::string>());
     bool set_confirm_backlog(const std::vector<std::string> &args = std::vector<std::string>());
+    bool set_confirm_backlog_threshold(const std::vector<std::string> &args = std::vector<std::string>());
+    bool set_confirm_export_overwrite(const std::vector<std::string> &args = std::vector<std::string>());
     bool set_refresh_from_block_height(const std::vector<std::string> &args = std::vector<std::string>());
+    bool set_auto_low_priority(const std::vector<std::string> &args = std::vector<std::string>());
+    bool set_segregate_pre_fork_outputs(const std::vector<std::string> &args = std::vector<std::string>());
+    bool set_key_reuse_mitigation2(const std::vector<std::string> &args = std::vector<std::string>());
+    bool set_subaddress_lookahead(const std::vector<std::string> &args = std::vector<std::string>());
+    bool set_segregation_height(const std::vector<std::string> &args = std::vector<std::string>());
     bool help(const std::vector<std::string> &args = std::vector<std::string>());
     bool start_mining(const std::vector<std::string> &args);
     bool stop_mining(const std::vector<std::string> &args);
-    bool save_bc(const std::vector<std::string>& args);
+    bool set_daemon(const std::vector<std::string> &args);
+    bool save_bc(const std::vector<std::string> &args);
     bool refresh(const std::vector<std::string> &args);
-    bool show_balance_unlocked();
+    bool show_balance_unlocked(bool detailed = false);
     bool show_balance(const std::vector<std::string> &args = std::vector<std::string>());
     bool show_incoming_transfers(const std::vector<std::string> &args);
     bool show_payments(const std::vector<std::string> &args);
@@ -139,6 +155,7 @@ namespace cryptonote
     bool sweep_main(uint64_t below, const std::vector<std::string> &args);
     bool sweep_all(const std::vector<std::string> &args);
     bool sweep_below(const std::vector<std::string> &args);
+    bool sweep_single(const std::vector<std::string> &args);
     bool sweep_unmixable(const std::vector<std::string> &args);
     bool donate(const std::vector<std::string> &args);
     bool sign_transfer(const std::vector<std::string> &args);
@@ -146,6 +163,9 @@ namespace cryptonote
     std::vector<std::vector<cryptonote::tx_destination_entry>> split_amounts(
         std::vector<cryptonote::tx_destination_entry> dsts, size_t num_splits
     );
+    bool account(const std::vector<std::string> &args = std::vector<std::string>());
+    void print_accounts();
+    void print_accounts(const std::string& tag);
     bool print_address(const std::vector<std::string> &args = std::vector<std::string>());
     bool print_integrated_address(const std::vector<std::string> &args = std::vector<std::string>());
     bool address_book(const std::vector<std::string> &args = std::vector<std::string>());
@@ -156,18 +176,22 @@ namespace cryptonote
     bool set_log(const std::vector<std::string> &args);
     bool get_tx_key(const std::vector<std::string> &args);
     bool check_tx_key(const std::vector<std::string> &args);
-    bool check_tx_key_helper(const crypto::hash &txid, const cryptonote::account_public_address &address, const crypto::key_derivation &derivation);
     bool get_tx_proof(const std::vector<std::string> &args);
+    bool check_tx_proof(const std::vector<std::string> &args);
     bool get_spend_proof(const std::vector<std::string> &args);
     bool check_spend_proof(const std::vector<std::string> &args);
-    bool check_tx_proof(const std::vector<std::string> &args);
+    bool get_reserve_proof(const std::vector<std::string> &args);
+    bool check_reserve_proof(const std::vector<std::string> &args);
     bool show_transfers(const std::vector<std::string> &args);
     bool unspent_outputs(const std::vector<std::string> &args);
     bool rescan_blockchain(const std::vector<std::string> &args);
-    bool refresh_main(uint64_t start_height, bool reset = false);
+    bool refresh_main(uint64_t start_height, bool reset = false, bool is_init = false);
     bool set_tx_note(const std::vector<std::string> &args);
     bool get_tx_note(const std::vector<std::string> &args);
+    bool set_description(const std::vector<std::string> &args);
+    bool get_description(const std::vector<std::string> &args);
     bool status(const std::vector<std::string> &args);
+    bool wallet_info(const std::vector<std::string> &args);
     bool set_default_priority(const std::vector<std::string> &args);
     bool sign(const std::vector<std::string> &args);
     bool verify(const std::vector<std::string> &args);
@@ -179,6 +203,22 @@ namespace cryptonote
     bool change_password(const std::vector<std::string>& args);
     bool payment_id(const std::vector<std::string> &args);
     bool print_fee_info(const std::vector<std::string> &args);
+    bool prepare_multisig(const std::vector<std::string>& args);
+    bool make_multisig(const std::vector<std::string>& args);
+    bool finalize_multisig(const std::vector<std::string> &args);
+    bool export_multisig(const std::vector<std::string>& args);
+    bool import_multisig(const std::vector<std::string>& args);
+    bool accept_loaded_tx(const tools::wallet2::multisig_tx_set &txs);
+    bool sign_multisig(const std::vector<std::string>& args);
+    bool submit_multisig(const std::vector<std::string>& args);
+    bool export_raw_multisig(const std::vector<std::string>& args);
+    bool print_ring(const std::vector<std::string>& args);
+    bool set_ring(const std::vector<std::string>& args);
+    bool save_known_rings(const std::vector<std::string>& args);
+    bool blackball(const std::vector<std::string>& args);
+    bool unblackball(const std::vector<std::string>& args);
+    bool blackballed(const std::vector<std::string>& args);
+    bool version(const std::vector<std::string>& args);
 
     uint64_t get_daemon_blockchain_height(std::string& err);
     bool try_connect_to_daemon(bool silent = false, uint32_t* version = nullptr);
@@ -188,6 +228,8 @@ namespace cryptonote
     bool accept_loaded_tx(const tools::wallet2::signed_tx_set &txs);
     bool print_ring_members(const std::vector<tools::wallet2::pending_tx>& ptx_vector, std::ostream& ostr);
     std::string get_prompt() const;
+    bool print_seed(bool encrypted);
+    bool is_daemon_trusted() const { return *m_trusted_daemon; }
 
     /*!
      * \brief Prints the seed with a nice message
@@ -204,11 +246,17 @@ namespace cryptonote
      */
     std::string get_mnemonic_language();
 
+    /*!
+     * \brief When --do-not-relay option is specified, save the raw tx hex blob to a file instead of calling m_wallet->commit_tx(ptx).
+     * \param ptx_vector Pending tx(es) created by transfer/sweep_all
+     */
+    void commit_or_save(std::vector<tools::wallet2::pending_tx>& ptx_vector, bool do_not_relay);
+
     //----------------- i_wallet2_callback ---------------------
     virtual void on_new_block(uint64_t height, const cryptonote::block& block);
-    virtual void on_money_received(uint64_t height, const crypto::hash &txid, const cryptonote::transaction& tx, uint64_t amount);
-    virtual void on_unconfirmed_money_received(uint64_t height, const crypto::hash &txid, const cryptonote::transaction& tx, uint64_t amount);
-    virtual void on_money_spent(uint64_t height, const crypto::hash &txid, const cryptonote::transaction& in_tx, uint64_t amount, const cryptonote::transaction& spend_tx);
+    virtual void on_money_received(uint64_t height, const crypto::hash &txid, const cryptonote::transaction& tx, uint64_t amount, const cryptonote::subaddress_index& subaddr_index);
+    virtual void on_unconfirmed_money_received(uint64_t height, const crypto::hash &txid, const cryptonote::transaction& tx, uint64_t amount, const cryptonote::subaddress_index& subaddr_index);
+    virtual void on_money_spent(uint64_t height, const crypto::hash &txid, const cryptonote::transaction& in_tx, uint64_t amount, const cryptonote::transaction& spend_tx, const cryptonote::subaddress_index& subaddr_index);
     virtual void on_skip_transaction(uint64_t height, const crypto::hash &txid, const cryptonote::transaction& tx);
     //----------------------------------------------------------
 
@@ -228,7 +276,7 @@ namespace cryptonote
       void update(uint64_t height, bool force = false)
       {
         auto current_time = std::chrono::system_clock::now();
-        const auto node_update_threshold = std::chrono::seconds(DIFFICULTY_TARGET / 2); // use min of V1/V2
+        const auto node_update_threshold = std::chrono::seconds(DIFFICULTY_TARGET_V1 / 2); // use min of V1/V2
         if (node_update_threshold < current_time - m_blockchain_height_update_time || m_blockchain_height <= height)
         {
           update_blockchain_height();
@@ -268,27 +316,32 @@ namespace cryptonote
   private:
     std::string m_wallet_file;
     std::string m_generate_new;
+    std::string m_generate_from_device;
     std::string m_generate_from_view_key;
+    std::string m_generate_from_spend_key;
     std::string m_generate_from_keys;
     std::string m_generate_from_multisig_keys;
     std::string m_generate_from_json;
     std::string m_mnemonic_language;
     std::string m_import_path;
+    std::string m_subaddress_lookahead;
 
     std::string m_electrum_seed;  // electrum-style seed parameter
 
     crypto::secret_key m_recovery_key;  // recovery key (used as random for wallet gen)
     bool m_restore_deterministic_wallet;  // recover flag
+    bool m_restore_multisig_wallet;  // recover flag
     bool m_non_deterministic;  // old 2-random generation
-    bool m_trusted_daemon;
+    boost::optional<bool> m_trusted_daemon;
     bool m_allow_mismatched_daemon_version;
     bool m_restoring;           // are we restoring, by whatever method?
     uint64_t m_restore_height;  // optional
+    bool m_do_not_relay;
+    bool m_use_english_language_names;
 
     epee::console_handlers_binder m_cmd_binder;
 
     std::unique_ptr<tools::wallet2> m_wallet;
-    epee::net_utils::http::http_simple_client m_http_client;
     refresh_progress_reporter_t m_refresh_progress_reporter;
 
     std::atomic<bool> m_idle_run;
@@ -299,5 +352,6 @@ namespace cryptonote
     std::atomic<bool> m_auto_refresh_enabled;
     bool m_auto_refresh_refreshing;
     std::atomic<bool> m_in_manual_refresh;
+    uint32_t m_current_subaddress_account;
   };
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -75,13 +75,13 @@ namespace cryptonote {
     }
   }
 
-    struct address_parse_info
-    {
-        account_public_address address;
-        bool is_subaddress;
-        bool has_payment_id;
-        crypto::hash8 payment_id;
-    };
+  struct address_parse_info
+  {
+    account_public_address address;
+    bool is_subaddress;
+    bool has_payment_id;
+    crypto::hash8 payment_id;
+  };
 
   /************************************************************************/
   /* Cryptonote helper functions                                          */
@@ -94,26 +94,26 @@ namespace cryptonote {
   uint8_t get_account_integrated_address_checksum(const public_integrated_address_outer_blob& bl);
 
   std::string get_account_address_as_str(
-      bool testnet
-    , bool subbaddress
+      network_type nettype
+    , bool subaddress
     , const account_public_address& adr
     );
 
   std::string get_account_integrated_address_as_str(
-      bool testnet
+      network_type nettype
     , const account_public_address& adr
     , const crypto::hash8& payment_id
     );
 
-    bool get_account_address_from_str(
-            address_parse_info& info
-            , bool testnet
-            , const std::string& str
+  bool get_account_address_from_str(
+      address_parse_info& info
+    , network_type nettype
+    , const std::string& str
     );
 
   bool get_account_address_from_str_or_url(
       address_parse_info& info
-    , bool testnet
+    , network_type nettype
     , const std::string& str_or_url
     , std::function<std::string(const std::string&, const std::vector<std::string>&, bool)> dns_confirm = return_first_address
     );
@@ -125,3 +125,4 @@ namespace cryptonote {
 }
 
 bool parse_hash256(const std::string str_hash, crypto::hash& hash);
+

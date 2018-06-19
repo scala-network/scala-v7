@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, The Monero Project
+# Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
 #
@@ -42,6 +42,7 @@ add_executable(cncrypto-tests
   ${crypto_headers})
 target_link_libraries(cncrypto-tests
   PRIVATE
+    common
     ${Boost_SYSTEM_LIBRARY}
     ${EXTRA_LIBRARIES})
 set_property(TARGET cncrypto-tests

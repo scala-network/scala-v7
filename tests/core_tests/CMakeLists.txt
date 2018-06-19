@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, The Monero Project
+# Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
 #
@@ -36,6 +36,7 @@ set(core_tests_sources
   chaingen_main.cpp
   double_spend.cpp
   integer_overflow.cpp
+  multisig.cpp
   ring_signature_1.cpp
   transaction_tests.cpp
   tx_validation.cpp
@@ -52,26 +53,30 @@ set(core_tests_headers
   double_spend.h
   double_spend.inl
   integer_overflow.h
+  multisig.h
   ring_signature_1.h
   transaction_tests.h
   tx_validation.h
   v2_tests.h
   rct.h)
 
-add_executable(coretests
+add_executable(core_tests
   ${core_tests_sources}
   ${core_tests_headers})
-target_link_libraries(coretests
+target_link_libraries(core_tests
   PRIVATE
+    multisig
     cryptonote_core
     p2p
+    version
     epee
+    device
     ${CMAKE_THREAD_LIBS_INIT}
     ${EXTRA_LIBRARIES})
-set_property(TARGET coretests
+set_property(TARGET core_tests
   PROPERTY
     FOLDER "tests")
 
 add_test(
-  NAME    coretests
-  COMMAND coretests --generate_and_play_test_data)
+  NAME    core_tests
+  COMMAND core_tests --generate_and_play_test_data)

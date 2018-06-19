@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -259,7 +259,7 @@ namespace cryptonote
             ar.tag("rctsig_prunable");
             ar.begin_object();
             r = rct_signatures.p.serialize_rctsig_prunable(ar, rct_signatures.type, vin.size(), vout.size(),
-                vin[0].type() == typeid(txin_to_key) ? boost::get<txin_to_key>(vin[0]).key_offsets.size() - 1 : 0);
+                vin.size() > 0 && vin[0].type() == typeid(txin_to_key) ? boost::get<txin_to_key>(vin[0]).key_offsets.size() - 1 : 0);
             if (!r || !ar.stream().good()) return false;
             ar.end_object();
           }
@@ -412,16 +412,16 @@ namespace cryptonote
       KV_SERIALIZE_VAL_POD_AS_BLOB_FORCE(m_view_public_key)
     END_KV_SERIALIZE_MAP()
 
-      bool operator==(const account_public_address& rhs) const
-      {
-        return m_spend_public_key == rhs.m_spend_public_key &&
-               m_view_public_key == rhs.m_view_public_key;
-      }
+    bool operator==(const account_public_address& rhs) const
+    {
+      return m_spend_public_key == rhs.m_spend_public_key &&
+             m_view_public_key == rhs.m_view_public_key;
+    }
 
-      bool operator!=(const account_public_address& rhs) const
-      {
-        return !(*this == rhs);
-      }
+    bool operator!=(const account_public_address& rhs) const
+    {
+      return !(*this == rhs);
+    }
   };
 
   struct keypair
@@ -429,15 +429,30 @@ namespace cryptonote
     crypto::public_key pub;
     crypto::secret_key sec;
 
-    static inline keypair generate()
+    static inline keypair generate(hw::device &hwdev)
     {
       keypair k;
-      generate_keys(k.pub, k.sec);
+      hwdev.generate_keys(k.pub, k.sec);
       return k;
     }
   };
   //---------------------------------------------------------------
 
+}
+
+namespace std {
+  template <>
+  struct hash<cryptonote::account_public_address>
+  {
+    std::size_t operator()(const cryptonote::account_public_address& addr) const
+    {
+      // https://stackoverflow.com/a/17017281
+      size_t res = 17;
+      res = res * 31 + hash<crypto::public_key>()(addr.m_spend_public_key);
+      res = res * 31 + hash<crypto::public_key>()(addr.m_view_public_key);
+      return res;
+    }
+  };
 }
 
 BLOB_SERIALIZER(cryptonote::txout_to_key);

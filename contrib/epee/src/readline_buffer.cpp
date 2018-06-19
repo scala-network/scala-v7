@@ -1,8 +1,8 @@
 #include "readline_buffer.h"
 #include <readline/readline.h>
 #include <readline/history.h>
-#include <sys/select.h>
 #include <unistd.h>
+#include <iostream>
 #include <boost/thread.hpp>
 #include <boost/algorithm/string.hpp>
 

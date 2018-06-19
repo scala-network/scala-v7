@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The Monero Project
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -313,7 +313,7 @@ void BlockchainBDB::remove_block()
         throw1(DB_ERROR("Failed to add removal of block hash to db transaction"));
 }
 
-void BlockchainBDB::add_transaction_data(const crypto::hash& blk_hash, const transaction& tx, const crypto::hash& tx_hash)
+void BlockchainBDB::add_transaction_data(const crypto::hash& blk_hash, const transaction& tx, const crypto::hash& tx_hash, const crypto::hash& tx_prunable_hash)
 {
     LOG_PRINT_L3("BlockchainBDB::" << __func__);
     check_open();
@@ -655,7 +655,7 @@ bool BlockchainBDB::for_all_blocks(std::function<bool(uint64_t, const crypto::ha
     return ret;
 }
 
-bool BlockchainBDB::for_all_transactions(std::function<bool(const crypto::hash&, const cryptonote::transaction&)> f) const
+bool BlockchainBDB::for_all_transactions(std::function<bool(const crypto::hash&, const cryptonote::transaction&)> f, bool pruned) const
 {
     LOG_PRINT_L3("BlockchainBDB::" << __func__);
     check_open();
@@ -770,13 +770,13 @@ BlockchainBDB::~BlockchainBDB()
 }
 
 BlockchainBDB::BlockchainBDB(bool batch_transactions) :
+        BlockchainDB(),
         m_buffer(DB_BUFFER_COUNT, DB_BUFFER_LENGTH)
 {
     LOG_PRINT_L3("BlockchainBDB::" << __func__);
     // initialize folder to something "safe" just in case
     // someone accidentally misuses this class...
     m_folder = "thishsouldnotexistbecauseitisgibberish";
-    m_open = false;
     m_run_checkpoint = 0;
     m_batch_transactions = batch_transactions;
     m_write_txn = nullptr;
@@ -2332,6 +2332,13 @@ void BlockchainBDB::checkpoint_worker() const
 bool BlockchainBDB::is_read_only() const
 {
   return false;
+}
+
+void BlockchainBDB::fixup()
+{
+  LOG_PRINT_L3("BlockchainBDB::" << __func__);
+  // Always call parent as well
+  BlockchainDB::fixup();
 }
 
 }  // namespace cryptonote
