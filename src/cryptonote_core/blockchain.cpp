@@ -89,26 +89,19 @@ static const struct {
   uint8_t threshold;
   time_t time;
 } mainnet_hard_forks[] = {
+
   // version 1 from the start of the blockchain
   { 1, 1, 0, 1341378000 },
 
-  // version 2 starts from block 1009827, which is on or around the 20th of March, 2016. Fork time finalised on 2015-09-20. No fork voting occurs for the v2 fork.
-  { 2, 1009827, 0, 1442763710 },
+  // Version 2 starts from block 67500, fork time decided on 2018-03-09
+  { 2, 67500, 0, 1520584977 },
 
-  // version 3 starts from block 1141317, which is on or around the 24th of September, 2016. Fork time finalised on 2016-03-21.
-  { 3, 1141317, 0, 1458558528 },
-  
-  // version 4 starts from block 1220516, which is on or around the 5th of January, 2017. Fork time finalised on 2016-09-18.
-  { 4, 1220516, 0, 1483574400 },
-  
-  // version 5 starts from block 1288616, which is on or around the 15th of April, 2017. Fork time finalised on 2017-03-14.
-  { 5, 1288616, 0, 1489520158 },  
+  // Version 3 starts from block 100800, fork time decided on 2018-04-01
+  { 3, 100800, 0, 1522557835 },
 
-  // version 6 starts from block 1400000, which is on or around the 16th of September, 2017. Fork time finalised on 2017-08-18.
-  { 6, 1400000, 0, 1503046577 },
+  // Version 4 starts from block 194600, fork time decided about midday UTC on 2018-06-08
+  { 4, 194600, 0, 1522557836 },
 
-  // version 7 starts from block 1546000, which is on or around the 6th of April, 2018. Fork time finalised on 2018-03-17.
-  { 7, 1546000, 0, 1521303150 },
 };
 static const uint64_t mainnet_hard_fork_version_1_till = 1009826;
 
@@ -4434,7 +4427,7 @@ void Blockchain::cancel()
 }
 
 #if defined(PER_BLOCK_CHECKPOINT)
-static const char expected_block_hashes_hash[] = "a6011e0dfaf768efe789d899e2cf6282c7b4b81dd0825d3b77625bbef6a433b0";
+static const char expected_block_hashes_hash[] = "3e0150a05adda702ca6c21d18ecd59d19d594411db3a6ffda001ef12434bbfb9";
 void Blockchain::load_compiled_in_block_hashes()
 {
   const bool testnet = m_nettype == TESTNET;
