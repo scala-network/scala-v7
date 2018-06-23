@@ -1,1 +1,1 @@
-cmd='/usr/bin/cmake;-GUnix Makefiles;/home/hayzam/stellite/tests/gtest'
+cmd='/usr/bin/cmake;-GUnix Makefiles;/root/stellite/tests/gtest'
