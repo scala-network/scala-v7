@@ -327,6 +327,151 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
         cumulative_difficulties.resize(DIFFICULTY_BLOCKS_COUNT_V4);
     }
 
+    size_t length_cumul_diff = cumulative_difficulties.size();
+    if(length_cumul_diff >= DIFFICULTY_BLOCKS_COUNT_V4 - 1) {
+        std::vector<difficulty_type> first_diffs;
+        std::vector<difficulty_type> mid_diffs;
+        std::vector<difficulty_type> last_diffs;
+        for (size_t i = 0; i < (DIFFICULTY_BLOCKS_COUNT_V4-30); i++) {
+            first_diffs.push_back(cumulative_difficulties[i]);
+        }
+        for (size_t i = (DIFFICULTY_BLOCKS_COUNT_V4-30); i < (DIFFICULTY_BLOCKS_COUNT_V4-10); i++) {
+            mid_diffs.push_back(cumulative_difficulties[i]);
+        }
+        for (size_t i = (DIFFICULTY_BLOCKS_COUNT_V4*-10); i < DIFFICULTY_BLOCKS_COUNT_V4; i++) {
+            last_diffs.push_back(cumulative_difficulties[i]);
+        }
+        difficulty_type median_first = epee::misc_utils::median(first_diffs);
+        difficulty_type median_mid = epee::misc_utils::median(mid_diffs);
+        difficulty_type median_last = epee::misc_utils::median(last_diffs);
+
+
+        if(median_first > (median_mid*6/5) && median_mid > (median_last*10/9))
+        {
+            timestamps.resize(25);
+            cumulative_difficulties.resize(25);
+        }
+        else if(median_mid > (median_first*6/5) && median_last > (median_mid*10/9)) {
+            timestamps.resize(25);
+            cumulative_difficulties.resize(25);
+        }
+
+    }
+
+    size_t length = timestamps.size();
+    assert(length == cumulative_difficulties.size());
+    if (length <= 1) {
+        return 1;
+    }
+
+
+    uint64_t weighted_timespans = 0;
+    uint64_t target;
+
+    int nbShortTsLastNBlocks = 0;
+    bool lastTimeWasShort=false;
+    int lastShortTimeInARaw = 0;
+
+    int nbLongTsLastNBlocks = 0;
+    bool lastTimeWasLong=false;
+
+    if (true) {
+        uint64_t previous_max = timestamps[0];
+
+        for (size_t i = 1; i < length; i++) {
+            uint64_t timespan;
+            uint64_t max_timestamp;
+
+            if (timestamps[i] > previous_max) {
+                max_timestamp = timestamps[i];
+            } else {
+                max_timestamp = previous_max;
+            }
+
+            timespan = max_timestamp - previous_max;
+            if (timespan == 0) {
+                timespan = 1;
+            } else if (timespan > 11 * target_seconds) {
+                timespan = 11 * target_seconds;
+            }
+            if(i>=(length-7)) {
+                if(timespan < 30) {
+                    nbShortTsLastNBlocks ++;
+                    lastTimeWasShort = true;
+                    lastShortTimeInARaw ++;
+                } else {
+                    lastTimeWasShort = false;
+                    lastShortTimeInARaw=0;
+                }
+                if(timespan >100) {
+                    nbLongTsLastNBlocks ++;
+                    lastTimeWasLong = true;
+                } else {
+                    lastTimeWasLong = false;
+                }
+            }
+
+            weighted_timespans += i * timespan;
+            previous_max = max_timestamp;
+        }
+        // adjust faster if many blocks fount too fast
+
+        if(lastTimeWasShort) {
+            if(nbShortTsLastNBlocks >= 7) {
+                weighted_timespans = weighted_timespans *1/2;
+            } else if(nbShortTsLastNBlocks == 6) {
+                weighted_timespans = weighted_timespans *3/5;
+                if(lastShortTimeInARaw ==6) {
+                    weighted_timespans = weighted_timespans *7/8;
+                }
+            } else if(nbShortTsLastNBlocks == 5) {
+                weighted_timespans = weighted_timespans *4/5;
+                if(lastShortTimeInARaw ==5) {
+                    weighted_timespans = weighted_timespans *7/8;
+                }
+            } else if(nbShortTsLastNBlocks == 4) {
+                weighted_timespans = weighted_timespans *9/10;
+                if(lastShortTimeInARaw ==4) {
+                    weighted_timespans = weighted_timespans *7/8;
+                }
+            } else if(nbShortTsLastNBlocks == 3  ) {
+                weighted_timespans = weighted_timespans *11/12;
+                if(lastShortTimeInARaw ==3) {
+                    weighted_timespans = weighted_timespans *7/8;
+                }
+            }
+        }
+
+        // adjust = 0.99 for N=60, leaving the + 1 for now as it's not affecting N
+        target = 99 * (((length + 1) / 2) * target_seconds) / 100;
+    }
+
+    uint64_t minimum_timespan = target_seconds * length / 2;
+    if (weighted_timespans < minimum_timespan) {
+        weighted_timespans = minimum_timespan;
+    }
+
+    difficulty_type total_work = cumulative_difficulties.back() - cumulative_difficulties.front();
+    assert(total_work > 0);
+
+    uint64_t low, high;
+    mul(total_work, target, low, high);
+
+    if (high != 0) {
+
+        return 0;
+    }
+    return (low / weighted_timespans);
+}
+
+difficulty_type next_difficulty_v4_cleaned(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds) {
+
+    if (timestamps.size() > DIFFICULTY_BLOCKS_COUNT_V4)
+    {
+        timestamps.resize(DIFFICULTY_BLOCKS_COUNT_V4);
+        cumulative_difficulties.resize(DIFFICULTY_BLOCKS_COUNT_V4);
+    }
+
     size_t timestamp_count = timestamps.size();
     assert(timestamp_count == cumulative_difficulties.size());
     if (timestamp_count <= 1) {
