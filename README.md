@@ -124,7 +124,7 @@ Install Stellite dependencies
 
   `brew install miniupnpc`
 
-  `brew install --with-pgm --devel zeromq`
+  `brew install zeromq`
 
   `brew install doxygen`
 
