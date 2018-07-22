@@ -88,13 +88,44 @@ build the library binary manually. This can be done with the following command `
 Stellite uses the CMake build system and a top-level [Makefile](Makefile) that
 invokes cmake commands as needed.
 
-#### On Linux and OS X
-
 * Install the dependencies
+
+## On Linux:
+
+(Tested on Ubuntu 18.04 LTS x64, 16.04 x86, 16.10 x64, Gentoo x64 and Linux Mint 18 "Sarah" - Cinnamon x64)
+
+1. Install Stellite dependencies
+
+  - For Ubuntu and Mint
+
+	`sudo apt install build-essential cmake libboost-all-dev miniupnpc libpcsclite-dev libzmq3-dev libminiupnpc-dev libunbound-dev graphviz doxygen libunwind8-dev pkg-config libssl-dev`
+
+  - For Gentoo
+
+	`sudo emerge app-arch/xz-utils app-doc/doxygen dev-cpp/gtest dev-libs/boost dev-libs/expat dev-libs/openssl dev-util/cmake media-gfx/graphviz net-dns/unbound net-libs/ldns net-libs/miniupnpc net-libs/zeromq sys-libs/libunwind`
+        
+## On OS X:
+
+1. Install or update Xcode from the AppStore
+2. Install [homebrew](http://brew.sh/) via the Terminal
+3. Install [stellite](https://github.com/stellitecoin/stellite) dependencies via the Terminal:
+
+  `brew install git`
+  
+  `brew install boost --c++11`
+
+  `brew install openssl` - to install openssl headers
+
+  `brew install pkgconfig`
+
+  `brew install cmake`
+
+### On Linux and OS X:
+
 * Change to the root of the source code directory and build:
 
         cd Stellite
-        make
+        make release-static
 
     *Optional*: If your machine has several cores and enough memory, enable
     parallel build by running `make -j<number of threads>` instead of `make`. For
