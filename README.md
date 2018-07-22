@@ -143,14 +143,14 @@ application.
 
 **Preparing the Build Environment**
 
-* Download and install the [MSYS2 installer](http://msys2.github.io), either the 64-bit or the 32-bit package, depending on your system.
+* Download and install the [MSYS2 installer](http://msys2.github.io), 64-bit package, depending on your system.
 * Open the MSYS shell via the `MSYS2 Shell` shortcut
 * Update packages using pacman:  
 
         pacman -Syuu  
 
 * Exit the MSYS shell using Alt+F4  
-* Edit the properties for the `MSYS2 Shell` shortcut changing "msys2_shell.bat" to "msys2_shell.cmd -mingw64" for 64-bit builds or "msys2_shell.cmd -mingw32" for 32-bit builds
+* Edit the properties for the `MSYS2 Shell` shortcut changing "msys2_shell.bat" to "msys2_shell.cmd -mingw64"
 * Restart MSYS shell via modified shortcut and update packages again using pacman:  
 
         pacman -Syuu  
@@ -160,25 +160,25 @@ application.
 
     To build for 64-bit Windows:
 
-        pacman -S mingw-w64-x86_64-toolchain make mingw-w64-x86_64-cmake mingw-w64-x86_64-boost
+        pacman -S mingw-w64-x86_64-toolchain make mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-openssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium
 
-    To build for 32-bit Windows:
 
-        pacman -S mingw-w64-i686-toolchain make mingw-w64-i686-cmake mingw-w64-i686-boost
 
 * Open the MingW shell via `MinGW-w64-Win64 Shell` shortcut on 64-bit Windows
   or `MinGW-w64-Win64 Shell` shortcut on 32-bit Windows. Note that if you are
   running 64-bit Windows, you will have both 64-bit and 32-bit MinGW shells.
+  
+**Cloning**
+
+* To git clone, run:
+
+        git clone --recursive https://github.com/stellitecoin/Stellite.git
 
 **Building**
 
 * If you are on a 64-bit system, run:
 
         make release-static-win64
-
-* If you are on a 32-bit system, run:
-
-        make release-static-win32
 
 * The resulting executables can be found in `build/release/bin`
 
