@@ -132,6 +132,10 @@ invokes cmake commands as needed.
 
 ### On Linux and OS X:
 
+* Download the source code via Git:
+
+`git clone --recursive https://github.com/stellitecoin/Stellite.git`
+
 * Change to the root of the source code directory and build:
 
         cd Stellite
