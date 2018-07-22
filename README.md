@@ -119,6 +119,16 @@ invokes cmake commands as needed.
   `brew install pkgconfig`
 
   `brew install cmake`
+  
+  `brew install unbound`
+
+  `brew install miniupnpc`
+
+  `brew install --with-pgm --devel zeromq`
+
+  `brew install doxygen`
+
+  `brew install pcsc-lite`
 
 ### On Linux and OS X:
 
