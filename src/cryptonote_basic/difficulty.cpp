@@ -111,6 +111,8 @@ static inline bool cadc(uint64_t a, uint64_t b, bool c) {
 }
 
 bool check_hash(const crypto::hash &hash, difficulty_type difficulty) {
+    LOG_PRINT_L1("WAZAAA difficulty " << difficulty);
+    LOG_PRINT_L1("WAZAAA hash " << &hash);
     uint64_t low, high, top, cur;
     // First check the highest word, this will most likely fail for a random hash.
     mul(swap64le(((const uint64_t *) &hash)[3]), difficulty, top, high);
@@ -319,8 +321,10 @@ difficulty_type next_difficulty_v3(std::vector<std::uint64_t> timestamps, std::v
     return low / weighted_timespans;
 }
 
-difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds) {
-
+difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds, bool isDebug) {
+    if(isDebug){
+         LOG_PRINT_L1("HELLO DOLLY back " << cumulative_difficulties.back() << ", front " << cumulative_difficulties.front());
+    }
     if (timestamps.size() > DIFFICULTY_BLOCKS_COUNT_V4)
     {
         timestamps.resize(DIFFICULTY_BLOCKS_COUNT_V4);
@@ -328,6 +332,9 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
     }
 
     size_t length_cumul_diff = cumulative_difficulties.size();
+    if(isDebug){
+        LOG_PRINT_L1("HELLO DOLLY length_cumul_diff " << length_cumul_diff);
+    }
     if(length_cumul_diff >= DIFFICULTY_BLOCKS_COUNT_V4 - 1) {
         std::vector<difficulty_type> first_diffs;
         std::vector<difficulty_type> mid_diffs;
@@ -350,10 +357,16 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
         {
             timestamps.resize(25);
             cumulative_difficulties.resize(25);
+                if(isDebug){
+                    LOG_PRINT_L1("HELLO DOLLY A1");
+                }
         }
         else if(median_mid > (median_first*6/5) && median_last > (median_mid*10/9)) {
             timestamps.resize(25);
             cumulative_difficulties.resize(25);
+                if(isDebug){
+                    LOG_PRINT_L1("HELLO DOLLY A2");
+                }
         }
 
     }
@@ -364,7 +377,9 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
         return 1;
     }
 
-
+    if(isDebug){
+        LOG_PRINT_L1("HELLO DOLLY length " << length);
+    }
     uint64_t weighted_timespans = 0;
     uint64_t target;
 
@@ -373,7 +388,7 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
     int lastShortTimeInARaw = 0;
 
     int nbLongTsLastNBlocks = 0;
-    bool lastTimeWasLong=false;
+
 
     if (true) {
         uint64_t previous_max = timestamps[0];
@@ -403,18 +418,19 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
                     lastTimeWasShort = false;
                     lastShortTimeInARaw=0;
                 }
-                if(timespan >100) {
-                    nbLongTsLastNBlocks ++;
-                    lastTimeWasLong = true;
-                } else {
-                    lastTimeWasLong = false;
-                }
+  
             }
 
             weighted_timespans += i * timespan;
             previous_max = max_timestamp;
         }
         // adjust faster if many blocks fount too fast
+        if(isDebug){
+            LOG_PRINT_L1("HELLO DOLLY previous_max " << previous_max);
+            LOG_PRINT_L1("HELLO DOLLY weighted_timespans " << weighted_timespans);
+        }
+
+
 
         if(lastTimeWasShort) {
             if(nbShortTsLastNBlocks >= 7) {
@@ -442,24 +458,38 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
             }
         }
 
+        if(isDebug){
+            LOG_PRINT_L1("HELLO DOLLY weighted_timespans2 " << weighted_timespans);
+        }
         // adjust = 0.99 for N=60, leaving the + 1 for now as it's not affecting N
         target = 99 * (((length + 1) / 2) * target_seconds) / 100;
     }
-
+        if(isDebug){
+            LOG_PRINT_L1("HELLO DOLLY target " << target);
+        }
     uint64_t minimum_timespan = target_seconds * length / 2;
     if (weighted_timespans < minimum_timespan) {
         weighted_timespans = minimum_timespan;
     }
-
+        if(isDebug){
+            LOG_PRINT_L1("HELLO DOLLY weighted_timespans3 " << weighted_timespans);
+        }
     difficulty_type total_work = cumulative_difficulties.back() - cumulative_difficulties.front();
     assert(total_work > 0);
-
+        if(isDebug){
+            LOG_PRINT_L1("HELLO DOLLY total_work " << total_work);
+        }
     uint64_t low, high;
     mul(total_work, target, low, high);
 
     if (high != 0) {
 
         return 0;
+    }
+    LOG_PRINT_L1("HEY PLEASE LOVE CHICKENS !!!");
+    LOG_PRINT_L1("low : " << low << ", weighted_timespans : " << weighted_timespans << ", target_seconds : " << target_seconds << " ,total_work : " << total_work << " ,target : " << target << " , length : " << length);
+    if(isDebug){
+        LOG_PRINT_L1("HELLO DOLLY DIFF " << (low / weighted_timespans));
     }
     return (low / weighted_timespans);
 }

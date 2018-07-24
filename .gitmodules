@@ -1,11 +1,9 @@
-[submodule "external/rapidjson"]
-	path = external/rapidjson
-	url = https://github.com/Tencent/rapidjson
-[submodule "external/miniupnp"]
-	path = external/miniupnp
-	url = https://github.com/monero-project/miniupnp
-	branch = monero
-[submodule "external/unbound"]
-	path = external/unbound
-	url = https://github.com/monero-project/unbound
-	branch = monero
+[submodule "build/rapidjson"]
+        path = build/rapidjson
+        url = https://github.com/Tencent/rapidjson
+[submodule "build/miniupnp"]
+        path = build/miniupnp
+        url = https://github.com/monero-project/miniupnp
+[submodule "build/unbound"]
+        path = build/unbound
+        url = https://github.com/monero-project/unbound

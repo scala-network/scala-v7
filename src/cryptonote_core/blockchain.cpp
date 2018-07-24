@@ -788,39 +788,30 @@ bool Blockchain::get_block_by_hash(const crypto::hash &h, block &blk, bool *orph
 difficulty_type Blockchain::get_difficulty_for_next_block()
 {
   LOG_PRINT_L3("Blockchain::" << __func__);
-
-  crypto::hash top_hash = get_tail_id();
-  {
-    CRITICAL_REGION_LOCAL(m_difficulty_lock);
-    // we can call this without the blockchain lock, it might just give us
-    // something a bit out of date, but that's fine since anything which
-    // requires the blockchain lock will have acquired it in the first place,
-    // and it will be unlocked only when called from the getinfo RPC
-    if (top_hash == m_difficulty_for_next_block_top_hash)
-      return m_difficulty_for_next_block;
-  }
-
   CRITICAL_REGION_LOCAL(m_blockchain_lock);
   std::vector<uint64_t> timestamps;
   std::vector<difficulty_type> difficulties;
   auto height = m_db->height();
+  //size_t difficult_block_count = get_current_hard_fork_version() < 2 ? DIFFICULTY_BLOCKS_COUNT : DIFFICULTY_BLOCKS_COUNT_V3;
 
   size_t difficult_block_count;
+
   if(get_current_hard_fork_version() < 2){
-  difficult_block_count = DIFFICULTY_BLOCKS_COUNT;
+    difficult_block_count = DIFFICULTY_BLOCKS_COUNT;
   }
   else if(get_current_hard_fork_version() < 4){
-  difficult_block_count = DIFFICULTY_BLOCKS_COUNT_V3;
+    difficult_block_count = DIFFICULTY_BLOCKS_COUNT_V3;
   }
   else{
-  difficult_block_count = DIFFICULTY_BLOCKS_COUNT_V4;
+    difficult_block_count = DIFFICULTY_BLOCKS_COUNT_V4;
   }
-  // ND: Speedup
+
+// ND: Speedup
   // 1. Keep a list of the last 735 (or less) blocks that is used to compute difficulty,
   //    then when the next block difficulty is queried, push the latest height data and
   //    pop the oldest one from the list. This only requires 1x read per height instead
   //    of doing 735 (DIFFICULTY_BLOCKS_COUNT).
-  if (m_timestamps_and_difficulties_height != 0 && ((height - m_timestamps_and_difficulties_height) == 1) && m_timestamps.size() >= difficult_block_count)
+  if (m_timestamps_and_difficulties_height != 0 && ((height - m_timestamps_and_difficulties_height) == 1))
   {
     uint64_t index = height - 1;
     m_timestamps.push_back(m_db->get_block_timestamp(index));
@@ -837,7 +828,7 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
   }
   else
   {
-    size_t offset = height - std::min < size_t > (height, static_cast<size_t>(DIFFICULTY_BLOCKS_COUNT));
+size_t offset = height - std::min < size_t >(height, static_cast<size_t>(difficult_block_count));
     if (offset == 0)
       ++offset;
 
@@ -853,17 +844,30 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
     m_timestamps = timestamps;
     m_difficulties = difficulties;
   }
-  size_t target = get_difficulty_target();
+  size_t target = DIFFICULTY_TARGET;
+  //return get_current_hard_fork_version() < 2 ? next_difficulty(timestamps, difficulties, target) : next_difficulty_v3(timestamps, difficulties, target, true);
 
   if(get_current_hard_fork_version() < 2){
     return next_difficulty(timestamps, difficulties, target);
   }
-  else if(get_current_hard_fork_version() < 4){
-  return next_difficulty_v3(timestamps, difficulties, target, true);
+  if(get_current_hard_fork_version() < 4){
+    return next_difficulty_v3(timestamps, difficulties, target, true);
   }
-  else{ 
-  return next_difficulty_v4(timestamps, difficulties, target);
+  else{
+    LOG_PRINT_L1("call diff V4 for block " << height);
+    if(height ==206080 ){
+      LOG_PRINT_L1("WONDERFULL WORLD " << difficulties.front() << " RED ROSES TOO " << difficulties.back());
+      using Iter = std::vector<difficulty_type>::const_iterator;
+      for (Iter it = difficulties.begin(); it!=difficulties.end(); ++it) {
+          LOG_PRINT_L1("WONDERFULL WORLD HEIGHT " << height << " value " << *it );
+      }
+      LOG_PRINT_L1("WONDERFULL WORLD END" );
+      return next_difficulty_v4(timestamps, difficulties, target,true);
+    } else {
+      return next_difficulty_v4(timestamps, difficulties, target,false);
+    }
   }
+
 }
 //------------------------------------------------------------------
 // This function removes blocks from the blockchain until it gets to the
@@ -3437,14 +3441,18 @@ leave:
   else
 #endif
   {
+    LOG_PRINT_L1("WORLD WHAMPION id is " << id);
     auto it = m_blocks_longhash_table.find(id);
     if (it != m_blocks_longhash_table.end())
     {
       precomputed = true;
       proof_of_work = it->second;
+      LOG_PRINT_L1("WORLD WHAMPION proof_of_work from it->second " << proof_of_work <<", id = " << id);
     }
-    else
+    else{
       proof_of_work = get_block_longhash(bl, m_db->height());
+      LOG_PRINT_L1("WORLD WHAMPION proof_of_work from else " << proof_of_work);
+    }
 
     // validate proof_of_work versus difficulty target
     if(!check_hash(proof_of_work, current_diffic))
@@ -4135,6 +4143,7 @@ bool Blockchain::prepare_handle_incoming_blocks(const std::list<block_complete_e
 
     if (!blocks_exist)
     {
+      LOG_PRINT_L1("ROMEO ZULU KILO => BLOCK DO NOT EXIUSTS I M HEIGHT  " << height );
       m_blocks_longhash_table.clear();
       uint64_t thread_height = height;
       tools::threadpool::waiter waiter;
@@ -4152,6 +4161,7 @@ bool Blockchain::prepare_handle_incoming_blocks(const std::list<block_complete_e
       for (const auto & map : maps)
       {
         m_blocks_longhash_table.insert(map.begin(), map.end());
+
       }
     }
   }
