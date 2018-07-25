@@ -1087,7 +1087,7 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std:
     return next_difficulty_v3(timestamps, cumulative_difficulties, target, true);
   }
   else{
-    return next_difficulty_v4(timestamps, cumulative_difficulties, target);
+    return next_difficulty_v4(timestamps, cumulative_difficulties, target, true);
   }
 }
 //------------------------------------------------------------------
