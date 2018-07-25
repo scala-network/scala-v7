@@ -1,1 +1,1 @@
-cmd='/usr/bin/cmake;-GUnix Makefiles;/root/stellite/translations'
+cmd='/usr/bin/cmake;-GUnix Makefiles;/root/Stellite/translations'

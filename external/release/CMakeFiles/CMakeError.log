@@ -1,26 +1,26 @@
 Determining if the pthread_create exist failed with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_78a9a/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_78a9a.dir/build.make CMakeFiles/cmTC_78a9a.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_78a9a.dir/CheckSymbolExists.c.o
-/usr/bin/cc     -o CMakeFiles/cmTC_78a9a.dir/CheckSymbolExists.c.o   -c /root/stellite/build/release/CMakeFiles/CMakeTmp/CheckSymbolExists.c
-Linking C executable cmTC_78a9a
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_78a9a.dir/link.txt --verbose=1
-/usr/bin/cc       CMakeFiles/cmTC_78a9a.dir/CheckSymbolExists.c.o  -o cmTC_78a9a -rdynamic 
-CMakeFiles/cmTC_78a9a.dir/CheckSymbolExists.c.o: In function `main':
+Run Build Command:"/usr/bin/make" "cmTC_c5a3f/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_c5a3f.dir/build.make CMakeFiles/cmTC_c5a3f.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c5a3f.dir/CheckSymbolExists.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_c5a3f.dir/CheckSymbolExists.c.o   -c /root/Stellite/build/release/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_c5a3f
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c5a3f.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_c5a3f.dir/CheckSymbolExists.c.o  -o cmTC_c5a3f -rdynamic 
+CMakeFiles/cmTC_c5a3f.dir/CheckSymbolExists.c.o: In function `main':
 CheckSymbolExists.c:(.text+0x16): undefined reference to `pthread_create'
 collect2: error: ld returned 1 exit status
-CMakeFiles/cmTC_78a9a.dir/build.make:97: recipe for target 'cmTC_78a9a' failed
-make[2]: *** [cmTC_78a9a] Error 1
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Makefile:126: recipe for target 'cmTC_78a9a/fast' failed
-make[1]: *** [cmTC_78a9a/fast] Error 2
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+CMakeFiles/cmTC_c5a3f.dir/build.make:97: recipe for target 'cmTC_c5a3f' failed
+make[2]: *** [cmTC_c5a3f] Error 1
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_c5a3f/fast' failed
+make[1]: *** [cmTC_c5a3f/fast] Error 2
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
-File /root/stellite/build/release/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+File /root/Stellite/build/release/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
 /* */
 #include <pthread.h>
 
@@ -36,65 +36,65 @@ int main(int argc, char** argv)
 }
 
 Determining if the function memset_s exists in the c failed with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_7a435/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_7a435.dir/build.make CMakeFiles/cmTC_7a435.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_7a435.dir/CheckFunctionExists.c.o
-/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=memset_s   -o CMakeFiles/cmTC_7a435.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
-Linking C executable cmTC_7a435
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7a435.dir/link.txt --verbose=1
-/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=memset_s    CMakeFiles/cmTC_7a435.dir/CheckFunctionExists.c.o  -o cmTC_7a435  -L/root/stellite/build/release/CMakeFiles/CMakeTmp/string.h -rdynamic -lc -Wl,-rpath,/root/stellite/build/release/CMakeFiles/CMakeTmp/string.h 
-CMakeFiles/cmTC_7a435.dir/CheckFunctionExists.c.o: In function `main':
+Run Build Command:"/usr/bin/make" "cmTC_ae66c/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_ae66c.dir/build.make CMakeFiles/cmTC_ae66c.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ae66c.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=memset_s   -o CMakeFiles/cmTC_ae66c.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_ae66c
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ae66c.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=memset_s    CMakeFiles/cmTC_ae66c.dir/CheckFunctionExists.c.o  -o cmTC_ae66c  -L/root/Stellite/build/release/CMakeFiles/CMakeTmp/string.h -rdynamic -lc -Wl,-rpath,/root/Stellite/build/release/CMakeFiles/CMakeTmp/string.h 
+CMakeFiles/cmTC_ae66c.dir/CheckFunctionExists.c.o: In function `main':
 CheckFunctionExists.c:(.text+0x15): undefined reference to `memset_s'
 collect2: error: ld returned 1 exit status
-CMakeFiles/cmTC_7a435.dir/build.make:97: recipe for target 'cmTC_7a435' failed
-make[2]: *** [cmTC_7a435] Error 1
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Makefile:126: recipe for target 'cmTC_7a435/fast' failed
-make[1]: *** [cmTC_7a435/fast] Error 2
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+CMakeFiles/cmTC_ae66c.dir/build.make:97: recipe for target 'cmTC_ae66c' failed
+make[2]: *** [cmTC_ae66c] Error 1
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_ae66c/fast' failed
+make[1]: *** [cmTC_ae66c/fast] Error 2
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
 Determining if the function explicit_bzero exists in the c failed with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_aa330/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_aa330.dir/build.make CMakeFiles/cmTC_aa330.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_aa330.dir/CheckFunctionExists.c.o
-/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=explicit_bzero   -o CMakeFiles/cmTC_aa330.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
-Linking C executable cmTC_aa330
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_aa330.dir/link.txt --verbose=1
-/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=explicit_bzero    CMakeFiles/cmTC_aa330.dir/CheckFunctionExists.c.o  -o cmTC_aa330  -L/root/stellite/build/release/CMakeFiles/CMakeTmp/strings.h -rdynamic -lc -Wl,-rpath,/root/stellite/build/release/CMakeFiles/CMakeTmp/strings.h 
-CMakeFiles/cmTC_aa330.dir/CheckFunctionExists.c.o: In function `main':
+Run Build Command:"/usr/bin/make" "cmTC_8c93f/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_8c93f.dir/build.make CMakeFiles/cmTC_8c93f.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_8c93f.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=explicit_bzero   -o CMakeFiles/cmTC_8c93f.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_8c93f
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8c93f.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=explicit_bzero    CMakeFiles/cmTC_8c93f.dir/CheckFunctionExists.c.o  -o cmTC_8c93f  -L/root/Stellite/build/release/CMakeFiles/CMakeTmp/strings.h -rdynamic -lc -Wl,-rpath,/root/Stellite/build/release/CMakeFiles/CMakeTmp/strings.h 
+CMakeFiles/cmTC_8c93f.dir/CheckFunctionExists.c.o: In function `main':
 CheckFunctionExists.c:(.text+0x15): undefined reference to `explicit_bzero'
 collect2: error: ld returned 1 exit status
-CMakeFiles/cmTC_aa330.dir/build.make:97: recipe for target 'cmTC_aa330' failed
-make[2]: *** [cmTC_aa330] Error 1
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Makefile:126: recipe for target 'cmTC_aa330/fast' failed
-make[1]: *** [cmTC_aa330/fast] Error 2
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+CMakeFiles/cmTC_8c93f.dir/build.make:97: recipe for target 'cmTC_8c93f' failed
+make[2]: *** [cmTC_8c93f] Error 1
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_8c93f/fast' failed
+make[1]: *** [cmTC_8c93f/fast] Error 2
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
 Determining if the -Wl,-z,noexecheap linker flag is suppored failed with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_1fe88/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_1fe88.dir/build.make CMakeFiles/cmTC_1fe88.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_1fe88.dir/CheckLinkerFlag.c.o
-/usr/bin/cc    -Wl,-z,noexecheap    -Wl,-z,noexecheap -o CMakeFiles/cmTC_1fe88.dir/CheckLinkerFlag.c.o   -c /root/stellite/cmake/CheckLinkerFlag.c
-Linking C executable cmTC_1fe88
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1fe88.dir/link.txt --verbose=1
-/usr/bin/cc  -Wl,-z,noexecheap     CMakeFiles/cmTC_1fe88.dir/CheckLinkerFlag.c.o  -o cmTC_1fe88 -rdynamic 
+Run Build Command:"/usr/bin/make" "cmTC_4db5c/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_4db5c.dir/build.make CMakeFiles/cmTC_4db5c.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4db5c.dir/CheckLinkerFlag.c.o
+/usr/bin/cc    -Wl,-z,noexecheap    -Wl,-z,noexecheap -o CMakeFiles/cmTC_4db5c.dir/CheckLinkerFlag.c.o   -c /root/Stellite/cmake/CheckLinkerFlag.c
+Linking C executable cmTC_4db5c
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4db5c.dir/link.txt --verbose=1
+/usr/bin/cc  -Wl,-z,noexecheap     CMakeFiles/cmTC_4db5c.dir/CheckLinkerFlag.c.o  -o cmTC_4db5c -rdynamic 
 /usr/bin/ld: warning: -z noexecheap ignored.
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 

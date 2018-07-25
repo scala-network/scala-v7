@@ -1,4 +1,4 @@
-The system is: Linux - 4.13.0-45-generic - x86_64
+The system is: Linux - 4.15.0-24-generic - x86_64
 Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
 Compiler: /usr/bin/cc 
 Build flags: 
@@ -10,7 +10,7 @@ The output was:
 
 Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
 
-The C compiler identification is GNU, found in "/root/stellite/build/release/CMakeFiles/3.5.1/CompilerIdC/a.out"
+The C compiler identification is GNU, found in "/root/Stellite/build/release/CMakeFiles/3.5.1/CompilerIdC/a.out"
 
 Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
 Compiler: /usr/bin/c++ 
@@ -23,80 +23,80 @@ The output was:
 
 Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
 
-The CXX compiler identification is GNU, found in "/root/stellite/build/release/CMakeFiles/3.5.1/CompilerIdCXX/a.out"
+The CXX compiler identification is GNU, found in "/root/Stellite/build/release/CMakeFiles/3.5.1/CompilerIdCXX/a.out"
 
 Determining if the C compiler works passed with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_8215b/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_8215b.dir/build.make CMakeFiles/cmTC_8215b.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_8215b.dir/testCCompiler.c.o
-/usr/bin/cc     -o CMakeFiles/cmTC_8215b.dir/testCCompiler.c.o   -c /root/stellite/build/release/CMakeFiles/CMakeTmp/testCCompiler.c
-Linking C executable cmTC_8215b
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8215b.dir/link.txt --verbose=1
-/usr/bin/cc       CMakeFiles/cmTC_8215b.dir/testCCompiler.c.o  -o cmTC_8215b -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_071e2/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_071e2.dir/build.make CMakeFiles/cmTC_071e2.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_071e2.dir/testCCompiler.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_071e2.dir/testCCompiler.c.o   -c /root/Stellite/build/release/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_071e2
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_071e2.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_071e2.dir/testCCompiler.c.o  -o cmTC_071e2 -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
 Detecting C compiler ABI info compiled with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_0a4ad/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_0a4ad.dir/build.make CMakeFiles/cmTC_0a4ad.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_0a4ad.dir/CMakeCCompilerABI.c.o
-/usr/bin/cc     -o CMakeFiles/cmTC_0a4ad.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.5/Modules/CMakeCCompilerABI.c
-Linking C executable cmTC_0a4ad
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0a4ad.dir/link.txt --verbose=1
-/usr/bin/cc      -v CMakeFiles/cmTC_0a4ad.dir/CMakeCCompilerABI.c.o  -o cmTC_0a4ad -rdynamic  
+Run Build Command:"/usr/bin/make" "cmTC_22e32/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_22e32.dir/build.make CMakeFiles/cmTC_22e32.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_22e32.dir/CMakeCCompilerABI.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_22e32.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.5/Modules/CMakeCCompilerABI.c
+Linking C executable cmTC_22e32
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_22e32.dir/link.txt --verbose=1
+/usr/bin/cc      -v CMakeFiles/cmTC_22e32.dir/CMakeCCompilerABI.c.o  -o cmTC_22e32 -rdynamic  
 Using built-in specs.
 COLLECT_GCC=/usr/bin/cc
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper
 Target: x86_64-linux-gnu
-Configured with: ../src/configure -v --with-pkgversion='Ubuntu 5.4.0-6ubuntu1~16.04.9' --with-bugurl=file:///usr/share/doc/gcc-5/README.Bugs --enable-languages=c,ada,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-5 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-5-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-5-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-5-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 5.4.0-6ubuntu1~16.04.10' --with-bugurl=file:///usr/share/doc/gcc-5/README.Bugs --enable-languages=c,ada,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-5 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-5-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-5-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-5-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
 Thread model: posix
-gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.9) 
+gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.10) 
 COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_0a4ad' '-rdynamic' '-mtune=generic' '-march=x86-64'
- /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccCgi9np.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_0a4ad /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_0a4ad.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_22e32' '-rdynamic' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccIv2A5p.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_22e32 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_22e32.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
 Parsed C implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
-  ignore line: [Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp]
+  ignore line: [Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_0a4ad/fast"]
-  ignore line: [make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp']
-  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_0a4ad.dir/build.make CMakeFiles/cmTC_0a4ad.dir/build]
-  ignore line: [make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp']
-  ignore line: [Building C object CMakeFiles/cmTC_0a4ad.dir/CMakeCCompilerABI.c.o]
-  ignore line: [/usr/bin/cc     -o CMakeFiles/cmTC_0a4ad.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.5/Modules/CMakeCCompilerABI.c]
-  ignore line: [Linking C executable cmTC_0a4ad]
-  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0a4ad.dir/link.txt --verbose=1]
-  ignore line: [/usr/bin/cc      -v CMakeFiles/cmTC_0a4ad.dir/CMakeCCompilerABI.c.o  -o cmTC_0a4ad -rdynamic  ]
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_22e32/fast"]
+  ignore line: [make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp']
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_22e32.dir/build.make CMakeFiles/cmTC_22e32.dir/build]
+  ignore line: [make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_22e32.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/cc     -o CMakeFiles/cmTC_22e32.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake-3.5/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTC_22e32]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_22e32.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/cc      -v CMakeFiles/cmTC_22e32.dir/CMakeCCompilerABI.c.o  -o cmTC_22e32 -rdynamic  ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/usr/bin/cc]
   ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper]
   ignore line: [Target: x86_64-linux-gnu]
-  ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 5.4.0-6ubuntu1~16.04.9' --with-bugurl=file:///usr/share/doc/gcc-5/README.Bugs --enable-languages=c,ada,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-5 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-5-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-5-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-5-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu]
+  ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 5.4.0-6ubuntu1~16.04.10' --with-bugurl=file:///usr/share/doc/gcc-5/README.Bugs --enable-languages=c,ada,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-5 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-5-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-5-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-5-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu]
   ignore line: [Thread model: posix]
-  ignore line: [gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.9) ]
+  ignore line: [gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.10) ]
   ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_0a4ad' '-rdynamic' '-mtune=generic' '-march=x86-64']
-  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccCgi9np.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_0a4ad /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_0a4ad.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_22e32' '-rdynamic' '-mtune=generic' '-march=x86-64']
+  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccIv2A5p.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_22e32 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_22e32.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/collect2] ==> ignore
     arg [-plugin] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so] ==> ignore
     arg [-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper] ==> ignore
-    arg [-plugin-opt=-fresolution=/tmp/ccCgi9np.res] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccIv2A5p.res] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
     arg [-plugin-opt=-pass-through=-lc] ==> ignore
@@ -114,7 +114,7 @@ Parsed C implicit link information from above output:
     arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
     arg [-zrelro] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_0a4ad] ==> ignore
+    arg [cmTC_22e32] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o] ==> ignore
@@ -126,7 +126,7 @@ Parsed C implicit link information from above output:
     arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
     arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
     arg [-L/usr/lib/gcc/x86_64-linux-gnu/5/../../..] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/5/../../..]
-    arg [CMakeFiles/cmTC_0a4ad.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [CMakeFiles/cmTC_22e32.dir/CMakeCCompilerABI.c.o] ==> ignore
     arg [-lgcc] ==> lib [gcc]
     arg [--as-needed] ==> ignore
     arg [-lgcc_s] ==> lib [gcc_s]
@@ -158,19 +158,19 @@ Parsed C implicit link information from above output:
 
 
 Detecting C [-std=c11] compiler features compiled with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_e12a3/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_e12a3.dir/build.make CMakeFiles/cmTC_e12a3.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_e12a3.dir/feature_tests.c.o
-/usr/bin/cc    -std=c11 -o CMakeFiles/cmTC_e12a3.dir/feature_tests.c.o   -c /root/stellite/build/release/CMakeFiles/feature_tests.c
-Linking C executable cmTC_e12a3
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e12a3.dir/link.txt --verbose=1
-/usr/bin/cc       CMakeFiles/cmTC_e12a3.dir/feature_tests.c.o  -o cmTC_e12a3 -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_2c422/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_2c422.dir/build.make CMakeFiles/cmTC_2c422.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_2c422.dir/feature_tests.c.o
+/usr/bin/cc    -std=c11 -o CMakeFiles/cmTC_2c422.dir/feature_tests.c.o   -c /root/Stellite/build/release/CMakeFiles/feature_tests.c
+Linking C executable cmTC_2c422
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2c422.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_2c422.dir/feature_tests.c.o  -o cmTC_2c422 -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
     Feature record: C_FEATURE:1c_function_prototypes
@@ -180,19 +180,19 @@ make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
 
 
 Detecting C [-std=c99] compiler features compiled with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_e537e/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_e537e.dir/build.make CMakeFiles/cmTC_e537e.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_e537e.dir/feature_tests.c.o
-/usr/bin/cc    -std=c99 -o CMakeFiles/cmTC_e537e.dir/feature_tests.c.o   -c /root/stellite/build/release/CMakeFiles/feature_tests.c
-Linking C executable cmTC_e537e
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e537e.dir/link.txt --verbose=1
-/usr/bin/cc       CMakeFiles/cmTC_e537e.dir/feature_tests.c.o  -o cmTC_e537e -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_9b8e1/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_9b8e1.dir/build.make CMakeFiles/cmTC_9b8e1.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_9b8e1.dir/feature_tests.c.o
+/usr/bin/cc    -std=c99 -o CMakeFiles/cmTC_9b8e1.dir/feature_tests.c.o   -c /root/Stellite/build/release/CMakeFiles/feature_tests.c
+Linking C executable cmTC_9b8e1
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9b8e1.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_9b8e1.dir/feature_tests.c.o  -o cmTC_9b8e1 -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
     Feature record: C_FEATURE:1c_function_prototypes
@@ -202,19 +202,19 @@ make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
 
 
 Detecting C [-std=c90] compiler features compiled with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_688e4/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_688e4.dir/build.make CMakeFiles/cmTC_688e4.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_688e4.dir/feature_tests.c.o
-/usr/bin/cc    -std=c90 -o CMakeFiles/cmTC_688e4.dir/feature_tests.c.o   -c /root/stellite/build/release/CMakeFiles/feature_tests.c
-Linking C executable cmTC_688e4
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_688e4.dir/link.txt --verbose=1
-/usr/bin/cc       CMakeFiles/cmTC_688e4.dir/feature_tests.c.o  -o cmTC_688e4 -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_bff46/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_bff46.dir/build.make CMakeFiles/cmTC_bff46.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_bff46.dir/feature_tests.c.o
+/usr/bin/cc    -std=c90 -o CMakeFiles/cmTC_bff46.dir/feature_tests.c.o   -c /root/Stellite/build/release/CMakeFiles/feature_tests.c
+Linking C executable cmTC_bff46
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_bff46.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_bff46.dir/feature_tests.c.o  -o cmTC_bff46 -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
     Feature record: C_FEATURE:1c_function_prototypes
@@ -222,77 +222,77 @@ make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
     Feature record: C_FEATURE:0c_static_assert
     Feature record: C_FEATURE:0c_variadic_macros
 Determining if the CXX compiler works passed with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_b1f6e/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_b1f6e.dir/build.make CMakeFiles/cmTC_b1f6e.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_b1f6e.dir/testCXXCompiler.cxx.o
-/usr/bin/c++      -o CMakeFiles/cmTC_b1f6e.dir/testCXXCompiler.cxx.o -c /root/stellite/build/release/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
-Linking CXX executable cmTC_b1f6e
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b1f6e.dir/link.txt --verbose=1
-/usr/bin/c++        CMakeFiles/cmTC_b1f6e.dir/testCXXCompiler.cxx.o  -o cmTC_b1f6e -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_b4d35/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_b4d35.dir/build.make CMakeFiles/cmTC_b4d35.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_b4d35.dir/testCXXCompiler.cxx.o
+/usr/bin/c++      -o CMakeFiles/cmTC_b4d35.dir/testCXXCompiler.cxx.o -c /root/Stellite/build/release/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTC_b4d35
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b4d35.dir/link.txt --verbose=1
+/usr/bin/c++        CMakeFiles/cmTC_b4d35.dir/testCXXCompiler.cxx.o  -o cmTC_b4d35 -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
 Detecting CXX compiler ABI info compiled with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_559f0/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_559f0.dir/build.make CMakeFiles/cmTC_559f0.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_559f0.dir/CMakeCXXCompilerABI.cpp.o
-/usr/bin/c++      -o CMakeFiles/cmTC_559f0.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.5/Modules/CMakeCXXCompilerABI.cpp
-Linking CXX executable cmTC_559f0
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_559f0.dir/link.txt --verbose=1
-/usr/bin/c++       -v CMakeFiles/cmTC_559f0.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_559f0 -rdynamic  
+Run Build Command:"/usr/bin/make" "cmTC_93d0b/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_93d0b.dir/build.make CMakeFiles/cmTC_93d0b.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_93d0b.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/c++      -o CMakeFiles/cmTC_93d0b.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.5/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTC_93d0b
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_93d0b.dir/link.txt --verbose=1
+/usr/bin/c++       -v CMakeFiles/cmTC_93d0b.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_93d0b -rdynamic  
 Using built-in specs.
 COLLECT_GCC=/usr/bin/c++
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper
 Target: x86_64-linux-gnu
-Configured with: ../src/configure -v --with-pkgversion='Ubuntu 5.4.0-6ubuntu1~16.04.9' --with-bugurl=file:///usr/share/doc/gcc-5/README.Bugs --enable-languages=c,ada,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-5 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-5-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-5-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-5-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 5.4.0-6ubuntu1~16.04.10' --with-bugurl=file:///usr/share/doc/gcc-5/README.Bugs --enable-languages=c,ada,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-5 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-5-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-5-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-5-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
 Thread model: posix
-gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.9) 
+gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.10) 
 COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_559f0' '-rdynamic' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
- /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccKVXzmb.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_559f0 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_559f0.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_93d0b' '-rdynamic' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/cc6afaQa.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_93d0b /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_93d0b.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
 Parsed CXX implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
-  ignore line: [Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp]
+  ignore line: [Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_559f0/fast"]
-  ignore line: [make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp']
-  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_559f0.dir/build.make CMakeFiles/cmTC_559f0.dir/build]
-  ignore line: [make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp']
-  ignore line: [Building CXX object CMakeFiles/cmTC_559f0.dir/CMakeCXXCompilerABI.cpp.o]
-  ignore line: [/usr/bin/c++      -o CMakeFiles/cmTC_559f0.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.5/Modules/CMakeCXXCompilerABI.cpp]
-  ignore line: [Linking CXX executable cmTC_559f0]
-  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_559f0.dir/link.txt --verbose=1]
-  ignore line: [/usr/bin/c++       -v CMakeFiles/cmTC_559f0.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_559f0 -rdynamic  ]
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_93d0b/fast"]
+  ignore line: [make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp']
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_93d0b.dir/build.make CMakeFiles/cmTC_93d0b.dir/build]
+  ignore line: [make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp']
+  ignore line: [Building CXX object CMakeFiles/cmTC_93d0b.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/usr/bin/c++      -o CMakeFiles/cmTC_93d0b.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.5/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTC_93d0b]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_93d0b.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/c++       -v CMakeFiles/cmTC_93d0b.dir/CMakeCXXCompilerABI.cpp.o  -o cmTC_93d0b -rdynamic  ]
   ignore line: [Using built-in specs.]
   ignore line: [COLLECT_GCC=/usr/bin/c++]
   ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper]
   ignore line: [Target: x86_64-linux-gnu]
-  ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 5.4.0-6ubuntu1~16.04.9' --with-bugurl=file:///usr/share/doc/gcc-5/README.Bugs --enable-languages=c,ada,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-5 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-5-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-5-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-5-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu]
+  ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 5.4.0-6ubuntu1~16.04.10' --with-bugurl=file:///usr/share/doc/gcc-5/README.Bugs --enable-languages=c,ada,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-5 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-5-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-5-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-5-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu]
   ignore line: [Thread model: posix]
-  ignore line: [gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.9) ]
+  ignore line: [gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.10) ]
   ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_559f0' '-rdynamic' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
-  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/ccKVXzmb.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_559f0 /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_559f0.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_93d0b' '-rdynamic' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/cc6afaQa.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_93d0b /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_93d0b.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/collect2] ==> ignore
     arg [-plugin] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so] ==> ignore
     arg [-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper] ==> ignore
-    arg [-plugin-opt=-fresolution=/tmp/ccKVXzmb.res] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/cc6afaQa.res] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
     arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
     arg [-plugin-opt=-pass-through=-lc] ==> ignore
@@ -310,7 +310,7 @@ Parsed CXX implicit link information from above output:
     arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
     arg [-zrelro] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTC_559f0] ==> ignore
+    arg [cmTC_93d0b] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o] ==> ignore
@@ -322,7 +322,7 @@ Parsed CXX implicit link information from above output:
     arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
     arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
     arg [-L/usr/lib/gcc/x86_64-linux-gnu/5/../../..] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/5/../../..]
-    arg [CMakeFiles/cmTC_559f0.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [CMakeFiles/cmTC_93d0b.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
     arg [-lstdc++] ==> lib [stdc++]
     arg [-lm] ==> lib [m]
     arg [-lgcc_s] ==> lib [gcc_s]
@@ -352,19 +352,19 @@ Parsed CXX implicit link information from above output:
 
 
 Detecting CXX [-std=c++14] compiler features compiled with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_1dd2b/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_1dd2b.dir/build.make CMakeFiles/cmTC_1dd2b.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_1dd2b.dir/feature_tests.cxx.o
-/usr/bin/c++     -std=c++14 -o CMakeFiles/cmTC_1dd2b.dir/feature_tests.cxx.o -c /root/stellite/build/release/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_1dd2b
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1dd2b.dir/link.txt --verbose=1
-/usr/bin/c++        CMakeFiles/cmTC_1dd2b.dir/feature_tests.cxx.o  -o cmTC_1dd2b -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_0a5a5/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_0a5a5.dir/build.make CMakeFiles/cmTC_0a5a5.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_0a5a5.dir/feature_tests.cxx.o
+/usr/bin/c++     -std=c++14 -o CMakeFiles/cmTC_0a5a5.dir/feature_tests.cxx.o -c /root/Stellite/build/release/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_0a5a5
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0a5a5.dir/link.txt --verbose=1
+/usr/bin/c++        CMakeFiles/cmTC_0a5a5.dir/feature_tests.cxx.o  -o cmTC_0a5a5 -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
     Feature record: CXX_FEATURE:1cxx_aggregate_default_initializers
@@ -427,19 +427,19 @@ make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
 
 
 Detecting CXX [-std=c++11] compiler features compiled with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_67e2e/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_67e2e.dir/build.make CMakeFiles/cmTC_67e2e.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_67e2e.dir/feature_tests.cxx.o
-/usr/bin/c++     -std=c++11 -o CMakeFiles/cmTC_67e2e.dir/feature_tests.cxx.o -c /root/stellite/build/release/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_67e2e
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_67e2e.dir/link.txt --verbose=1
-/usr/bin/c++        CMakeFiles/cmTC_67e2e.dir/feature_tests.cxx.o  -o cmTC_67e2e -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_7f370/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_7f370.dir/build.make CMakeFiles/cmTC_7f370.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_7f370.dir/feature_tests.cxx.o
+/usr/bin/c++     -std=c++11 -o CMakeFiles/cmTC_7f370.dir/feature_tests.cxx.o -c /root/Stellite/build/release/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_7f370
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7f370.dir/link.txt --verbose=1
+/usr/bin/c++        CMakeFiles/cmTC_7f370.dir/feature_tests.cxx.o  -o cmTC_7f370 -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
     Feature record: CXX_FEATURE:0cxx_aggregate_default_initializers
@@ -502,19 +502,19 @@ make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
 
 
 Detecting CXX [-std=c++98] compiler features compiled with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_e4e30/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_e4e30.dir/build.make CMakeFiles/cmTC_e4e30.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_e4e30.dir/feature_tests.cxx.o
-/usr/bin/c++     -std=c++98 -o CMakeFiles/cmTC_e4e30.dir/feature_tests.cxx.o -c /root/stellite/build/release/CMakeFiles/feature_tests.cxx
-Linking CXX executable cmTC_e4e30
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e4e30.dir/link.txt --verbose=1
-/usr/bin/c++        CMakeFiles/cmTC_e4e30.dir/feature_tests.cxx.o  -o cmTC_e4e30 -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_c31d7/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_c31d7.dir/build.make CMakeFiles/cmTC_c31d7.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_c31d7.dir/feature_tests.cxx.o
+/usr/bin/c++     -std=c++98 -o CMakeFiles/cmTC_c31d7.dir/feature_tests.cxx.o -c /root/Stellite/build/release/CMakeFiles/feature_tests.cxx
+Linking CXX executable cmTC_c31d7
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c31d7.dir/link.txt --verbose=1
+/usr/bin/c++        CMakeFiles/cmTC_c31d7.dir/feature_tests.cxx.o  -o cmTC_c31d7 -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
     Feature record: CXX_FEATURE:0cxx_aggregate_default_initializers
@@ -575,289 +575,289 @@ make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
     Feature record: CXX_FEATURE:0cxx_variadic_macros
     Feature record: CXX_FEATURE:0cxx_variadic_templates
 Determining if the include file pthread.h exists passed with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_078d9/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_078d9.dir/build.make CMakeFiles/cmTC_078d9.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_078d9.dir/CheckIncludeFile.c.o
-/usr/bin/cc     -o CMakeFiles/cmTC_078d9.dir/CheckIncludeFile.c.o   -c /root/stellite/build/release/CMakeFiles/CMakeTmp/CheckIncludeFile.c
-Linking C executable cmTC_078d9
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_078d9.dir/link.txt --verbose=1
-/usr/bin/cc       CMakeFiles/cmTC_078d9.dir/CheckIncludeFile.c.o  -o cmTC_078d9 -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_cb235/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_cb235.dir/build.make CMakeFiles/cmTC_cb235.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_cb235.dir/CheckIncludeFile.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_cb235.dir/CheckIncludeFile.c.o   -c /root/Stellite/build/release/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_cb235
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cb235.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_cb235.dir/CheckIncludeFile.c.o  -o cmTC_cb235 -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
 Determining if the function strptime exists passed with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_8f37d/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_8f37d.dir/build.make CMakeFiles/cmTC_8f37d.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_8f37d.dir/CheckFunctionExists.c.o
-/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=strptime   -o CMakeFiles/cmTC_8f37d.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
-Linking C executable cmTC_8f37d
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8f37d.dir/link.txt --verbose=1
-/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=strptime    CMakeFiles/cmTC_8f37d.dir/CheckFunctionExists.c.o  -o cmTC_8f37d -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_99589/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_99589.dir/build.make CMakeFiles/cmTC_99589.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_99589.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=strptime   -o CMakeFiles/cmTC_99589.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Linking C executable cmTC_99589
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_99589.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=strptime    CMakeFiles/cmTC_99589.dir/CheckFunctionExists.c.o  -o cmTC_99589 -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
 Performing C SOURCE FILE Test _Wformat_c succeeded with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_8ed25/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_8ed25.dir/build.make CMakeFiles/cmTC_8ed25.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_8ed25.dir/src.c.o
-/usr/bin/cc    -fno-strict-aliasing -D_Wformat_c   -Wformat -o CMakeFiles/cmTC_8ed25.dir/src.c.o   -c /root/stellite/build/release/CMakeFiles/CMakeTmp/src.c
-Linking C executable cmTC_8ed25
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8ed25.dir/link.txt --verbose=1
-/usr/bin/cc   -fno-strict-aliasing -D_Wformat_c    CMakeFiles/cmTC_8ed25.dir/src.c.o  -o cmTC_8ed25 -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_aa71e/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_aa71e.dir/build.make CMakeFiles/cmTC_aa71e.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_aa71e.dir/src.c.o
+/usr/bin/cc    -fno-strict-aliasing -D_Wformat_c   -Wformat -o CMakeFiles/cmTC_aa71e.dir/src.c.o   -c /root/Stellite/build/release/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_aa71e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_aa71e.dir/link.txt --verbose=1
+/usr/bin/cc   -fno-strict-aliasing -D_Wformat_c    CMakeFiles/cmTC_aa71e.dir/src.c.o  -o cmTC_aa71e -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 Source file was:
 int main(void) { return 0; }
 Performing C++ SOURCE FILE Test _Wformat_cxx succeeded with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_91af9/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_91af9.dir/build.make CMakeFiles/cmTC_91af9.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_91af9.dir/src.cxx.o
-/usr/bin/c++     -fno-strict-aliasing -D_Wformat_cxx   -Wformat -o CMakeFiles/cmTC_91af9.dir/src.cxx.o -c /root/stellite/build/release/CMakeFiles/CMakeTmp/src.cxx
-Linking CXX executable cmTC_91af9
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_91af9.dir/link.txt --verbose=1
-/usr/bin/c++    -fno-strict-aliasing -D_Wformat_cxx    CMakeFiles/cmTC_91af9.dir/src.cxx.o  -o cmTC_91af9 -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_2da6d/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_2da6d.dir/build.make CMakeFiles/cmTC_2da6d.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_2da6d.dir/src.cxx.o
+/usr/bin/c++     -fno-strict-aliasing -D_Wformat_cxx   -Wformat -o CMakeFiles/cmTC_2da6d.dir/src.cxx.o -c /root/Stellite/build/release/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_2da6d
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2da6d.dir/link.txt --verbose=1
+/usr/bin/c++    -fno-strict-aliasing -D_Wformat_cxx    CMakeFiles/cmTC_2da6d.dir/src.cxx.o  -o cmTC_2da6d -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 Source file was:
 int main() { return 0; }
 Performing C SOURCE FILE Test _Wformat_security_c succeeded with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_aaa72/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_aaa72.dir/build.make CMakeFiles/cmTC_aaa72.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_aaa72.dir/src.c.o
-/usr/bin/cc    -fno-strict-aliasing -D_Wformat_security_c   -Wformat-security -o CMakeFiles/cmTC_aaa72.dir/src.c.o   -c /root/stellite/build/release/CMakeFiles/CMakeTmp/src.c
-Linking C executable cmTC_aaa72
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_aaa72.dir/link.txt --verbose=1
-/usr/bin/cc   -fno-strict-aliasing -D_Wformat_security_c    CMakeFiles/cmTC_aaa72.dir/src.c.o  -o cmTC_aaa72 -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_18ed2/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_18ed2.dir/build.make CMakeFiles/cmTC_18ed2.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_18ed2.dir/src.c.o
+/usr/bin/cc    -fno-strict-aliasing -D_Wformat_security_c   -Wformat-security -o CMakeFiles/cmTC_18ed2.dir/src.c.o   -c /root/Stellite/build/release/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_18ed2
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_18ed2.dir/link.txt --verbose=1
+/usr/bin/cc   -fno-strict-aliasing -D_Wformat_security_c    CMakeFiles/cmTC_18ed2.dir/src.c.o  -o cmTC_18ed2 -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 Source file was:
 int main(void) { return 0; }
 Performing C++ SOURCE FILE Test _Wformat_security_cxx succeeded with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_9a15a/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_9a15a.dir/build.make CMakeFiles/cmTC_9a15a.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_9a15a.dir/src.cxx.o
-/usr/bin/c++     -fno-strict-aliasing -D_Wformat_security_cxx   -Wformat-security -o CMakeFiles/cmTC_9a15a.dir/src.cxx.o -c /root/stellite/build/release/CMakeFiles/CMakeTmp/src.cxx
-Linking CXX executable cmTC_9a15a
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9a15a.dir/link.txt --verbose=1
-/usr/bin/c++    -fno-strict-aliasing -D_Wformat_security_cxx    CMakeFiles/cmTC_9a15a.dir/src.cxx.o  -o cmTC_9a15a -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_92740/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_92740.dir/build.make CMakeFiles/cmTC_92740.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_92740.dir/src.cxx.o
+/usr/bin/c++     -fno-strict-aliasing -D_Wformat_security_cxx   -Wformat-security -o CMakeFiles/cmTC_92740.dir/src.cxx.o -c /root/Stellite/build/release/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_92740
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_92740.dir/link.txt --verbose=1
+/usr/bin/c++    -fno-strict-aliasing -D_Wformat_security_cxx    CMakeFiles/cmTC_92740.dir/src.cxx.o  -o cmTC_92740 -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 Source file was:
 int main() { return 0; }
 Performing C SOURCE FILE Test _fstack_protector_c succeeded with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_95a08/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_95a08.dir/build.make CMakeFiles/cmTC_95a08.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_95a08.dir/src.c.o
-/usr/bin/cc    -fno-strict-aliasing -D_fstack_protector_c   -fstack-protector -o CMakeFiles/cmTC_95a08.dir/src.c.o   -c /root/stellite/build/release/CMakeFiles/CMakeTmp/src.c
-Linking C executable cmTC_95a08
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_95a08.dir/link.txt --verbose=1
-/usr/bin/cc   -fno-strict-aliasing -D_fstack_protector_c    CMakeFiles/cmTC_95a08.dir/src.c.o  -o cmTC_95a08 -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_60b55/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_60b55.dir/build.make CMakeFiles/cmTC_60b55.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_60b55.dir/src.c.o
+/usr/bin/cc    -fno-strict-aliasing -D_fstack_protector_c   -fstack-protector -o CMakeFiles/cmTC_60b55.dir/src.c.o   -c /root/Stellite/build/release/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_60b55
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_60b55.dir/link.txt --verbose=1
+/usr/bin/cc   -fno-strict-aliasing -D_fstack_protector_c    CMakeFiles/cmTC_60b55.dir/src.c.o  -o cmTC_60b55 -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 Source file was:
 int main(void) { return 0; }
 Performing C++ SOURCE FILE Test _fstack_protector_cxx succeeded with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_25d18/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_25d18.dir/build.make CMakeFiles/cmTC_25d18.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_25d18.dir/src.cxx.o
-/usr/bin/c++     -fno-strict-aliasing -D_fstack_protector_cxx   -fstack-protector -o CMakeFiles/cmTC_25d18.dir/src.cxx.o -c /root/stellite/build/release/CMakeFiles/CMakeTmp/src.cxx
-Linking CXX executable cmTC_25d18
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_25d18.dir/link.txt --verbose=1
-/usr/bin/c++    -fno-strict-aliasing -D_fstack_protector_cxx    CMakeFiles/cmTC_25d18.dir/src.cxx.o  -o cmTC_25d18 -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_0a5fc/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_0a5fc.dir/build.make CMakeFiles/cmTC_0a5fc.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_0a5fc.dir/src.cxx.o
+/usr/bin/c++     -fno-strict-aliasing -D_fstack_protector_cxx   -fstack-protector -o CMakeFiles/cmTC_0a5fc.dir/src.cxx.o -c /root/Stellite/build/release/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_0a5fc
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0a5fc.dir/link.txt --verbose=1
+/usr/bin/c++    -fno-strict-aliasing -D_fstack_protector_cxx    CMakeFiles/cmTC_0a5fc.dir/src.cxx.o  -o cmTC_0a5fc -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 Source file was:
 int main() { return 0; }
 Performing C SOURCE FILE Test _fstack_protector_strong_c succeeded with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_d01d9/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_d01d9.dir/build.make CMakeFiles/cmTC_d01d9.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_d01d9.dir/src.c.o
-/usr/bin/cc    -fno-strict-aliasing -D_fstack_protector_strong_c   -fstack-protector-strong -o CMakeFiles/cmTC_d01d9.dir/src.c.o   -c /root/stellite/build/release/CMakeFiles/CMakeTmp/src.c
-Linking C executable cmTC_d01d9
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d01d9.dir/link.txt --verbose=1
-/usr/bin/cc   -fno-strict-aliasing -D_fstack_protector_strong_c    CMakeFiles/cmTC_d01d9.dir/src.c.o  -o cmTC_d01d9 -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_393d2/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_393d2.dir/build.make CMakeFiles/cmTC_393d2.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_393d2.dir/src.c.o
+/usr/bin/cc    -fno-strict-aliasing -D_fstack_protector_strong_c   -fstack-protector-strong -o CMakeFiles/cmTC_393d2.dir/src.c.o   -c /root/Stellite/build/release/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_393d2
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_393d2.dir/link.txt --verbose=1
+/usr/bin/cc   -fno-strict-aliasing -D_fstack_protector_strong_c    CMakeFiles/cmTC_393d2.dir/src.c.o  -o cmTC_393d2 -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 Source file was:
 int main(void) { return 0; }
 Performing C++ SOURCE FILE Test _fstack_protector_strong_cxx succeeded with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_070e7/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_070e7.dir/build.make CMakeFiles/cmTC_070e7.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_070e7.dir/src.cxx.o
-/usr/bin/c++     -fno-strict-aliasing -D_fstack_protector_strong_cxx   -fstack-protector-strong -o CMakeFiles/cmTC_070e7.dir/src.cxx.o -c /root/stellite/build/release/CMakeFiles/CMakeTmp/src.cxx
-Linking CXX executable cmTC_070e7
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_070e7.dir/link.txt --verbose=1
-/usr/bin/c++    -fno-strict-aliasing -D_fstack_protector_strong_cxx    CMakeFiles/cmTC_070e7.dir/src.cxx.o  -o cmTC_070e7 -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_c2d53/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_c2d53.dir/build.make CMakeFiles/cmTC_c2d53.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_c2d53.dir/src.cxx.o
+/usr/bin/c++     -fno-strict-aliasing -D_fstack_protector_strong_cxx   -fstack-protector-strong -o CMakeFiles/cmTC_c2d53.dir/src.cxx.o -c /root/Stellite/build/release/CMakeFiles/CMakeTmp/src.cxx
+Linking CXX executable cmTC_c2d53
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c2d53.dir/link.txt --verbose=1
+/usr/bin/c++    -fno-strict-aliasing -D_fstack_protector_strong_cxx    CMakeFiles/cmTC_c2d53.dir/src.cxx.o  -o cmTC_c2d53 -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 Source file was:
 int main() { return 0; }
 Determining if the -pie linker flag is supported passed with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_26acd/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_26acd.dir/build.make CMakeFiles/cmTC_26acd.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_26acd.dir/CheckLinkerFlag.c.o
-/usr/bin/cc    -pie    -pie -o CMakeFiles/cmTC_26acd.dir/CheckLinkerFlag.c.o   -c /root/stellite/cmake/CheckLinkerFlag.c
-Linking C executable cmTC_26acd
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_26acd.dir/link.txt --verbose=1
-/usr/bin/cc  -pie     CMakeFiles/cmTC_26acd.dir/CheckLinkerFlag.c.o  -o cmTC_26acd -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_18504/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_18504.dir/build.make CMakeFiles/cmTC_18504.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_18504.dir/CheckLinkerFlag.c.o
+/usr/bin/cc    -pie    -pie -o CMakeFiles/cmTC_18504.dir/CheckLinkerFlag.c.o   -c /root/Stellite/cmake/CheckLinkerFlag.c
+Linking C executable cmTC_18504
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_18504.dir/link.txt --verbose=1
+/usr/bin/cc  -pie     CMakeFiles/cmTC_18504.dir/CheckLinkerFlag.c.o  -o cmTC_18504 -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
 Determining if the -Wl,-z,relro linker flag is supported passed with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_57ae7/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_57ae7.dir/build.make CMakeFiles/cmTC_57ae7.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_57ae7.dir/CheckLinkerFlag.c.o
-/usr/bin/cc    -Wl,-z,relro    -Wl,-z,relro -o CMakeFiles/cmTC_57ae7.dir/CheckLinkerFlag.c.o   -c /root/stellite/cmake/CheckLinkerFlag.c
-Linking C executable cmTC_57ae7
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_57ae7.dir/link.txt --verbose=1
-/usr/bin/cc  -Wl,-z,relro     CMakeFiles/cmTC_57ae7.dir/CheckLinkerFlag.c.o  -o cmTC_57ae7 -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_b3a6b/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_b3a6b.dir/build.make CMakeFiles/cmTC_b3a6b.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b3a6b.dir/CheckLinkerFlag.c.o
+/usr/bin/cc    -Wl,-z,relro    -Wl,-z,relro -o CMakeFiles/cmTC_b3a6b.dir/CheckLinkerFlag.c.o   -c /root/Stellite/cmake/CheckLinkerFlag.c
+Linking C executable cmTC_b3a6b
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b3a6b.dir/link.txt --verbose=1
+/usr/bin/cc  -Wl,-z,relro     CMakeFiles/cmTC_b3a6b.dir/CheckLinkerFlag.c.o  -o cmTC_b3a6b -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
 Determining if the -Wl,-z,now linker flag is supported passed with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_56436/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_56436.dir/build.make CMakeFiles/cmTC_56436.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_56436.dir/CheckLinkerFlag.c.o
-/usr/bin/cc    -Wl,-z,now    -Wl,-z,now -o CMakeFiles/cmTC_56436.dir/CheckLinkerFlag.c.o   -c /root/stellite/cmake/CheckLinkerFlag.c
-Linking C executable cmTC_56436
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_56436.dir/link.txt --verbose=1
-/usr/bin/cc  -Wl,-z,now     CMakeFiles/cmTC_56436.dir/CheckLinkerFlag.c.o  -o cmTC_56436 -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_67e00/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_67e00.dir/build.make CMakeFiles/cmTC_67e00.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_67e00.dir/CheckLinkerFlag.c.o
+/usr/bin/cc    -Wl,-z,now    -Wl,-z,now -o CMakeFiles/cmTC_67e00.dir/CheckLinkerFlag.c.o   -c /root/Stellite/cmake/CheckLinkerFlag.c
+Linking C executable cmTC_67e00
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_67e00.dir/link.txt --verbose=1
+/usr/bin/cc  -Wl,-z,now     CMakeFiles/cmTC_67e00.dir/CheckLinkerFlag.c.o  -o cmTC_67e00 -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
 Determining if the -Wl,-z,noexecstack linker flag is supported passed with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_4378e/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_4378e.dir/build.make CMakeFiles/cmTC_4378e.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_4378e.dir/CheckLinkerFlag.c.o
-/usr/bin/cc    -Wl,-z,noexecstack    -Wl,-z,noexecstack -o CMakeFiles/cmTC_4378e.dir/CheckLinkerFlag.c.o   -c /root/stellite/cmake/CheckLinkerFlag.c
-Linking C executable cmTC_4378e
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4378e.dir/link.txt --verbose=1
-/usr/bin/cc  -Wl,-z,noexecstack     CMakeFiles/cmTC_4378e.dir/CheckLinkerFlag.c.o  -o cmTC_4378e -rdynamic 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_3ef6d/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_3ef6d.dir/build.make CMakeFiles/cmTC_3ef6d.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_3ef6d.dir/CheckLinkerFlag.c.o
+/usr/bin/cc    -Wl,-z,noexecstack    -Wl,-z,noexecstack -o CMakeFiles/cmTC_3ef6d.dir/CheckLinkerFlag.c.o   -c /root/Stellite/cmake/CheckLinkerFlag.c
+Linking C executable cmTC_3ef6d
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3ef6d.dir/link.txt --verbose=1
+/usr/bin/cc  -Wl,-z,noexecstack     CMakeFiles/cmTC_3ef6d.dir/CheckLinkerFlag.c.o  -o cmTC_3ef6d -rdynamic 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
 Determining if the function rl_copy_text exists passed with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_eec21/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_eec21.dir/build.make CMakeFiles/cmTC_eec21.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_eec21.dir/CheckFunctionExists.c.o
-/usr/bin/cc    -fno-strict-aliasing -maes -std=c11 -D_GNU_SOURCE   -Wall -Wextra -Wpointer-arith -Wundef -Wvla -Wwrite-strings -Wno-error=extra -Wno-error=deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-error=unused-variable -Wno-error=undef -Wno-error=uninitialized -Wlogical-op -Wno-error=maybe-uninitialized -Wno-error=cpp -Waggregate-return -Wnested-externs -Wold-style-definition -Wstrict-prototypes -march=native  -fPIC  -Wformat -Wformat-security -fstack-protector -fstack-protector-strong -fno-strict-aliasing -DCHECK_FUNCTION_EXISTS=rl_copy_text   -o CMakeFiles/cmTC_eec21.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Run Build Command:"/usr/bin/make" "cmTC_8bccb/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_8bccb.dir/build.make CMakeFiles/cmTC_8bccb.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_8bccb.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -fno-strict-aliasing -maes -std=c11 -D_GNU_SOURCE   -Wall -Wextra -Wpointer-arith -Wundef -Wvla -Wwrite-strings -Wno-error=extra -Wno-error=deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-error=unused-variable -Wno-error=undef -Wno-error=uninitialized -Wlogical-op -Wno-error=maybe-uninitialized -Wno-error=cpp -Waggregate-return -Wnested-externs -Wold-style-definition -Wstrict-prototypes -march=native  -fPIC  -Wformat -Wformat-security -fstack-protector -fstack-protector-strong -fno-strict-aliasing -DCHECK_FUNCTION_EXISTS=rl_copy_text   -o CMakeFiles/cmTC_8bccb.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
 /usr/share/cmake-3.5/Modules/CheckFunctionExists.c:6:1: warning: function declaration isn’t a prototype [-Wstrict-prototypes]
  char CHECK_FUNCTION_EXISTS();
  ^
-Linking C executable cmTC_eec21
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_eec21.dir/link.txt --verbose=1
-/usr/bin/cc   -fno-strict-aliasing -maes -std=c11 -D_GNU_SOURCE   -Wall -Wextra -Wpointer-arith -Wundef -Wvla -Wwrite-strings -Wno-error=extra -Wno-error=deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-error=unused-variable -Wno-error=undef -Wno-error=uninitialized -Wlogical-op -Wno-error=maybe-uninitialized -Wno-error=cpp -Waggregate-return -Wnested-externs -Wold-style-definition -Wstrict-prototypes -march=native  -fPIC  -Wformat -Wformat-security -fstack-protector -fstack-protector-strong -fno-strict-aliasing -DCHECK_FUNCTION_EXISTS=rl_copy_text    CMakeFiles/cmTC_eec21.dir/CheckFunctionExists.c.o  -o cmTC_eec21 -rdynamic /usr/lib/x86_64-linux-gnu/libreadline.so 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Linking C executable cmTC_8bccb
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8bccb.dir/link.txt --verbose=1
+/usr/bin/cc   -fno-strict-aliasing -maes -std=c11 -D_GNU_SOURCE   -Wall -Wextra -Wpointer-arith -Wundef -Wvla -Wwrite-strings -Wno-error=extra -Wno-error=deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-error=unused-variable -Wno-error=undef -Wno-error=uninitialized -Wlogical-op -Wno-error=maybe-uninitialized -Wno-error=cpp -Waggregate-return -Wnested-externs -Wold-style-definition -Wstrict-prototypes -march=native  -fPIC  -Wformat -Wformat-security -fstack-protector -fstack-protector-strong -fno-strict-aliasing -DCHECK_FUNCTION_EXISTS=rl_copy_text    CMakeFiles/cmTC_8bccb.dir/CheckFunctionExists.c.o  -o cmTC_8bccb -rdynamic /usr/lib/x86_64-linux-gnu/libreadline.so 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
 Determining if the function rl_filename_completion_function exists passed with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_80a15/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_80a15.dir/build.make CMakeFiles/cmTC_80a15.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_80a15.dir/CheckFunctionExists.c.o
-/usr/bin/cc    -fno-strict-aliasing -maes -std=c11 -D_GNU_SOURCE   -Wall -Wextra -Wpointer-arith -Wundef -Wvla -Wwrite-strings -Wno-error=extra -Wno-error=deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-error=unused-variable -Wno-error=undef -Wno-error=uninitialized -Wlogical-op -Wno-error=maybe-uninitialized -Wno-error=cpp -Waggregate-return -Wnested-externs -Wold-style-definition -Wstrict-prototypes -march=native  -fPIC  -Wformat -Wformat-security -fstack-protector -fstack-protector-strong -fno-strict-aliasing -DCHECK_FUNCTION_EXISTS=rl_filename_completion_function   -o CMakeFiles/cmTC_80a15.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
+Run Build Command:"/usr/bin/make" "cmTC_69683/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_69683.dir/build.make CMakeFiles/cmTC_69683.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_69683.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -fno-strict-aliasing -maes -std=c11 -D_GNU_SOURCE   -Wall -Wextra -Wpointer-arith -Wundef -Wvla -Wwrite-strings -Wno-error=extra -Wno-error=deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-error=unused-variable -Wno-error=undef -Wno-error=uninitialized -Wlogical-op -Wno-error=maybe-uninitialized -Wno-error=cpp -Waggregate-return -Wnested-externs -Wold-style-definition -Wstrict-prototypes -march=native  -fPIC  -Wformat -Wformat-security -fstack-protector -fstack-protector-strong -fno-strict-aliasing -DCHECK_FUNCTION_EXISTS=rl_filename_completion_function   -o CMakeFiles/cmTC_69683.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.5/Modules/CheckFunctionExists.c
 /usr/share/cmake-3.5/Modules/CheckFunctionExists.c:6:1: warning: function declaration isn’t a prototype [-Wstrict-prototypes]
  char CHECK_FUNCTION_EXISTS();
  ^
-Linking C executable cmTC_80a15
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_80a15.dir/link.txt --verbose=1
-/usr/bin/cc   -fno-strict-aliasing -maes -std=c11 -D_GNU_SOURCE   -Wall -Wextra -Wpointer-arith -Wundef -Wvla -Wwrite-strings -Wno-error=extra -Wno-error=deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-error=unused-variable -Wno-error=undef -Wno-error=uninitialized -Wlogical-op -Wno-error=maybe-uninitialized -Wno-error=cpp -Waggregate-return -Wnested-externs -Wold-style-definition -Wstrict-prototypes -march=native  -fPIC  -Wformat -Wformat-security -fstack-protector -fstack-protector-strong -fno-strict-aliasing -DCHECK_FUNCTION_EXISTS=rl_filename_completion_function    CMakeFiles/cmTC_80a15.dir/CheckFunctionExists.c.o  -o cmTC_80a15 -rdynamic /usr/lib/x86_64-linux-gnu/libreadline.so 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Linking C executable cmTC_69683
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_69683.dir/link.txt --verbose=1
+/usr/bin/cc   -fno-strict-aliasing -maes -std=c11 -D_GNU_SOURCE   -Wall -Wextra -Wpointer-arith -Wundef -Wvla -Wwrite-strings -Wno-error=extra -Wno-error=deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-error=unused-variable -Wno-error=undef -Wno-error=uninitialized -Wlogical-op -Wno-error=maybe-uninitialized -Wno-error=cpp -Waggregate-return -Wnested-externs -Wold-style-definition -Wstrict-prototypes -march=native  -fPIC  -Wformat -Wformat-security -fstack-protector -fstack-protector-strong -fno-strict-aliasing -DCHECK_FUNCTION_EXISTS=rl_filename_completion_function    CMakeFiles/cmTC_69683.dir/CheckFunctionExists.c.o  -o cmTC_69683 -rdynamic /usr/lib/x86_64-linux-gnu/libreadline.so 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 
 Performing C SOURCE FILE Test HAVE_C11 succeeded with the following output:
-Change Dir: /root/stellite/build/release/CMakeFiles/CMakeTmp
+Change Dir: /root/Stellite/build/release/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_752c5/fast"
-make[1]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-/usr/bin/make -f CMakeFiles/cmTC_752c5.dir/build.make CMakeFiles/cmTC_752c5.dir/build
-make[2]: Entering directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_752c5.dir/src.c.o
-/usr/bin/cc    -fno-strict-aliasing -maes -std=c11 -D_GNU_SOURCE   -Wall -Wextra -Wpointer-arith -Wundef -Wvla -Wwrite-strings -Wno-error=extra -Wno-error=deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-error=unused-variable -Wno-error=undef -Wno-error=uninitialized -Wlogical-op -Wno-error=maybe-uninitialized -Wno-error=cpp -Waggregate-return -Wnested-externs -Wold-style-definition -Wstrict-prototypes -march=native  -fPIC  -Wformat -Wformat-security -fstack-protector -fstack-protector-strong -fno-strict-aliasing -DHAVE_C11   -std=c11 -o CMakeFiles/cmTC_752c5.dir/src.c.o   -c /root/stellite/build/release/CMakeFiles/CMakeTmp/src.c
-Linking C executable cmTC_752c5
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_752c5.dir/link.txt --verbose=1
-/usr/bin/cc   -fno-strict-aliasing -maes -std=c11 -D_GNU_SOURCE   -Wall -Wextra -Wpointer-arith -Wundef -Wvla -Wwrite-strings -Wno-error=extra -Wno-error=deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-error=unused-variable -Wno-error=undef -Wno-error=uninitialized -Wlogical-op -Wno-error=maybe-uninitialized -Wno-error=cpp -Waggregate-return -Wnested-externs -Wold-style-definition -Wstrict-prototypes -march=native  -fPIC  -Wformat -Wformat-security -fstack-protector -fstack-protector-strong -fno-strict-aliasing -DHAVE_C11    CMakeFiles/cmTC_752c5.dir/src.c.o  -o cmTC_752c5 -rdynamic /usr/lib/x86_64-linux-gnu/libreadline.so 
-make[2]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
-make[1]: Leaving directory '/root/stellite/build/release/CMakeFiles/CMakeTmp'
+Run Build Command:"/usr/bin/make" "cmTC_b66a1/fast"
+make[1]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+/usr/bin/make -f CMakeFiles/cmTC_b66a1.dir/build.make CMakeFiles/cmTC_b66a1.dir/build
+make[2]: Entering directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b66a1.dir/src.c.o
+/usr/bin/cc    -fno-strict-aliasing -maes -std=c11 -D_GNU_SOURCE   -Wall -Wextra -Wpointer-arith -Wundef -Wvla -Wwrite-strings -Wno-error=extra -Wno-error=deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-error=unused-variable -Wno-error=undef -Wno-error=uninitialized -Wlogical-op -Wno-error=maybe-uninitialized -Wno-error=cpp -Waggregate-return -Wnested-externs -Wold-style-definition -Wstrict-prototypes -march=native  -fPIC  -Wformat -Wformat-security -fstack-protector -fstack-protector-strong -fno-strict-aliasing -DHAVE_C11   -std=c11 -o CMakeFiles/cmTC_b66a1.dir/src.c.o   -c /root/Stellite/build/release/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_b66a1
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b66a1.dir/link.txt --verbose=1
+/usr/bin/cc   -fno-strict-aliasing -maes -std=c11 -D_GNU_SOURCE   -Wall -Wextra -Wpointer-arith -Wundef -Wvla -Wwrite-strings -Wno-error=extra -Wno-error=deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-error=unused-variable -Wno-error=undef -Wno-error=uninitialized -Wlogical-op -Wno-error=maybe-uninitialized -Wno-error=cpp -Waggregate-return -Wnested-externs -Wold-style-definition -Wstrict-prototypes -march=native  -fPIC  -Wformat -Wformat-security -fstack-protector -fstack-protector-strong -fno-strict-aliasing -DHAVE_C11    CMakeFiles/cmTC_b66a1.dir/src.c.o  -o cmTC_b66a1 -rdynamic /usr/lib/x86_64-linux-gnu/libreadline.so 
+make[2]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
+make[1]: Leaving directory '/root/Stellite/build/release/CMakeFiles/CMakeTmp'
 
 Source file was:
 int main(void) { return 0; }

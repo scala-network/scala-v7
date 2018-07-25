@@ -103,7 +103,7 @@ static const struct {
   { 4, 194600, 0, 1522557836 },
 
 };
-static const uint64_t mainnet_hard_fork_version_1_till = 1009826;
+static const uint64_t mainnet_hard_fork_version_1_till = (uint64_t)-1;
 
 static const struct {
   uint8_t version;
@@ -1079,9 +1079,16 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std:
 
   // FIXME: This will fail if fork activation heights are subject to voting
   size_t target = get_ideal_hard_fork_version(bei.height) < 2 ? DIFFICULTY_TARGET_V1 : DIFFICULTY_TARGET_V2;
-
-  // calculate the difficulty target for the block and return it
-  return next_difficulty(timestamps, cumulative_difficulties, target);
+  
+  if(get_current_hard_fork_version() < 2){
+    return next_difficulty(timestamps, cumulative_difficulties, target);
+  }
+  if(get_current_hard_fork_version() < 4){
+    return next_difficulty_v3(timestamps, cumulative_difficulties, target, true);
+  }
+  else{
+    return next_difficulty_v4(timestamps, cumulative_difficulties, target);
+  }
 }
 //------------------------------------------------------------------
 // This function does a sanity check on basic things that all miner
