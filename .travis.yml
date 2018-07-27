@@ -2,11 +2,11 @@ sudo: required
 before_install:
   - sudo apt install git-all build-essential cmake libboost-all-dev miniupnpc libpcsclite-dev libzmq3-dev libminiupnpc-dev libunbound-dev graphviz doxygen libunwind8-dev pkg-config libssl-dev
   - sudo apt-get update && sudo apt-get install build-essential g++ python-dev autotools-dev libicu-dev build-essential libbz2-dev libboost-all-dev
-  - wget https://transfer.sh/12xOcX/boost_1_62_0.tar.gz
-  - tar -xf boost_1_62_0.tar.gz
-  - cd boost_1_62_0
-  - ./bootstrap.sh --prefix=/usr/local
-  - sudo ./b2 install
+#  - wget https://transfer.sh/12xOcX/boost_1_62_0.tar.gz
+#  - tar -xf boost_1_62_0.tar.gz
+#  - cd boost_1_62_0
+#  - ./bootstrap.sh --prefix=/usr/local
+#  - sudo ./b2 install
 
 # Enable C++ support
 language: cpp
