@@ -195,11 +195,11 @@ application.
         pacman -Syuu  
 
 * Exit the MSYS shell using Alt+F4  
-* Edit the properties for the `MSYS2 Shell` shortcut changing "msys2_shell.bat" to "msys2_shell.cmd -mingw64"
-* Restart MSYS shell via modified shortcut and update packages again using pacman:  
+* Restart MSYS shell
 
         pacman -Syuu  
 
+* Exit the MSYS shell using Alt+F4  
 
 * Install dependencies:
 
@@ -207,7 +207,7 @@ application.
 
     To build for 64-bit Windows:
 
-        pacman -S mingw-w64-x86_64-toolchain make mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-openssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium
+        pacman -S git-core mingw-w64-x86_64-libpsl mingw-w64-x86_64-toolchain make mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-openssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium
   
 **Cloning**
 
