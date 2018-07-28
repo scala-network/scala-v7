@@ -223,7 +223,13 @@ application.
 
 * The resulting executables can be found in `build/release/bin`
 
+* If you see errors with boost try to install the 1.66.0-2 version of boost, specificly the required static libraries
 
+    ```
+	wget http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-boost-1.66.0-2-any.pkg.tar.xz
+	Pacman -U mingw-w64-x86_64-boost-1.66.0-2-any.pkg.tar.xz
+	
+    ```
 ### Building Portable Statically Linked Binaries
 
 By default, in either dynamically or statically linked builds, binaries target the specific host processor on which the build happens and are not portable to other processors. Portable binaries can be built using the following targets:
