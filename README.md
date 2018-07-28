@@ -207,7 +207,7 @@ application.
 
     To build for 64-bit Windows:
 
-        pacman -S git-core mingw-w64-x86_64-libpsl mingw-w64-x86_64-toolchain make mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-openssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium
+        pacman -S git-core mingw-w64-x86_64-libpsl mingw-w64-x86_64-toolchain make mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-openssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium mingw-w64-x86_64-miniupnpc pkg-config mingw-w64-x86_64-unbound
   
 **Cloning**
 
@@ -222,6 +222,7 @@ application.
         make release-static-win64
 
 * The resulting executables can be found in `build/release/bin`
+
 
 ### Building Portable Statically Linked Binaries
 
