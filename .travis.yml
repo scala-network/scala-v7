@@ -36,3 +36,4 @@ notifications:
     nick: monero
     template:
       - "%{result} | %{repository}#%{build_number} (%{commit} : %{author}) | Build details : %{build_url}"
+      
