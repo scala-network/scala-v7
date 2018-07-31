@@ -1,6 +1,6 @@
 sudo: required
 before_install:
-  - sudo apt-get update && sudo apt-get install g++ python-dev autotools-dev libicu-dev build-essential libbz2-dev git-core build-essential cmake libpcsclite-dev miniupnpc libunbound-dev graphviz pkg-config libssl-dev
+  - sudo apt-get update && sudo apt-get install g++ python-dev autotools-dev libicu-dev build-essential libbz2-dev git-core build-essential cmake libpcsclite-dev libzmq3-dev miniupnpc libunbound-dev graphviz pkg-config libssl-dev
   - wget https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0_rc2.tar.gz
   - tar -xf boost_1_66_0_rc2.tar.gz
   - cd boost_1_66_0
