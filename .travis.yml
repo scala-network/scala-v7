@@ -1,15 +1,38 @@
 sudo: required
-before_install:
-  - sudo apt install git-all build-essential cmake libboost-all-dev miniupnpc libpcsclite-dev libzmq3-dev libminiupnpc-dev libunbound-dev graphviz doxygen libunwind8-dev pkg-config libssl-dev
-  - sudo apt-get update && sudo apt-get install build-essential g++ python-dev autotools-dev libicu-dev build-essential libbz2-dev libboost-all-dev
-
-# Enable C++ support
+dist: trusty
 language: cpp
-
-# Compiler selection
 compiler:
-  - gcc
-
-# Build steps
-script:
-  - make -j4
+- gcc
+- clang
+addons:
+  apt:
+    packages:
+    - build-essential
+    - cmake
+    - doxygen
+    - g++
+    - gcc
+    - clang
+    - graphviz
+    - libboost1.55-all-dev
+    - libdb++-dev
+    - libdb-dev
+    - libgtest-dev
+    - libminiupnpc-dev
+    - libssl-dev
+    - libssl1.0.0
+    - libunbound-dev
+    - libunwind8-dev
+    #sources:
+    #- ubuntu-toolchain-r-test
+script: make -j2 && HAVE_DOT=YES doxygen Doxyfile
+notifications:
+  email: false
+  irc:
+    on_success: change
+    on_failure: change
+    channels:
+      - "chat.freenode.net#monero-dev"
+    nick: monero
+    template:
+      - "%{result} | %{repository}#%{build_number} (%{commit} : %{author}) | Build details : %{build_url}"
