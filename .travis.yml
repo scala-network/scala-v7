@@ -16,4 +16,4 @@ compiler:
 
 # Build steps
 script:
-  - make release-static
+  - make -j2 release-static
