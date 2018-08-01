@@ -6,9 +6,9 @@ before_install:
   - cd boost_1_66_0
   - ./bootstrap.sh --prefix=/usr/local
   - sudo ./b2 --build-type=minimal link=static --with-chrono --with-date_time --with-filesystem --with-program_options --with-regex --with-serialization --with-system --with-thread --with-locale threading=multi threadapi=pthread cflags="-fPIC" cxxflags="-fPIC" stage install
-  - wget http://www.openssl.org/source/openssl-1.0.1g.tar.gz
-  - tar -xvzf openssl-1.0.1g.tar.gz
-  - cd openssl-1.0.1g
+  - wget https://www.openssl.org/source/openssl-1.0.2o.tar.gz
+  - tar -xvzf openssl-1.0.2o.tar.gz
+  - cd openssl-1.0.2o
   - ./Configure linux-x86_64 no-shared --static -fPIC
   - cd /home/travis/build/stellitequestion/Stellite/
 # Enable C++ support
