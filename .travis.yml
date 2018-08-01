@@ -10,6 +10,7 @@ before_install:
   - tar -xvzf openssl-1.0.2o.tar.gz
   - cd openssl-1.0.2o
   - ./Configure linux-x86_64 no-shared --static -fPIC
+  - sudo make install
   - cd /home/travis/build/stellitequestion/Stellite/
 # Enable C++ support
 language: cpp
