@@ -5,7 +5,7 @@ before_install:
   - tar -xf boost_1_66_0_rc2.tar.gz
   - cd boost_1_66_0
   - ./bootstrap.sh --prefix=/usr/local
-  - sudo ./b2 -fPIC install
+  - sudo ./b2 cxxflags=-fPIC install
   - cd /home/travis/build/stellitequestion/Stellite/
 # Enable C++ support
 language: cpp
