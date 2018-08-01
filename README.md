@@ -78,7 +78,7 @@ library archives (`.a`).
 | pcsclite       | ?             | NO       | `libpcsclite-dev`  | `pcsc-lite pcsc-lite-devel` | NO       | Ledger         |
 
 Debian / Ubuntu one liner for all dependencies  
-``` sudo apt update && sudo apt install build-essential cmake pkg-config libboost-all-dev libssl-dev libzmq3-dev libunbound-dev libsodium-dev libminiupnpc-dev miniupnpc libunwind8-dev liblzma-dev libldns-dev libpgm-dev libexpat1-dev doxygen graphviz libpcsclite-dev ```
+``` sudo apt update && sudo apt install git-core build-essential cmake pkg-config libboost-all-dev libssl-dev libzmq3-dev libunbound-dev libsodium-dev libminiupnpc-dev miniupnpc libunwind8-dev liblzma-dev libldns-dev libpgm-dev libexpat1-dev doxygen graphviz libnorm-dev libpcsclite-dev ```
 
 [^] On Debian/Ubuntu `libgtest-dev` only includes sources and headers. You must
 build the library binary manually. This can be done with the following command ```sudo apt-get install libgtest-dev && cd /usr/src/gtest && sudo cmake . && sudo make && sudo mv libg* /usr/lib/ ```
