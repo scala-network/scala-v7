@@ -98,7 +98,7 @@ Install Stellite dependencies
 
   - For Ubuntu and Mint
 
-	`sudo apt install git-all build-essential cmake libboost-all-dev miniupnpc libpcsclite-dev libzmq3-dev libminiupnpc-dev libunbound-dev graphviz doxygen libpgm-dev libunwind8-dev pkg-config libssl-dev`
+``` sudo apt update && sudo apt install git-core build-essential cmake pkg-config libboost-all-dev libssl-dev libzmq3-dev libunbound-dev libsodium-dev libminiupnpc-dev miniupnpc libunwind8-dev liblzma-dev libldns-dev libpgm-dev libexpat1-dev doxygen graphviz libnorm-dev libpcsclite-dev ```
 
   - For Gentoo
 
