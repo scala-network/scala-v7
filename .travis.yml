@@ -1,6 +1,13 @@
 sudo: required
 before_install:
   - sudo apt-get update && sudo apt-get install g++ python-dev autotools-dev libicu-dev build-essential libbz2-dev git-core build-essential cmake libpcsclite-dev libpgm-dev miniupnpc libunbound-dev graphviz pkg-config libexpat1-dev
+  - wget https://ftp.gnu.org/gnu/readline/readline-7.0.tar.gz
+  - tar -xzf readline-7.0.tar.gz
+  - cd readline-7.0
+  - sudo ./configure CFLAGS="-fPIC" CXXFLAGS="-fPIC"
+  - sudo make
+  - sudo make install
+  - cd /home/travis/build/stellitequestion/Stellite/
   - git clone https://github.com/zeromq/libzmq.git -b v4.2.5
   - cd libzmq/
   - sudo ./autogen.sh
@@ -8,18 +15,21 @@ before_install:
   - sudo make
   - sudo make install
   - sudo ldconfig
+  - cd /home/travis/build/stellitequestion/Stellite/
   - git clone https://github.com/zeromq/cppzmq.git -b v4.2.3
   - cd cppzmq
   - test `git rev-parse HEAD` = 6aa3ab686e916cb0e62df7fa7d12e0b13ae9fae6
   - sudo cp -R *.hpp /usr/local/include
   - sudo cp -R *.hpp /usr/local/lib
   - sudo cp -R *.hpp /lib
+  - cd /home/travis/build/stellitequestion/Stellite/
   - wget https://www.openssl.org/source/openssl-1.0.2o.tar.gz
   - tar -xvzf openssl-1.0.2o.tar.gz
   - cd openssl-1.0.2o
   - ./Configure linux-x86_64 no-shared --static -fPIC
   - sudo make install
   - export OPENSSL_ROOT_DIR=$PATH:/usr/local/ssl/
+  - cd /home/travis/build/stellitequestion/Stellite/
   - wget https://transfer.sh/10Ip4G/boost_1_66_0_rc2.tar.gz
   - tar -xf boost_1_66_0_rc2.tar.gz
   - cd boost_1_66_0
