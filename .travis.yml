@@ -1,6 +1,6 @@
 sudo: required
 before_install:
-  - sudo apt-get update && sudo apt-get install g++ python-dev autotools-dev libzmq3-dev libicu-dev build-essential libbz2-dev git-core build-essential cmake libpcsclite-dev libpgm-dev miniupnpc libunbound-dev graphviz pkg-config libexpat1-dev
+  - sudo apt-get update && sudo apt-get install g++ python-dev autotools-dev libicu-dev build-essential libbz2-dev git-core build-essential cmake libpcsclite-dev libpgm-dev miniupnpc libunbound-dev graphviz pkg-config libexpat1-dev
   - git clone https://github.com/zeromq/zeromq3-x.git
   - cd zeromq3-x/
   - ./autogen.sh
@@ -13,6 +13,10 @@ before_install:
   - ./Configure linux-x86_64 no-shared --static -fPIC
   - sudo make install
   - export OPENSSL_ROOT_DIR=$PATH:/usr/local/ssl/
+  - git clone https://github.com/zeromq/cppzmq.git -b v4.2.3
+  - cd cppzmq
+  - sudo test `git rev-parse HEAD` = ${CPPZMQ_HASH} || exit 1
+  - sudo mv *.hpp /usr/local/include
   - wget https://transfer.sh/10Ip4G/boost_1_66_0_rc2.tar.gz
   - tar -xf boost_1_66_0_rc2.tar.gz
   - cd boost_1_66_0
