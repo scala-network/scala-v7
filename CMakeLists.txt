@@ -146,7 +146,7 @@ endif()
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 enable_testing()
 
-option(BUILD_DOCUMENTATION "Build the Doxygen documentation." OFF)
+option(BUILD_DOCUMENTATION "Build the Doxygen documentation." ON)
 
 # Check whether we're on a 32-bit or 64-bit system
 if(CMAKE_SIZEOF_VOID_P EQUAL "8")
@@ -666,19 +666,6 @@ elseif(NOT MSVC)
 endif()
 
 list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
-
-option(USE_READLINE "Build with GNU readline support." OFF)
-if(USE_READLINE)
-  find_package(Readline)
-  if(READLINE_FOUND AND GNU_READLINE_FOUND)
-    add_definitions(-DHAVE_READLINE)
-    include_directories(${Readline_INCLUDE_DIR})
-    list(APPEND EXTRA_LIBRARIES ${Readline_LIBRARY})
-    message(STATUS "Found readline library at: ${Readline_ROOT_DIR}")
-  else()
-    message(STATUS "Could not find GNU readline library so building without readline support")
-  endif()
-endif()
 
 if(ANDROID)
   set(ATOMIC libatomic.a)
