@@ -11,9 +11,9 @@ before_install:
   - git clone https://github.com/zeromq/cppzmq.git -b v4.2.3
   - cd cppzmq
   - test `git rev-parse HEAD` = 6aa3ab686e916cb0e62df7fa7d12e0b13ae9fae6
-  - sudo copy *.hpp /usr/local/include
-  - sudo copy *.hpp /usr/local/lib
-  - sudo copy *.hpp /lib
+  - sudo cp -R *.hpp /usr/local/include
+  - sudo cp -R *.hpp /usr/local/lib
+  - sudo cp -R *.hpp /lib
   - wget https://www.openssl.org/source/openssl-1.0.2o.tar.gz
   - tar -xvzf openssl-1.0.2o.tar.gz
   - cd openssl-1.0.2o
