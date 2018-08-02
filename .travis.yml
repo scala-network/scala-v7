@@ -6,7 +6,7 @@ before_install:
   - cd openssl-1.0.2o
   - ./Configure linux-x86_64 no-shared --static -fPIC
   - sudo make install
-  - export $OPENSSL_ROOT_DIR=/usr/local/ssl/
+  - export OPENSSL_ROOT_DIR=$PATH:/usr/local/ssl/
   - wget https://transfer.sh/10Ip4G/boost_1_66_0_rc2.tar.gz
   - tar -xf boost_1_66_0_rc2.tar.gz
   - cd boost_1_66_0
