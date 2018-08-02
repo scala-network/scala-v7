@@ -7,16 +7,15 @@ before_install:
   - sudo ./configure --enable-static --disable-shared --prefix=$OUTPUT_DIR LDFLAGS="-L$OUTPUT_DIR/lib" CPPFLAGS="-fPIC -I$OUTPUT_DIR/include" LIBS="-lgcc"
   - sudo make
   - sudo make install
+  - git clone https://github.com/zeromq/cppzmq.git -b v4.2.3
+  - cd cppzmq
+  - sudo mv *.hpp /usr/local/include
   - wget https://www.openssl.org/source/openssl-1.0.2o.tar.gz
   - tar -xvzf openssl-1.0.2o.tar.gz
   - cd openssl-1.0.2o
   - ./Configure linux-x86_64 no-shared --static -fPIC
   - sudo make install
   - export OPENSSL_ROOT_DIR=$PATH:/usr/local/ssl/
-  - git clone https://github.com/zeromq/cppzmq.git -b v4.2.3
-  - cd cppzmq
-  - sudo test `git rev-parse HEAD` = ${CPPZMQ_HASH} || exit 1
-  - sudo mv *.hpp /usr/local/include
   - wget https://transfer.sh/10Ip4G/boost_1_66_0_rc2.tar.gz
   - tar -xf boost_1_66_0_rc2.tar.gz
   - cd boost_1_66_0
