@@ -10,7 +10,7 @@ before_install:
   - sudo ldconfig
   - git clone https://github.com/zeromq/cppzmq.git -b v4.2.3
   - cd cppzmq
-  - test `git rev-parse HEAD` = ${CPPZMQ_HASH} || exit 1 \
+  - test `git rev-parse HEAD` = 6aa3ab686e916cb0e62df7fa7d12e0b13ae9fae6
   - sudo mv *.hpp /usr/local/include
   - wget https://www.openssl.org/source/openssl-1.0.2o.tar.gz
   - tar -xvzf openssl-1.0.2o.tar.gz
