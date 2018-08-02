@@ -1,6 +1,6 @@
 sudo: required
 before_install:
-  - sudo apt-get update && sudo apt-get install g++ python-dev autotools-dev libicu-dev build-essential libbz2-dev git-core build-essential cmake libpcsclite-dev libpgm-dev miniupnpc libunbound-dev graphviz pkg-config libexpat1-dev
+  - sudo apt-get update && sudo apt-get install g++ python-dev autotools-dev libzmq3-dev libicu-dev build-essential libbz2-dev git-core build-essential cmake libpcsclite-dev libpgm-dev miniupnpc libunbound-dev graphviz pkg-config libexpat1-dev
   - git clone https://github.com/zeromq/zeromq3-x.git
   - cd zeromq3-x/
   - ./autogen.sh
