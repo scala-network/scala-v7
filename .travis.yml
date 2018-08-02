@@ -1,12 +1,13 @@
 sudo: required
 before_install:
   - sudo apt-get update && sudo apt-get install g++ python-dev autotools-dev libicu-dev build-essential libbz2-dev git-core build-essential cmake libpcsclite-dev libpgm-dev miniupnpc libunbound-dev graphviz pkg-config libexpat1-dev
-  - git clone https://github.com/zeromq/zeromq3-x.git
-  - cd zeromq3-x/
-  - ./autogen.sh
+  - git clone https://github.com/zeromq/libzmq.git
+  - cd libzmq/
+  - sudo ./autogen.sh
   - sudo ./configure --enable-static --disable-shared --prefix=$OUTPUT_DIR LDFLAGS="-L$OUTPUT_DIR/lib" CPPFLAGS="-fPIC -I$OUTPUT_DIR/include" LIBS="-lgcc"
   - sudo make
   - sudo make install
+  - ldconfig
   - git clone https://github.com/zeromq/cppzmq.git -b v4.2.3
   - cd cppzmq
   - sudo mv *.hpp /usr/local/include
