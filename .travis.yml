@@ -16,6 +16,14 @@ before_install:
   - sudo make install
   - sudo ldconfig
   - cd /home/travis/build/stellitequestion/Stellite/
+  - git clone https://github.com/jedisct1/libsodium.git -b 1.0.16
+  - cd libsodium
+  - sudo ./autogen.sh
+  - sudo ./configure CFLAGS="-fPIC" CXXFLAGS="-fPIC"
+  - sudo make
+  - sudo make check
+  - sudo make install
+  - cd /home/travis/build/stellitequestion/Stellite/
   - git clone https://github.com/zeromq/cppzmq.git -b v4.2.3
   - cd cppzmq
   - test `git rev-parse HEAD` = 6aa3ab686e916cb0e62df7fa7d12e0b13ae9fae6
