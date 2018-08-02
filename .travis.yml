@@ -4,9 +4,9 @@ before_install:
   - git clone https://github.com/zeromq/zeromq3-x.git
   - cd zeromq3-x/
   - ./autogen.sh
-  - ./configure --enable-static --disable-shared --host=linux-x86_64 --prefix=$OUTPUT_DIR LDFLAGS="-L$OUTPUT_DIR/lib" CPPFLAGS="-fPIC -I$OUTPUT_DIR/include" LIBS="-lgcc"
-  - make
-  - make install
+  - sudo ./configure --enable-static --disable-shared --host=linux-x86_64 --prefix=$OUTPUT_DIR LDFLAGS="-L$OUTPUT_DIR/lib" CPPFLAGS="-fPIC -I$OUTPUT_DIR/include" LIBS="-lgcc"
+  - sudo make
+  - sudo make install
   - wget https://www.openssl.org/source/openssl-1.0.2o.tar.gz
   - tar -xvzf openssl-1.0.2o.tar.gz
   - cd openssl-1.0.2o
