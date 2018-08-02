@@ -4,7 +4,7 @@ before_install:
   - git clone https://github.com/zeromq/zeromq3-x.git
   - cd zeromq3-x/
   - ./autogen.sh
-  - ./configure --enable-static --disable-shared CPPFLAGS="-fPIC" LIBS="-lgcc"
+  - ./configure --host=linux-x86_64 --enable-static --disable-shared CPPFLAGS="-fPIC" LIBS="-lgcc"
   - make
   - make install
   - wget https://www.openssl.org/source/openssl-1.0.2o.tar.gz
