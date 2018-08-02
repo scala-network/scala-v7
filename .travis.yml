@@ -7,7 +7,7 @@ before_install:
   - sudo ./configure --enable-static --disable-shared --prefix=$OUTPUT_DIR LDFLAGS="-L$OUTPUT_DIR/lib" CPPFLAGS="-fPIC -I$OUTPUT_DIR/include" LIBS="-lgcc"
   - sudo make
   - sudo make install
-  - ldconfig
+  - sudo ldconfig
   - git clone https://github.com/zeromq/cppzmq.git -b v4.2.3
   - cd cppzmq
   - sudo mv *.hpp /usr/local/include
