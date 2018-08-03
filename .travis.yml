@@ -1,13 +1,6 @@
 sudo: required
 before_install:
   - sudo apt-get update && sudo apt-get install g++ python-dev autotools-dev libicu-dev build-essential libbz2-dev git-core build-essential cmake libpcsclite-dev libpgm-dev miniupnpc libunbound-dev graphviz pkg-config libexpat1-dev
-  - wget https://ftp.gnu.org/gnu/readline/readline-7.0.tar.gz
-  - tar -xzf readline-7.0.tar.gz
-  - cd readline-7.0
-  - sudo ./configure CFLAGS="-fPIC" CXXFLAGS="-fPIC"
-  - sudo make
-  - sudo make install
-  - cd /home/travis/build/stellitequestion/Stellite/
   - git clone https://github.com/zeromq/libzmq.git -b v4.2.5
   - cd libzmq/
   - sudo ./autogen.sh
