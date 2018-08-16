@@ -31,7 +31,7 @@ before_install:
   - sudo make install
   - export OPENSSL_ROOT_DIR=$PATH:/usr/local/ssl/
   - cd /home/travis/build/stellitequestion/Stellite/
-  - wget https://transfer.sh/10Ip4G/boost_1_66_0_rc2.tar.gz
+  - wget https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0_rc2.tar.gz
   - tar -xf boost_1_66_0_rc2.tar.gz
   - cd boost_1_66_0
   - ./bootstrap.sh --prefix=/usr/local
