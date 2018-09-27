@@ -1074,7 +1074,7 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
 
     uint64_t total_received_2 = 0;
     total_received_2 += tx_money_got_in_outs;
-    if (!td.m_rct && total_received_1 != total_received_2)
+    if (tx.version != 2 && total_received_1 != total_received_2)
     {
       const el::Level level = el::Level::Warning;
       MCLOG_RED(level, "global", "**********************************************************************");
