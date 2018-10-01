@@ -932,10 +932,10 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
           }
 	total_received_1 += amount_;
         }
-	else if (m_transfers[kit->second].m_spent || m_transfers[kit->second].amount() >= amount[o])
+	else if (m_transfers[kit->second].m_spent || /*m_transfers[kit->second].amount() >= amount[o]*/ true)
         {
 	  LOG_ERROR("Public key " << epee::string_tools::pod_to_hex(kit->first)
-              << " from received " << print_money(tx.vout[o].amount) << " output already exists with "
+              << " from received " << print_money(amount[o]) << " output already exists with "
               << (m_transfers[kit->second].m_spent ? "spent" : "unspent") << " "
               << print_money(m_transfers[kit->second].amount()) << ", received output ignored");
           THROW_WALLET_EXCEPTION_IF(tx_money_got_in_outs < amount[o],
@@ -945,7 +945,7 @@ void wallet2::process_new_transaction(const crypto::hash &txid, const cryptonote
         else
         {
 	  LOG_ERROR("Public key " << epee::string_tools::pod_to_hex(kit->first)
-              << " from received " << print_money(tx.vout[o].amount) << " output already exists with "
+              << " from received " << print_money(amount[o]) << " output already exists with "
               << print_money(m_transfers[kit->second].amount()) << ", replacing with new output");
           // The new larger output replaced a previous smaller one
 
