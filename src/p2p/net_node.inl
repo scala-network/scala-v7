@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The MoNerO Project
 //
 // All rights reserved.
 //
@@ -30,11 +30,10 @@
 
 // IP blocking adapted from Boolberry
 
-#pragma once
-
 #include <algorithm>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp>
+#include <boost/bind.hpp>
 #include <atomic>
 
 #include "version.h"
@@ -48,17 +47,11 @@
 #include "net/local_ip.h"
 #include "crypto/crypto.h"
 #include "storages/levin_abstract_invoke2.h"
+#include "cryptonote_core/cryptonote_core.h"
 
-// We have to look for miniupnpc headers in different places, dependent on if its compiled or external
-#ifdef UPNP_STATIC
-  #include <miniupnpc/miniupnpc.h>
-  #include <miniupnpc/upnpcommands.h>
-  #include <miniupnpc/upnperrors.h>
-#else
-  #include "miniupnpc.h"
-  #include "upnpcommands.h"
-  #include "upnperrors.h"
-#endif
+#include <miniupnp/miniupnpc/miniupnpc.h>
+#include <miniupnp/miniupnpc/upnpcommands.h>
+#include <miniupnp/miniupnpc/upnperrors.h>
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "net.p2p"
@@ -69,48 +62,13 @@
 
 namespace nodetool
 {
-  namespace
-  {
-    const int64_t default_limit_up = 2048;
-    const int64_t default_limit_down = 8192;
-    const command_line::arg_descriptor<std::string> arg_p2p_bind_ip        = {"p2p-bind-ip", "Interface for p2p network protocol", "0.0.0.0"};
-    const command_line::arg_descriptor<std::string> arg_p2p_bind_port = {
-        "p2p-bind-port"
-      , "Port for p2p network protocol"
-      , std::to_string(config::P2P_DEFAULT_PORT)
-      };
-    const command_line::arg_descriptor<std::string> arg_testnet_p2p_bind_port = {
-        "testnet-p2p-bind-port"
-      , "Port for testnet p2p network protocol"
-      , std::to_string(config::testnet::P2P_DEFAULT_PORT)
-      };
-    const command_line::arg_descriptor<uint32_t>    arg_p2p_external_port  = {"p2p-external-port", "External port for p2p network protocol (if port forwarding used with NAT)", 0};
-    const command_line::arg_descriptor<bool>        arg_p2p_allow_local_ip = {"allow-local-ip", "Allow local ip add to peer list, mostly in debug purposes"};
-    const command_line::arg_descriptor<std::vector<std::string> > arg_p2p_add_peer   = {"add-peer", "Manually add peer to local peerlist"};
-    const command_line::arg_descriptor<std::vector<std::string> > arg_p2p_add_priority_node   = {"add-priority-node", "Specify list of peers to connect to and attempt to keep the connection open"};
-    const command_line::arg_descriptor<std::vector<std::string> > arg_p2p_add_exclusive_node   = {"add-exclusive-node", "Specify list of peers to connect to only."
-                                                                                                  " If this option is given the options add-priority-node and seed-node are ignored"};
-    const command_line::arg_descriptor<std::vector<std::string> > arg_p2p_seed_node   = {"seed-node", "Connect to a node to retrieve peer addresses, and disconnect"};
-    const command_line::arg_descriptor<bool> arg_p2p_hide_my_port   =    {"hide-my-port", "Do not announce yourself as peerlist candidate", false, true};
-
-    const command_line::arg_descriptor<bool>        arg_no_igd  = {"no-igd", "Disable UPnP port mapping"};
-    const command_line::arg_descriptor<bool>        arg_offline = {"offline", "Do not listen for peers, nor connect to any"};
-    const command_line::arg_descriptor<int64_t>     arg_out_peers = {"out-peers", "set max number of out peers", -1};
-    const command_line::arg_descriptor<int> arg_tos_flag = {"tos-flag", "set TOS flag", -1};
-
-    const command_line::arg_descriptor<int64_t> arg_limit_rate_up = {"limit-rate-up", "set limit-rate-up [kB/s]", -1};
-    const command_line::arg_descriptor<int64_t> arg_limit_rate_down = {"limit-rate-down", "set limit-rate-down [kB/s]", -1};
-    const command_line::arg_descriptor<int64_t> arg_limit_rate = {"limit-rate", "set limit-rate [kB/s]", -1};
-
-    const command_line::arg_descriptor<bool> arg_save_graph = {"save-graph", "Save data for dr monero", false};
-  }
+  inline bool append_net_address(std::vector<epee::net_utils::network_address> & seed_nodes, std::string const & addr, uint16_t default_port);
   //-----------------------------------------------------------------------------------
   template<class t_payload_net_handler>
   void node_server<t_payload_net_handler>::init_options(boost::program_options::options_description& desc)
   {
     command_line::add_arg(desc, arg_p2p_bind_ip);
     command_line::add_arg(desc, arg_p2p_bind_port, false);
-    command_line::add_arg(desc, arg_testnet_p2p_bind_port, false);
     command_line::add_arg(desc, arg_p2p_external_port);
     command_line::add_arg(desc, arg_p2p_allow_local_ip);
     command_line::add_arg(desc, arg_p2p_add_peer);
@@ -119,8 +77,8 @@ namespace nodetool
     command_line::add_arg(desc, arg_p2p_seed_node);
     command_line::add_arg(desc, arg_p2p_hide_my_port);
     command_line::add_arg(desc, arg_no_igd);
-    command_line::add_arg(desc, arg_offline);
     command_line::add_arg(desc, arg_out_peers);
+    command_line::add_arg(desc, arg_in_peers);
     command_line::add_arg(desc, arg_tos_flag);
     command_line::add_arg(desc, arg_limit_rate_up);
     command_line::add_arg(desc, arg_limit_rate_down);
@@ -298,14 +256,16 @@ namespace nodetool
       const boost::program_options::variables_map& vm
     )
   {
-    auto p2p_bind_arg = m_testnet ? arg_testnet_p2p_bind_port : arg_p2p_bind_port;
+    bool testnet = command_line::get_arg(vm, cryptonote::arg_testnet_on);
+    bool stagenet = command_line::get_arg(vm, cryptonote::arg_stagenet_on);
+    m_nettype = testnet ? cryptonote::TESTNET : stagenet ? cryptonote::STAGENET : cryptonote::MAINNET;
 
     m_bind_ip = command_line::get_arg(vm, arg_p2p_bind_ip);
-    m_port = command_line::get_arg(vm, p2p_bind_arg);
+    m_port = command_line::get_arg(vm, arg_p2p_bind_port);
     m_external_port = command_line::get_arg(vm, arg_p2p_external_port);
     m_allow_local_ip = command_line::get_arg(vm, arg_p2p_allow_local_ip);
     m_no_igd = command_line::get_arg(vm, arg_no_igd);
-    m_offline = command_line::get_arg(vm, arg_offline);
+    m_offline = command_line::get_arg(vm, cryptonote::arg_offline);
 
     if (command_line::has_arg(vm, arg_p2p_add_peer))
     {
@@ -314,10 +274,22 @@ namespace nodetool
       {
         nodetool::peerlist_entry pe = AUTO_VAL_INIT(pe);
         pe.id = crypto::rand<uint64_t>();
-        const uint16_t default_port = m_testnet ? ::config::testnet::P2P_DEFAULT_PORT : ::config::P2P_DEFAULT_PORT;
+        const uint16_t default_port = cryptonote::get_config(m_nettype).P2P_DEFAULT_PORT;
         bool r = parse_peer_from_string(pe.adr, pr_str, default_port);
-        CHECK_AND_ASSERT_MES(r, false, "Failed to parse address from string: " << pr_str);
-        m_command_line_peers.push_back(pe);
+        if (r)
+        {
+          m_command_line_peers.push_back(pe);
+          continue;
+        }
+        std::vector<epee::net_utils::network_address> resolved_addrs;
+        r = append_net_address(resolved_addrs, pr_str, default_port);
+        CHECK_AND_ASSERT_MES(r, false, "Failed to parse or resolve address from string: " << pr_str);
+        for (const epee::net_utils::network_address& addr : resolved_addrs)
+        {
+          pe.id = crypto::rand<uint64_t>();
+          pe.adr = addr;
+          m_command_line_peers.push_back(pe);
+        }
       }
     }
 
@@ -350,6 +322,9 @@ namespace nodetool
     if ( !set_max_out_peers(vm, command_line::get_arg(vm, arg_out_peers) ) )
       return false;
 
+    if ( !set_max_in_peers(vm, command_line::get_arg(vm, arg_in_peers) ) )
+      return false;
+
     if ( !set_tos_flag(vm, command_line::get_arg(vm, arg_tos_flag) ) )
       return false;
 
@@ -365,24 +340,31 @@ namespace nodetool
     return true;
   }
   //-----------------------------------------------------------------------------------
-  inline void append_net_address(
+  inline bool append_net_address(
       std::vector<epee::net_utils::network_address> & seed_nodes
     , std::string const & addr
+    , uint16_t default_port
     )
   {
     using namespace boost::asio;
 
+    std::string host = addr;
+    std::string port = std::to_string(default_port);
     size_t pos = addr.find_last_of(':');
-    CHECK_AND_ASSERT_MES_NO_RET(std::string::npos != pos && addr.length() - 1 != pos && 0 != pos, "Failed to parse seed address from string: '" << addr << '\'');
-    std::string host = addr.substr(0, pos);
-    std::string port = addr.substr(pos + 1);
+    if (std::string::npos != pos)
+    {
+      CHECK_AND_ASSERT_MES(addr.length() - 1 != pos && 0 != pos, false, "Failed to parse seed address from string: '" << addr << '\'');
+      host = addr.substr(0, pos);
+      port = addr.substr(pos + 1);
+    }
+    MINFO("Resolving node address: host=" << host << ", port=" << port);
 
     io_service io_srv;
     ip::tcp::resolver resolver(io_srv);
     ip::tcp::resolver::query query(host, port, boost::asio::ip::tcp::resolver::query::canonical_name);
     boost::system::error_code ec;
     ip::tcp::resolver::iterator i = resolver.resolve(query, ec);
-    CHECK_AND_ASSERT_MES_NO_RET(!ec, "Failed to resolve host name '" << host << "': " << ec.message() << ':' << ec.value());
+    CHECK_AND_ASSERT_MES(!ec, false, "Failed to resolve host name '" << host << "': " << ec.message() << ':' << ec.value());
 
     ip::tcp::resolver::iterator iend;
     for (; i != iend; ++i)
@@ -390,35 +372,37 @@ namespace nodetool
       ip::tcp::endpoint endpoint = *i;
       if (endpoint.address().is_v4())
       {
-        epee::net_utils::network_address na(new epee::net_utils::ipv4_network_address(boost::asio::detail::socket_ops::host_to_network_long(endpoint.address().to_v4().to_ulong()), endpoint.port()));
+        epee::net_utils::network_address na{epee::net_utils::ipv4_network_address{boost::asio::detail::socket_ops::host_to_network_long(endpoint.address().to_v4().to_ulong()), endpoint.port()}};
         seed_nodes.push_back(na);
-        MINFO("Added seed node: " << na.str());
+        MINFO("Added node: " << na.str());
       }
       else
       {
         MWARNING("IPv6 unsupported, skip '" << host << "' -> " << endpoint.address().to_v6().to_string(ec));
-        throw std::runtime_error("IPv6 unsupported");
       }
     }
+    return true;
   }
 
   //-----------------------------------------------------------------------------------
   template<class t_payload_net_handler>
-  std::set<std::string> node_server<t_payload_net_handler>::get_seed_nodes(bool testnet) const
+  std::set<std::string> node_server<t_payload_net_handler>::get_seed_nodes(cryptonote::network_type nettype) const
   {
     std::set<std::string> full_addrs;
-    if (testnet)
+    if (nettype == cryptonote::TESTNET)
     {
-      // Add testnet nodes here, will update later PINKY PROMISE
+      full_addrs.insert("127.0.0.1:30188");
+    }
+    else if (nettype == cryptonote::STAGENET)
+    {
+      full_addrs.insert("127.0.0.1:40188");
+    }
+    else if (nettype == cryptonote::FAKECHAIN)
+    {
     }
     else
     {
-      full_addrs.insert("185.91.116.196:20188");
-      full_addrs.insert("185.91.116.136:20188");
-      full_addrs.insert("185.91.116.164:20188");
-      full_addrs.insert("62.75.160.163:20188");
-      full_addrs.insert("107.191.63.92:20188");
-      full_addrs.insert("51.38.235.241:20188");
+      full_addrs.insert("66.42.43.109:20188");
     }
     return full_addrs;
   }
@@ -428,16 +412,26 @@ namespace nodetool
   bool node_server<t_payload_net_handler>::init(const boost::program_options::variables_map& vm)
   {
     std::set<std::string> full_addrs;
-    m_testnet = command_line::get_arg(vm, command_line::arg_testnet_on);
 
-    if (m_testnet)
+    bool res = handle_command_line(vm);
+    CHECK_AND_ASSERT_MES(res, false, "Failed to handle command line");
+
+    m_fallback_seed_nodes_added = false;
+    if (m_nettype == cryptonote::TESTNET)
     {
       memcpy(&m_network_id, &::config::testnet::NETWORK_ID, 16);
-      full_addrs = get_seed_nodes(true);
+      full_addrs = get_seed_nodes(cryptonote::TESTNET);
+    }
+    else if (m_nettype == cryptonote::STAGENET)
+    {
+      memcpy(&m_network_id, &::config::stagenet::NETWORK_ID, 16);
+      full_addrs = get_seed_nodes(cryptonote::STAGENET);
     }
     else
     {
       memcpy(&m_network_id, &::config::NETWORK_ID, 16);
+      if (m_exclusive_peers.empty())
+      {
       // for each hostname in the seed nodes list, attempt to DNS resolve and
       // add the result addresses as seed nodes
       // TODO: at some point add IPv6 support, but that won't be relevant
@@ -501,7 +495,7 @@ namespace nodetool
         if (result.size())
         {
           for (const auto& addr_string : result)
-            full_addrs.insert(addr_string + ":18080");
+            full_addrs.insert(addr_string + ":" + std::to_string(cryptonote::get_config(m_nettype).P2P_DEFAULT_PORT));
         }
         ++i;
       }
@@ -514,26 +508,25 @@ namespace nodetool
         else
           MINFO("Not enough DNS seed nodes found, using fallback defaults too");
 
-        for (const auto &peer: get_seed_nodes(false))
+        for (const auto &peer: get_seed_nodes(cryptonote::MAINNET))
           full_addrs.insert(peer);
+        m_fallback_seed_nodes_added = true;
       }
+    }
     }
 
     for (const auto& full_addr : full_addrs)
     {
       MDEBUG("Seed node: " << full_addr);
-      append_net_address(m_seed_nodes, full_addr);
+      append_net_address(m_seed_nodes, full_addr, cryptonote::get_config(m_nettype).P2P_DEFAULT_PORT);
     }
     MDEBUG("Number of seed nodes: " << m_seed_nodes.size());
 
-    bool res = handle_command_line(vm);
-    CHECK_AND_ASSERT_MES(res, false, "Failed to handle command line");
+    m_config_folder = command_line::get_arg(vm, cryptonote::arg_data_dir);
 
-    auto config_arg = m_testnet ? command_line::arg_testnet_data_dir : command_line::arg_data_dir;
-    m_config_folder = command_line::get_arg(vm, config_arg);
-
-    if ((!m_testnet && m_port != std::to_string(::config::P2P_DEFAULT_PORT))
-        || (m_testnet && m_port != std::to_string(::config::testnet::P2P_DEFAULT_PORT))) {
+    if ((m_nettype == cryptonote::MAINNET && m_port != std::to_string(::config::P2P_DEFAULT_PORT))
+        || (m_nettype == cryptonote::TESTNET && m_port != std::to_string(::config::testnet::P2P_DEFAULT_PORT))
+        || (m_nettype == cryptonote::STAGENET && m_port != std::to_string(::config::stagenet::P2P_DEFAULT_PORT))) {
       m_config_folder = m_config_folder + "/" + m_port;
     }
 
@@ -554,7 +547,7 @@ namespace nodetool
 
     //configure self
     m_net_server.set_threads_prefix("P2P");
-    m_net_server.get_config_object().m_pcommands_handler = this;
+    m_net_server.get_config_object().set_handler(this);
     m_net_server.get_config_object().m_invoke_timeout = P2P_DEFAULT_INVOKE_TIMEOUT;
     m_net_server.set_connection_filter(this);
 
@@ -567,55 +560,15 @@ namespace nodetool
     res = m_net_server.init_server(m_port, m_bind_ip);
     CHECK_AND_ASSERT_MES(res, false, "Failed to bind server");
 
-    m_listenning_port = m_net_server.get_binded_port();
-    MLOG_GREEN(el::Level::Info, "Net service bound to " << m_bind_ip << ":" << m_listenning_port);
+    m_listening_port = m_net_server.get_binded_port();
+    MLOG_GREEN(el::Level::Info, "Net service bound to " << m_bind_ip << ":" << m_listening_port);
     if(m_external_port)
       MDEBUG("External port defined as " << m_external_port);
 
-    // Add UPnP port mapping
-    if(m_no_igd == false) {
-      MDEBUG("Attempting to add IGD port mapping.");
-      int result;
-#if MINIUPNPC_API_VERSION > 13
-      // default according to miniupnpc.h
-      unsigned char ttl = 2;
-      UPNPDev* deviceList = upnpDiscover(1000, NULL, NULL, 0, 0, ttl, &result);
-#else
-      UPNPDev* deviceList = upnpDiscover(1000, NULL, NULL, 0, 0, &result);
-#endif
-      UPNPUrls urls;
-      IGDdatas igdData;
-      char lanAddress[64];
-      result = UPNP_GetValidIGD(deviceList, &urls, &igdData, lanAddress, sizeof lanAddress);
-      freeUPNPDevlist(deviceList);
-      if (result != 0) {
-        if (result == 1) {
-          std::ostringstream portString;
-          portString << m_listenning_port;
+    // add UPnP port mapping
+    if(!m_no_igd)
+      add_upnp_port_mapping(m_listening_port);
 
-          // Delete the port mapping before we create it, just in case we have dangling port mapping from the daemon not being shut down correctly
-          UPNP_DeletePortMapping(urls.controlURL, igdData.first.servicetype, portString.str().c_str(), "TCP", 0);
-
-          int portMappingResult;
-          portMappingResult = UPNP_AddPortMapping(urls.controlURL, igdData.first.servicetype, portString.str().c_str(), portString.str().c_str(), lanAddress, CRYPTONOTE_NAME, "TCP", 0, "0");
-          if (portMappingResult != 0) {
-            LOG_ERROR("UPNP_AddPortMapping failed, error: " << strupnperror(portMappingResult));
-          } else {
-            MLOG_GREEN(el::Level::Info, "Added IGD port mapping.");
-          }
-        } else if (result == 2) {
-          MWARNING("IGD was found but reported as not connected.");
-        } else if (result == 3) {
-          MWARNING("UPnP device was found but not recognized as IGD.");
-        } else {
-          MWARNING("UPNP_GetValidIGD returned an unknown result code.");
-        }
-
-        FreeUPNPUrls(&urls);
-      } else {
-        MINFO("No IGD was found.");
-      }
-    }
     return res;
   }
   //-----------------------------------------------------------------------------------
@@ -635,14 +588,23 @@ namespace nodetool
       while (!is_closing && !m_net_server.is_stop_signal_sent())
       { // main loop of thread
         //number_of_peers = m_net_server.get_config_object().get_connections_count();
-        unsigned int number_of_peers = 0;
+        unsigned int number_of_in_peers = 0;
+        unsigned int number_of_out_peers = 0;
         m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt)
         {
-          if (!cntxt.m_is_income) ++number_of_peers;
+          if (cntxt.m_is_income)
+          {
+            ++number_of_in_peers;
+          }
+          else
+          {
+            ++number_of_out_peers;
+          }
           return true;
         }); // lambda
 
-        m_current_number_of_out_peers = number_of_peers;
+        m_current_number_of_in_peers = number_of_in_peers;
+        m_current_number_of_out_peers = number_of_out_peers;
 
         boost::this_thread::sleep_for(boost::chrono::seconds(1));
       } // main loop of thread
@@ -682,6 +644,9 @@ namespace nodetool
     kill();
     m_peerlist.deinit();
     m_net_server.deinit_server();
+    // remove UPnP port mapping
+    if(!m_no_igd)
+      delete_upnp_port_mapping(m_listening_port);
     return store_config();
   }
   //-----------------------------------------------------------------------------------
@@ -716,11 +681,11 @@ namespace nodetool
   template<class t_payload_net_handler>
   bool node_server<t_payload_net_handler>::send_stop_signal()
   {
-	MDEBUG("[node] sending stop signal");
-	m_net_server.send_stop_signal();
-	MDEBUG("[node] Stop signal sent"); 
+    MDEBUG("[node] sending stop signal");
+    m_net_server.send_stop_signal();
+    MDEBUG("[node] Stop signal sent");
 
-   std::list<boost::uuids::uuid> connection_ids;
+    std::list<boost::uuids::uuid> connection_ids;
     m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt) {
       connection_ids.push_back(cntxt.m_connection_id);
       return true;
@@ -729,6 +694,7 @@ namespace nodetool
       m_net_server.get_config_object().close(connection_id);
 
     m_payload_handler.stop();
+
     return true;
   }
   //-----------------------------------------------------------------------------------
@@ -806,7 +772,7 @@ namespace nodetool
     }
     else
     {
-      try_get_support_flags(context_, [](p2p_connection_context& flags_context, const uint32_t& support_flags)
+      try_get_support_flags(context_, [](p2p_connection_context& flags_context, const uint32_t& support_flags) 
       {
         flags_context.support_flags = support_flags;
       });
@@ -937,11 +903,11 @@ namespace nodetool
   template<class t_payload_net_handler>
   bool node_server<t_payload_net_handler>::try_to_connect_and_handshake_with_new_peer(const epee::net_utils::network_address& na, bool just_take_peerlist, uint64_t last_seen_stamp, PeerType peer_type, uint64_t first_seen_stamp)
   {
-    if (m_current_number_of_out_peers == m_config.m_net_config.connections_count) // out peers limit
+    if (m_current_number_of_out_peers == m_config.m_net_config.max_out_connection_count) // out peers limit
     {
       return false;
     }
-    else if (m_current_number_of_out_peers > m_config.m_net_config.connections_count)
+    else if (m_current_number_of_out_peers > m_config.m_net_config.max_out_connection_count)
     {
       m_net_server.get_config_object().del_out_connections(1);
       m_current_number_of_out_peers --; // atomic variable, update time = 1s
@@ -959,7 +925,7 @@ namespace nodetool
     bool res = m_net_server.connect(epee::string_tools::get_ip_string_from_int32(ipv4.ip()),
       epee::string_tools::num_to_string_fast(ipv4.port()),
       m_config.m_net_config.connection_timeout,
-      con);
+      con, m_bind_ip.empty() ? "0.0.0.0" : m_bind_ip);
 
     if(!res)
     {
@@ -1024,7 +990,7 @@ namespace nodetool
     bool res = m_net_server.connect(epee::string_tools::get_ip_string_from_int32(ipv4.ip()),
                                     epee::string_tools::num_to_string_fast(ipv4.port()),
                                     m_config.m_net_config.connection_timeout,
-                                    con);
+                                    con, m_bind_ip.empty() ? "0.0.0.0" : m_bind_ip);
 
     if (!res) {
       bool is_priority = is_priority_node(na);
@@ -1123,10 +1089,15 @@ namespace nodetool
 
       if (use_white_list) {
         local_peers_count = m_peerlist.get_white_peers_count();
+        if (!local_peers_count)
+          return false;
         max_random_index = std::min<uint64_t>(local_peers_count -1, 20);
         random_index = get_random_index_with_fixed_probability(max_random_index);
       } else {
-        random_index = crypto::rand<size_t>() % m_peerlist.get_gray_peers_count();
+        local_peers_count = m_peerlist.get_gray_peers_count();
+        if (!local_peers_count)
+          return false;
+        random_index = crypto::rand<size_t>() % local_peers_count;
       }
 
       CHECK_AND_ASSERT_MES(random_index < local_peers_count, false, "random_starter_index < peers_local.size() failed!!");
@@ -1171,12 +1142,11 @@ namespace nodetool
   template<class t_payload_net_handler>
   bool node_server<t_payload_net_handler>::connect_to_seed()
   {
-      if (m_seed_nodes.empty())
+      if (m_seed_nodes.empty() || m_offline || !m_exclusive_peers.empty())
         return true;
 
       size_t try_count = 0;
       size_t current_index = crypto::rand<size_t>()%m_seed_nodes.size();
-      bool fallback_nodes_added = false;
       while(true)
       {
         if(m_net_server.is_stop_signal_sent())
@@ -1186,15 +1156,21 @@ namespace nodetool
           break;
         if(++try_count > m_seed_nodes.size())
         {
-          if (!fallback_nodes_added)
+          if (!m_fallback_seed_nodes_added)
           {
             MWARNING("Failed to connect to any of seed peers, trying fallback seeds");
-            for (const auto &peer: get_seed_nodes(m_testnet))
+            current_index = m_seed_nodes.size();
+            for (const auto &peer: get_seed_nodes(m_nettype))
             {
               MDEBUG("Fallback seed node: " << peer);
-              append_net_address(m_seed_nodes, peer);
+              append_net_address(m_seed_nodes, peer, cryptonote::get_config(m_nettype).P2P_DEFAULT_PORT);
             }
-            fallback_nodes_added = true;
+            m_fallback_seed_nodes_added = true;
+            if (current_index == m_seed_nodes.size())
+            {
+              MWARNING("No fallback seeds, continuing without seeds");
+              break;
+            }
             // continue for another few cycles
           }
           else
@@ -1212,6 +1188,7 @@ namespace nodetool
   template<class t_payload_net_handler>
   bool node_server<t_payload_net_handler>::connections_maker()
   {
+    if (m_offline) return true;
     if (!connect_to_peerlist(m_exclusive_peers)) return false;
 
     if (!m_exclusive_peers.empty()) return true;
@@ -1225,10 +1202,10 @@ namespace nodetool
 
     if (!connect_to_peerlist(m_priority_peers)) return false;
 
-    size_t expected_white_connections = (m_config.m_net_config.connections_count*P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT)/100;
+    size_t expected_white_connections = (m_config.m_net_config.max_out_connection_count*P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT)/100;
 
     size_t conn_count = get_outgoing_connections_count();
-    if(conn_count < m_config.m_net_config.connections_count)
+    if(conn_count < m_config.m_net_config.max_out_connection_count)
     {
       if(conn_count < expected_white_connections)
       {
@@ -1239,20 +1216,20 @@ namespace nodetool
         if(!make_expected_connections_count(white, expected_white_connections))
           return false;
         //then do grey list
-        if(!make_expected_connections_count(gray, m_config.m_net_config.connections_count))
+        if(!make_expected_connections_count(gray, m_config.m_net_config.max_out_connection_count))
           return false;
       }else
       {
         //start from grey list
-        if(!make_expected_connections_count(gray, m_config.m_net_config.connections_count))
+        if(!make_expected_connections_count(gray, m_config.m_net_config.max_out_connection_count))
           return false;
         //and then do white list
-        if(!make_expected_connections_count(white, m_config.m_net_config.connections_count))
+        if(!make_expected_connections_count(white, m_config.m_net_config.max_out_connection_count))
           return false;
       }
     }
 
-    if (start_conn_count == get_outgoing_connections_count() && start_conn_count < m_config.m_net_config.connections_count)
+    if (start_conn_count == get_outgoing_connections_count() && start_conn_count < m_config.m_net_config.max_out_connection_count)
     {
       MINFO("Failed to connect to any, trying seeds");
       if (!connect_to_seed())
@@ -1314,12 +1291,40 @@ namespace nodetool
   }
   //-----------------------------------------------------------------------------------
   template<class t_payload_net_handler>
+  size_t node_server<t_payload_net_handler>::get_incoming_connections_count()
+  {
+    size_t count = 0;
+    m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt)
+    {
+      if(cntxt.m_is_income)
+        ++count;
+      return true;
+    });
+
+    return count;
+  }
+  //-----------------------------------------------------------------------------------
+  template<class t_payload_net_handler>
   bool node_server<t_payload_net_handler>::idle_worker()
   {
     m_peer_handshake_idle_maker_interval.do_call(boost::bind(&node_server<t_payload_net_handler>::peer_sync_idle_maker, this));
     m_connections_maker_interval.do_call(boost::bind(&node_server<t_payload_net_handler>::connections_maker, this));
     m_gray_peerlist_housekeeping_interval.do_call(boost::bind(&node_server<t_payload_net_handler>::gray_peerlist_housekeeping, this));
     m_peerlist_store_interval.do_call(boost::bind(&node_server<t_payload_net_handler>::store_config, this));
+    m_incoming_connections_interval.do_call(boost::bind(&node_server<t_payload_net_handler>::check_incoming_connections, this));
+    return true;
+  }
+  //-----------------------------------------------------------------------------------
+  template<class t_payload_net_handler>
+  bool node_server<t_payload_net_handler>::check_incoming_connections()
+  {
+    if (m_offline || m_hide_my_port)
+      return true;
+    if (get_incoming_connections_count() == 0)
+    {
+      const el::Level level = el::Level::Warning;
+      MCLOG_RED(level, "global", "No incoming connections - check firewalls/routers allow port " << get_this_peer_port());
+    }
     return true;
   }
   //-----------------------------------------------------------------------------------
@@ -1385,7 +1390,7 @@ namespace nodetool
     node_data.local_time = local_time;
     node_data.peer_id = m_config.m_peer_id;
     if(!m_hide_my_port)
-      node_data.my_port = m_external_port ? m_external_port : m_listenning_port;
+      node_data.my_port = m_external_port ? m_external_port : m_listening_port;
     else
       node_data.my_port = 0;
     node_data.network_id = m_network_id;
@@ -1538,7 +1543,7 @@ namespace nodetool
   }
   //-----------------------------------------------------------------------------------
   template<class t_payload_net_handler> template<class t_callback>
-  bool node_server<t_payload_net_handler>::try_ping(basic_node_data& node_data, p2p_connection_context& context, t_callback cb)
+  bool node_server<t_payload_net_handler>::try_ping(basic_node_data& node_data, p2p_connection_context& context, const t_callback &cb)
   {
     if(!node_data.my_port)
       return false;
@@ -1552,7 +1557,7 @@ namespace nodetool
       return false;
     std::string ip = epee::string_tools::get_ip_string_from_int32(actual_ip);
     std::string port = epee::string_tools::num_to_string_fast(node_data.my_port);
-    epee::net_utils::network_address address(new epee::net_utils::ipv4_network_address(actual_ip, node_data.my_port));
+    epee::net_utils::network_address address{epee::net_utils::ipv4_network_address(actual_ip, node_data.my_port)};
     peerid_type pr = node_data.peer_id;
     bool r = m_net_server.connect_async(ip, port, m_config.m_net_config.ping_connection_timeout, [cb, /*context,*/ address, pr, this](
       const typename net_server::t_connection_context& ping_context,
@@ -1600,7 +1605,7 @@ namespace nodetool
         return false;
       }
       return true;
-    });
+    }, m_bind_ip.empty() ? "0.0.0.0" : m_bind_ip);
     if(!r)
     {
       LOG_WARNING_CC(context, "Failed to call connect_async, network error.");
@@ -1614,25 +1619,25 @@ namespace nodetool
     COMMAND_REQUEST_SUPPORT_FLAGS::request support_flags_request;
     bool r = epee::net_utils::async_invoke_remote_command2<typename COMMAND_REQUEST_SUPPORT_FLAGS::response>
     (
-      context.m_connection_id,
-      COMMAND_REQUEST_SUPPORT_FLAGS::ID,
-      support_flags_request,
+      context.m_connection_id, 
+      COMMAND_REQUEST_SUPPORT_FLAGS::ID, 
+      support_flags_request, 
       m_net_server.get_config_object(),
       [=](int code, const typename COMMAND_REQUEST_SUPPORT_FLAGS::response& rsp, p2p_connection_context& context_)
-      {
+      {  
         if(code < 0)
         {
           LOG_WARNING_CC(context_, "COMMAND_REQUEST_SUPPORT_FLAGS invoke failed. (" << code <<  ", " << epee::levin::get_err_descr(code) << ")");
           return;
         }
-
+        
         f(context_, rsp.support_flags);
       },
       P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT
     );
 
     return r;
-  }
+  }  
   //-----------------------------------------------------------------------------------
   template<class t_payload_net_handler>
   int node_server<t_payload_net_handler>::handle_timed_sync(int command, typename COMMAND_TIMED_SYNC::request& arg, typename COMMAND_TIMED_SYNC::response& rsp, p2p_connection_context& context)
@@ -1679,6 +1684,13 @@ namespace nodetool
       return 1;
     }
 
+   if (m_current_number_of_in_peers >= m_config.m_net_config.max_in_connection_count) // in peers limit
+    {
+      LOG_WARNING_CC(context, "COMMAND_HANDSHAKE came, but already have max incoming connections, so dropping this one.");
+      drop_connection(context);
+      return 1;
+    }
+
     if(!m_payload_handler.process_payload_sync_data(arg.payload_data, context, true))
     {
       LOG_WARNING_CC(context, "COMMAND_HANDSHAKE came, but process_payload_sync_data returned false, dropping connection.");
@@ -1709,7 +1721,7 @@ namespace nodetool
         //called only(!) if success pinged, update local peerlist
         peerlist_entry pe;
         const epee::net_utils::network_address na = context.m_remote_address;
-        pe.adr.reset(new epee::net_utils::ipv4_network_address(na.as<epee::net_utils::ipv4_network_address>().ip(), port_l));
+        pe.adr = epee::net_utils::ipv4_network_address(na.as<epee::net_utils::ipv4_network_address>().ip(), port_l);
         time_t last_seen;
         time(&last_seen);
         pe.last_seen = static_cast<int64_t>(last_seen);
@@ -1718,8 +1730,8 @@ namespace nodetool
         LOG_DEBUG_CC(context, "PING SUCCESS " << context.m_remote_address.host_str() << ":" << port_l);
       });
     }
-
-    try_get_support_flags(context, [](p2p_connection_context& flags_context, const uint32_t& support_flags)
+    
+    try_get_support_flags(context, [](p2p_connection_context& flags_context, const uint32_t& support_flags) 
     {
       flags_context.support_flags = support_flags;
     });
@@ -1827,10 +1839,20 @@ namespace nodetool
     for(const std::string& pr_str: perrs)
     {
       epee::net_utils::network_address na = AUTO_VAL_INIT(na);
-      const uint16_t default_port = m_testnet ? ::config::testnet::P2P_DEFAULT_PORT : ::config::P2P_DEFAULT_PORT;
+      const uint16_t default_port = cryptonote::get_config(m_nettype).P2P_DEFAULT_PORT;
       bool r = parse_peer_from_string(na, pr_str, default_port);
-      CHECK_AND_ASSERT_MES(r, false, "Failed to parse address from string: " << pr_str);
-      container.push_back(na);
+      if (r)
+      {
+        container.push_back(na);
+        continue;
+      }
+      std::vector<epee::net_utils::network_address> resolved_addrs;
+      r = append_net_address(resolved_addrs, pr_str, default_port);
+      CHECK_AND_ASSERT_MES(r, false, "Failed to parse or resolve address from string: " << pr_str);
+      for (const epee::net_utils::network_address& addr : resolved_addrs)
+      {
+        container.push_back(addr);
+      }
     }
 
     return true;
@@ -1840,17 +1862,34 @@ namespace nodetool
   bool node_server<t_payload_net_handler>::set_max_out_peers(const boost::program_options::variables_map& vm, int64_t max)
   {
     if(max == -1) {
-      m_config.m_net_config.connections_count = P2P_DEFAULT_CONNECTIONS_COUNT;
+      m_config.m_net_config.max_out_connection_count = P2P_DEFAULT_CONNECTIONS_COUNT;
       return true;
     }
-    m_config.m_net_config.connections_count = max;
+    m_config.m_net_config.max_out_connection_count = max;
     return true;
   }
 
   template<class t_payload_net_handler>
-  void node_server<t_payload_net_handler>::delete_connections(size_t count)
+  bool node_server<t_payload_net_handler>::set_max_in_peers(const boost::program_options::variables_map& vm, int64_t max)
+  {
+    if(max == -1) {
+      m_config.m_net_config.max_in_connection_count = -1;
+      return true;
+    }
+    m_config.m_net_config.max_in_connection_count = max;
+    return true;
+  }
+
+  template<class t_payload_net_handler>
+  void node_server<t_payload_net_handler>::delete_out_connections(size_t count)
   {
     m_net_server.get_config_object().del_out_connections(count);
+  }
+
+  template<class t_payload_net_handler>
+  void node_server<t_payload_net_handler>::delete_in_connections(size_t count)
+  {
+    m_net_server.get_config_object().del_in_connections(count);
   }
 
   template<class t_payload_net_handler>
@@ -1874,9 +1913,8 @@ namespace nodetool
       this->islimitup=false;
     }
 
-    limit *= 1024;
     epee::net_utils::connection<epee::levin::async_protocol_handler<p2p_connection_context> >::set_rate_up_limit( limit );
-    MINFO("Set limit-up to " << limit/1024 << " kB/s");
+    MINFO("Set limit-up to " << limit << " kB/s");
     return true;
   }
 
@@ -1888,9 +1926,8 @@ namespace nodetool
       limit=default_limit_down;
       this->islimitdown=false;
     }
-    limit *= 1024;
     epee::net_utils::connection<epee::levin::async_protocol_handler<p2p_connection_context> >::set_rate_down_limit( limit );
-    MINFO("Set limit-down to " << limit/1024 << " kB/s");
+    MINFO("Set limit-down to " << limit << " kB/s");
     return true;
   }
 
@@ -1902,21 +1939,21 @@ namespace nodetool
 
     if(limit == -1)
     {
-      limit_up = default_limit_up * 1024;
-      limit_down = default_limit_down * 1024;
+      limit_up = default_limit_up;
+      limit_down = default_limit_down;
     }
     else
     {
-      limit_up = limit * 1024;
-      limit_down = limit * 1024;
+      limit_up = limit;
+      limit_down = limit;
     }
     if(!this->islimitup) {
       epee::net_utils::connection<epee::levin::async_protocol_handler<p2p_connection_context> >::set_rate_up_limit(limit_up);
-      MINFO("Set limit-up to " << limit_up/1024 << " kB/s");
+      MINFO("Set limit-up to " << limit_up << " kB/s");
     }
     if(!this->islimitdown) {
       epee::net_utils::connection<epee::levin::async_protocol_handler<p2p_connection_context> >::set_rate_down_limit(limit_down);
-      MINFO("Set limit-down to " << limit_down/1024 << " kB/s");
+      MINFO("Set limit-down to " << limit_down << " kB/s");
     }
 
     return true;
@@ -1925,8 +1962,8 @@ namespace nodetool
   template<class t_payload_net_handler>
   bool node_server<t_payload_net_handler>::has_too_many_connections(const epee::net_utils::network_address &address)
   {
-    const uint8_t max_connections = 1;
-    uint8_t count = 0;
+    const size_t max_connections = 1;
+    size_t count = 0;
 
     m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt)
     {
@@ -1947,7 +1984,13 @@ namespace nodetool
   template<class t_payload_net_handler>
   bool node_server<t_payload_net_handler>::gray_peerlist_housekeeping()
   {
+    if (m_offline) return true;
+    if (!m_exclusive_peers.empty()) return true;
+
     peerlist_entry pe = AUTO_VAL_INIT(pe);
+
+    if (m_net_server.is_stop_signal_sent())
+      return false;
 
     if (!m_peerlist.get_random_gray_peer(pe)) {
         return false;
@@ -1968,5 +2011,94 @@ namespace nodetool
     LOG_PRINT_L2("PEER PROMOTED TO WHITE PEER LIST IP address: " << pe.adr.host_str() << " Peer ID: " << peerid_type(pe.id));
 
     return true;
+  }
+
+  template<class t_payload_net_handler>
+  void node_server<t_payload_net_handler>::add_upnp_port_mapping(uint32_t port)
+  {
+    MDEBUG("Attempting to add IGD port mapping.");
+    int result;
+#if MINIUPNPC_API_VERSION > 13
+    // default according to miniupnpc.h
+    unsigned char ttl = 2;
+    UPNPDev* deviceList = upnpDiscover(1000, NULL, NULL, 0, 0, ttl, &result);
+#else
+    UPNPDev* deviceList = upnpDiscover(1000, NULL, NULL, 0, 0, &result);
+#endif
+    UPNPUrls urls;
+    IGDdatas igdData;
+    char lanAddress[64];
+    result = UPNP_GetValidIGD(deviceList, &urls, &igdData, lanAddress, sizeof lanAddress);
+    freeUPNPDevlist(deviceList);
+    if (result != 0) {
+      if (result == 1) {
+        std::ostringstream portString;
+        portString << port;
+
+        // Delete the port mapping before we create it, just in case we have dangling port mapping from the daemon not being shut down correctly
+        UPNP_DeletePortMapping(urls.controlURL, igdData.first.servicetype, portString.str().c_str(), "TCP", 0);
+
+        int portMappingResult;
+        portMappingResult = UPNP_AddPortMapping(urls.controlURL, igdData.first.servicetype, portString.str().c_str(), portString.str().c_str(), lanAddress, CRYPTONOTE_NAME, "TCP", 0, "0");
+        if (portMappingResult != 0) {
+          LOG_ERROR("UPNP_AddPortMapping failed, error: " << strupnperror(portMappingResult));
+        } else {
+          MLOG_GREEN(el::Level::Info, "Added IGD port mapping.");
+        }
+      } else if (result == 2) {
+        MWARNING("IGD was found but reported as not connected.");
+      } else if (result == 3) {
+        MWARNING("UPnP device was found but not recognized as IGD.");
+      } else {
+        MWARNING("UPNP_GetValidIGD returned an unknown result code.");
+      }
+
+      FreeUPNPUrls(&urls);
+    } else {
+      MINFO("No IGD was found.");
+    }
+  }
+
+  template<class t_payload_net_handler>
+  void node_server<t_payload_net_handler>::delete_upnp_port_mapping(uint32_t port)
+  {
+    MDEBUG("Attempting to delete IGD port mapping.");
+    int result;
+#if MINIUPNPC_API_VERSION > 13
+    // default according to miniupnpc.h
+    unsigned char ttl = 2;
+    UPNPDev* deviceList = upnpDiscover(1000, NULL, NULL, 0, 0, ttl, &result);
+#else
+    UPNPDev* deviceList = upnpDiscover(1000, NULL, NULL, 0, 0, &result);
+#endif
+    UPNPUrls urls;
+    IGDdatas igdData;
+    char lanAddress[64];
+    result = UPNP_GetValidIGD(deviceList, &urls, &igdData, lanAddress, sizeof lanAddress);
+    freeUPNPDevlist(deviceList);
+    if (result != 0) {
+      if (result == 1) {
+        std::ostringstream portString;
+        portString << port;
+
+        int portMappingResult;
+        portMappingResult = UPNP_DeletePortMapping(urls.controlURL, igdData.first.servicetype, portString.str().c_str(), "TCP", 0);
+        if (portMappingResult != 0) {
+          LOG_ERROR("UPNP_DeletePortMapping failed, error: " << strupnperror(portMappingResult));
+        } else {
+          MLOG_GREEN(el::Level::Info, "Deleted IGD port mapping.");
+        }
+      } else if (result == 2) {
+        MWARNING("IGD was found but reported as not connected.");
+      } else if (result == 3) {
+        MWARNING("UPnP device was found but not recognized as IGD.");
+      } else {
+        MWARNING("UPNP_GetValidIGD returned an unknown result code.");
+      }
+
+      FreeUPNPUrls(&urls);
+    } else {
+      MINFO("No IGD was found.");
+    }
   }
 }

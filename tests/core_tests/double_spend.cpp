@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The MoNerO Project
 // 
 // All rights reserved.
 // 
@@ -29,7 +29,7 @@
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #include "chaingen.h"
-#include "chaingen_tests_list.h"
+#include "double_spend.h"
 
 using namespace epee;
 using namespace cryptonote;
@@ -73,7 +73,7 @@ bool gen_double_spend_in_different_chains::check_double_spend(cryptonote::core& 
 {
   DEFINE_TESTS_ERROR_CONTEXT("gen_double_spend_in_different_chains::check_double_spend");
 
-  std::list<block> block_list;
+  std::vector<block> block_list;
   bool r = c.get_blocks(0, 100 + 2 * CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW, block_list);
   CHECK_TEST_CONDITION(r);
 

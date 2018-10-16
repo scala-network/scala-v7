@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The MoNerO Project
 // 
 // All rights reserved.
 // 
@@ -49,7 +49,10 @@ namespace Language
   class English: public Base
   {
   public:
-    English(): Base("English", std::vector<std::string>({
+    English(): Base("English", "English", {}, 3)
+    {
+      static constexpr const char * const words[NWORDS] =
+      {
         "abbey",
         "abducts",
         "ability",
@@ -1676,8 +1679,8 @@ namespace Language
         "zombie",
         "zones",
         "zoom"
-      }), 3)
-    {
+      };
+      set_words(words);
       populate_maps();
     }
   };

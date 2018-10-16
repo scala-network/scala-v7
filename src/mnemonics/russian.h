@@ -1,6 +1,6 @@
-// Word list created by Monero contributor sammy007
+// Word list created by Stellite contributor sammy007
 // 
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The MoNerO Project
 // 
 // All rights reserved.
 // 
@@ -51,7 +51,10 @@ namespace Language
   class Russian: public Base
   {
   public:
-    Russian(): Base("русский язык", std::vector<std::string>({
+    Russian(): Base("русский язык", "Russian", {}, 4)
+    {
+      static constexpr const char * const words[NWORDS] =
+      {
         "абажур",
         "абзац",
         "абонент",
@@ -1678,8 +1681,8 @@ namespace Language
         "яхта",
         "ячейка",
         "ящик"
-      }), 4)
-    {
+      };
+      set_words(words);
       populate_maps();
     }
   };

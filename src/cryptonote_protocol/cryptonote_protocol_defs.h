@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The MoNerO Project
 // 
 // All rights reserved.
 // 
@@ -33,7 +33,7 @@
 #include <list>
 #include "serialization/keyvalue_serialization.h"
 #include "cryptonote_basic/cryptonote_basic.h"
-#include "cryptonote_protocol/blobdatatype.h"
+#include "cryptonote_basic/blobdatatype.h"
 namespace cryptonote
 {
 
@@ -74,7 +74,7 @@ namespace cryptonote
   
 	uint32_t support_flags;
 
-	boost::uuids::uuid connection_id;
+	std::string connection_id;
 
     uint64_t height;
 
@@ -98,7 +98,7 @@ namespace cryptonote
       KV_SERIALIZE(avg_upload)
       KV_SERIALIZE(current_upload)
       KV_SERIALIZE(support_flags)
-      KV_SERIALIZE_VAL_POD_AS_BLOB(connection_id)
+      KV_SERIALIZE(connection_id)
       KV_SERIALIZE(height)
     END_KV_SERIALIZE_MAP()
   };
@@ -109,7 +109,7 @@ namespace cryptonote
   struct block_complete_entry
   {
     blobdata block;
-    std::list<blobdata> txs;
+    std::vector<blobdata> txs;
     BEGIN_KV_SERIALIZE_MAP()
       KV_SERIALIZE(block)
       KV_SERIALIZE(txs)
@@ -128,12 +128,10 @@ namespace cryptonote
     {
       block_complete_entry b;
       uint64_t current_blockchain_height;
-      uint32_t hop;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(b)
         KV_SERIALIZE(current_blockchain_height)
-        KV_SERIALIZE(hop)
       END_KV_SERIALIZE_MAP()
     };
   };
@@ -147,7 +145,7 @@ namespace cryptonote
 
     struct request
     {
-      std::list<blobdata>   txs;
+      std::vector<blobdata>   txs;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(txs)
@@ -163,8 +161,8 @@ namespace cryptonote
 
     struct request
     {
-      std::list<crypto::hash>    txs;
-      std::list<crypto::hash>    blocks;
+      std::vector<crypto::hash>    txs;
+      std::vector<crypto::hash>    blocks;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE_CONTAINER_POD_AS_BLOB(txs)
@@ -179,9 +177,9 @@ namespace cryptonote
 
     struct request
     {
-      std::list<blobdata>              txs;
-      std::list<block_complete_entry>  blocks;
-      std::list<crypto::hash>               missed_ids;
+      std::vector<blobdata>              txs;
+      std::vector<block_complete_entry>  blocks;
+      std::vector<crypto::hash>          missed_ids;
       uint64_t                         current_blockchain_height;
 
       BEGIN_KV_SERIALIZE_MAP()
@@ -232,7 +230,7 @@ namespace cryptonote
       uint64_t start_height;
       uint64_t total_height;
       uint64_t cumulative_difficulty;
-      std::list<crypto::hash> m_block_ids;
+      std::vector<crypto::hash> m_block_ids;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(start_height)
@@ -254,12 +252,10 @@ namespace cryptonote
     {
       block_complete_entry b;
       uint64_t current_blockchain_height;
-      uint32_t hop;
 
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE(b)
         KV_SERIALIZE(current_blockchain_height)
-        KV_SERIALIZE(hop)
       END_KV_SERIALIZE_MAP()
     };
   };  
@@ -275,14 +271,12 @@ namespace cryptonote
     {
       crypto::hash block_hash;
       uint64_t current_blockchain_height;      
-      std::vector<size_t> missing_tx_indices;
-      uint32_t hop;
+      std::vector<uint64_t> missing_tx_indices;
       
       BEGIN_KV_SERIALIZE_MAP()
         KV_SERIALIZE_VAL_POD_AS_BLOB(block_hash)
         KV_SERIALIZE(current_blockchain_height)
         KV_SERIALIZE_CONTAINER_POD_AS_BLOB(missing_tx_indices)
-        KV_SERIALIZE(hop)
       END_KV_SERIALIZE_MAP()
     };
   }; 

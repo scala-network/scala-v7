@@ -1,4 +1,4 @@
-// Copyright (c) 2017, The Monero Project
+// Copyright (c) 2017-2018, The MoNerO Project
 // 
 // All rights reserved.
 // 
@@ -31,6 +31,7 @@
 #include <vector>
 #include <unordered_map>
 #include <boost/uuid/nil_generator.hpp>
+#include "string_tools.h"
 #include "cryptonote_protocol_defs.h"
 #include "block_queue.h"
 
@@ -49,18 +50,23 @@ namespace std {
 namespace cryptonote
 {
 
-void block_queue::add_blocks(uint64_t height, std::list<cryptonote::block_complete_entry> bcel, const boost::uuids::uuid &connection_id, float rate, size_t size)
+void block_queue::add_blocks(uint64_t height, std::vector<cryptonote::block_complete_entry> bcel, const boost::uuids::uuid &connection_id, float rate, size_t size)
 {
   boost::unique_lock<boost::recursive_mutex> lock(mutex);
-  std::list<crypto::hash> hashes;
+  std::vector<crypto::hash> hashes;
   bool has_hashes = remove_span(height, &hashes);
   blocks.insert(span(height, std::move(bcel), connection_id, rate, size));
   if (has_hashes)
+  {
+    for (const crypto::hash &h: hashes)
+      requested_hashes.insert(h);
     set_span_hashes(height, connection_id, hashes);
+  }
 }
 
 void block_queue::add_blocks(uint64_t height, uint64_t nblocks, const boost::uuids::uuid &connection_id, boost::posix_time::ptime time)
 {
+  CHECK_AND_ASSERT_THROW_MES(nblocks > 0, "Empty span");
   boost::unique_lock<boost::recursive_mutex> lock(mutex);
   blocks.insert(span(height, nblocks, connection_id, time));
 }
@@ -74,9 +80,17 @@ void block_queue::flush_spans(const boost::uuids::uuid &connection_id, bool all)
     block_map::iterator j = i++;
     if (j->connection_id == connection_id && (all || j->blocks.size() == 0))
     {
-      blocks.erase(j);
+      erase_block(j);
     }
   }
+}
+
+void block_queue::erase_block(block_map::iterator j)
+{
+  CHECK_AND_ASSERT_THROW_MES(j != blocks.end(), "Invalid iterator");
+  for (const crypto::hash &h: j->hashes)
+    requested_hashes.erase(h);
+  blocks.erase(j);
 }
 
 void block_queue::flush_stale_spans(const std::set<boost::uuids::uuid> &live_connections)
@@ -90,12 +104,12 @@ void block_queue::flush_stale_spans(const std::set<boost::uuids::uuid> &live_con
     block_map::iterator j = i++;
     if (live_connections.find(j->connection_id) == live_connections.end() && j->blocks.size() == 0)
     {
-      blocks.erase(j);
+      erase_block(j);
     }
   }
 }
 
-bool block_queue::remove_span(uint64_t start_block_height, std::list<crypto::hash> *hashes)
+bool block_queue::remove_span(uint64_t start_block_height, std::vector<crypto::hash> *hashes)
 {
   boost::unique_lock<boost::recursive_mutex> lock(mutex);
   for (block_map::iterator i = blocks.begin(); i != blocks.end(); ++i)
@@ -104,7 +118,7 @@ bool block_queue::remove_span(uint64_t start_block_height, std::list<crypto::has
     {
       if (hashes)
         *hashes = std::move(i->hashes);
-      blocks.erase(i);
+      erase_block(i);
       return true;
     }
   }
@@ -119,7 +133,7 @@ void block_queue::remove_spans(const boost::uuids::uuid &connection_id, uint64_t
     block_map::iterator j = i++;
     if (j->connection_id == connection_id && j->start_block_height <= start_block_height)
     {
-      blocks.erase(j);
+      erase_block(j);
     }
   }
 }
@@ -158,19 +172,18 @@ std::string block_queue::get_overview() const
   return s;
 }
 
+inline bool block_queue::requested_internal(const crypto::hash &hash) const
+{
+  return requested_hashes.find(hash) != requested_hashes.end();
+}
+
 bool block_queue::requested(const crypto::hash &hash) const
 {
   boost::unique_lock<boost::recursive_mutex> lock(mutex);
-  for (const auto &span: blocks)
-  {
-    for (const auto &h: span.hashes)
-      if (h == hash)
-        return true;
-  }
-  return false;
+  return requested_internal(hash);
 }
 
-std::pair<uint64_t, uint64_t> block_queue::reserve_span(uint64_t first_block_height, uint64_t last_block_height, uint64_t max_blocks, const boost::uuids::uuid &connection_id, const std::list<crypto::hash> &block_hashes, boost::posix_time::ptime time)
+std::pair<uint64_t, uint64_t> block_queue::reserve_span(uint64_t first_block_height, uint64_t last_block_height, uint64_t max_blocks, const boost::uuids::uuid &connection_id, const std::vector<crypto::hash> &block_hashes, boost::posix_time::ptime time)
 {
   boost::unique_lock<boost::recursive_mutex> lock(mutex);
 
@@ -181,14 +194,14 @@ std::pair<uint64_t, uint64_t> block_queue::reserve_span(uint64_t first_block_hei
   }
 
   uint64_t span_start_height = last_block_height - block_hashes.size() + 1;
-  std::list<crypto::hash>::const_iterator i = block_hashes.begin();
-  while (i != block_hashes.end() && requested(*i))
+  std::vector<crypto::hash>::const_iterator i = block_hashes.begin();
+  while (i != block_hashes.end() && requested_internal(*i))
   {
     ++i;
     ++span_start_height;
   }
   uint64_t span_length = 0;
-  std::list<crypto::hash> hashes;
+  std::vector<crypto::hash> hashes;
   while (i != block_hashes.end() && span_length < max_blocks)
   {
     hashes.push_back(*i);
@@ -205,8 +218,7 @@ std::pair<uint64_t, uint64_t> block_queue::reserve_span(uint64_t first_block_hei
 
 bool block_queue::is_blockchain_placeholder(const span &span) const
 {
-  static const boost::uuids::uuid uuid0 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  return span.connection_id == uuid0;
+  return span.connection_id == boost::uuids::nil_uuid();
 }
 
 std::pair<uint64_t, uint64_t> block_queue::get_start_gap_span() const
@@ -229,7 +241,7 @@ std::pair<uint64_t, uint64_t> block_queue::get_start_gap_span() const
   return std::make_pair(current_height + 1, first_span_height - current_height - 1);
 }
 
-std::pair<uint64_t, uint64_t> block_queue::get_next_span_if_scheduled(std::list<crypto::hash> &hashes, boost::uuids::uuid &connection_id, boost::posix_time::ptime &time) const
+std::pair<uint64_t, uint64_t> block_queue::get_next_span_if_scheduled(std::vector<crypto::hash> &hashes, boost::uuids::uuid &connection_id, boost::posix_time::ptime &time) const
 {
   boost::unique_lock<boost::recursive_mutex> lock(mutex);
   if (blocks.empty())
@@ -247,7 +259,7 @@ std::pair<uint64_t, uint64_t> block_queue::get_next_span_if_scheduled(std::list<
   return std::make_pair(i->start_block_height, i->nblocks);
 }
 
-void block_queue::set_span_hashes(uint64_t start_height, const boost::uuids::uuid &connection_id, std::list<crypto::hash> hashes)
+void block_queue::set_span_hashes(uint64_t start_height, const boost::uuids::uuid &connection_id, std::vector<crypto::hash> hashes)
 {
   boost::unique_lock<boost::recursive_mutex> lock(mutex);
   for (block_map::iterator i = blocks.begin(); i != blocks.end(); ++i)
@@ -255,15 +267,17 @@ void block_queue::set_span_hashes(uint64_t start_height, const boost::uuids::uui
     if (i->start_block_height == start_height && i->connection_id == connection_id)
     {
       span s = *i;
-      blocks.erase(i);
+      erase_block(i);
       s.hashes = std::move(hashes);
+      for (const crypto::hash &h: s.hashes)
+        requested_hashes.insert(h);
       blocks.insert(s);
       return;
     }
   }
 }
 
-bool block_queue::get_next_span(uint64_t &height, std::list<cryptonote::block_complete_entry> &bcel, boost::uuids::uuid &connection_id, bool filled) const
+bool block_queue::get_next_span(uint64_t &height, std::vector<cryptonote::block_complete_entry> &bcel, boost::uuids::uuid &connection_id, bool filled) const
 {
   boost::unique_lock<boost::recursive_mutex> lock(mutex);
   if (blocks.empty())
@@ -340,7 +354,7 @@ size_t block_queue::get_num_filled_spans() const
 crypto::hash block_queue::get_last_known_hash(const boost::uuids::uuid &connection_id) const
 {
   boost::unique_lock<boost::recursive_mutex> lock(mutex);
-  crypto::hash hash = cryptonote::null_hash;
+  crypto::hash hash = crypto::null_hash;
   uint64_t highest_height = 0;
   for (const auto &span: blocks)
   {
@@ -384,7 +398,7 @@ float block_queue::get_speed(const boost::uuids::uuid &connection_id) const
       i->second = (i->second + span.rate) / 2;
   }
   float conn_rate = -1, best_rate = 0;
-  for (auto i: speeds)
+  for (const auto &i: speeds)
   {
     if (i.first == connection_id)
       conn_rate = i.second;

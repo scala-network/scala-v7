@@ -1,6 +1,6 @@
-// Word list created by Monero contributor Shrikez
+// Word list created by Stellite contributor Shrikez
 // 
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The MoNerO Project
 // 
 // All rights reserved.
 // 
@@ -51,7 +51,10 @@ namespace Language
   class Italian: public Base
   {
   public:
-    Italian(): Base("Italiano", std::vector<std::string>({
+    Italian(): Base("Italiano", "Italian", {}, 4)
+    {
+      static constexpr const char * const words[NWORDS] =
+      {
         "abbinare",
         "abbonato",
         "abisso",
@@ -1678,8 +1681,8 @@ namespace Language
         "zolfo",
         "zombie",
         "zucchero"
-      }), 4)
-    {
+      };
+      set_words(words);
       populate_maps();
     }
   };

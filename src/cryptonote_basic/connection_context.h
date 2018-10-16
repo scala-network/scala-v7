@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The MoNerO Project
 // 
 // All rights reserved.
 // 
@@ -39,8 +39,8 @@ namespace cryptonote
 
   struct cryptonote_connection_context: public epee::net_utils::connection_context_base
   {
-
-    cryptonote_connection_context(): m_state(state_before_handshake), m_remote_blockchain_height(0), m_last_response_height(0) {}
+    cryptonote_connection_context(): m_state(state_before_handshake), m_remote_blockchain_height(0), m_last_response_height(0),
+        m_last_request_time(boost::posix_time::microsec_clock::universal_time()), m_callback_request_count(0), m_last_known_hash(crypto::null_hash) {}
 
     enum state
     {
@@ -52,7 +52,7 @@ namespace cryptonote
     };
 
     state m_state;
-    std::list<crypto::hash> m_needed_objects;
+    std::vector<crypto::hash> m_needed_objects;
     std::unordered_set<crypto::hash> m_requested_objects;
     uint64_t m_remote_blockchain_height;
     uint64_t m_last_response_height;
@@ -67,15 +67,15 @@ namespace cryptonote
     switch (s)
     {
     case cryptonote_connection_context::state_before_handshake:
-      return "state_before_handshake";
+      return "before_handshake";
     case cryptonote_connection_context::state_synchronizing:
-      return "state_synchronizing";
+      return "synchronizing";
     case cryptonote_connection_context::state_standby:
-      return "state_standby";
+      return "standby";
     case cryptonote_connection_context::state_idle:
-      return "state_idle";
+      return "idle";
     case cryptonote_connection_context::state_normal:
-      return "state_normal";
+      return "normal";
     default:
       return "unknown";
     }    

@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, The Monero Project
+# Copyright (c) 2014-2018, The MoNerO Project
 #
 # All rights reserved.
 #
@@ -46,16 +46,18 @@ set(mnemonics_private_headers
   russian.h
   singleton.h
   spanish.h
-  esperanto.h)
+  esperanto.h
+  lojban.h)
 
-monero_private_headers(mnemonics
+stellite_private_headers(mnemonics
   ${mnemonics_private_headers})
-monero_add_library(mnemonics
+stellite_add_library(mnemonics
   ${mnemonics_sources}
   ${mnemonics_headers}
   ${mnemonics_private_headers})
 target_link_libraries(mnemonics
   PUBLIC
+    epee
     easylogging
     ${Boost_SYSTEM_LIBRARY}
   PRIVATE

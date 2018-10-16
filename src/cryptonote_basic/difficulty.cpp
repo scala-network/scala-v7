@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2017, The MoNerO Project
 // Copyright (c) 2017 The Masari Project(next_difficulty_v3)
 // All rights reserved.
 //
@@ -374,7 +374,7 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
     int lastShortTimeInARaw = 0;
 
     int nbLongTsLastNBlocks = 0;
-    bool lastTimeWasLong=false;
+    //bool lastTimeWasLong=false;
 
     if (true) {
         uint64_t previous_max = timestamps[0];
@@ -406,9 +406,9 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
                 }
                 if(timespan >100) {
                     nbLongTsLastNBlocks ++;
-                    lastTimeWasLong = true;
+                    //lastTimeWasLong = true;
                 } else {
-                    lastTimeWasLong = false;
+                    //lastTimeWasLong = false;
                 }
             }
 
@@ -470,7 +470,7 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
 // Copyright (c) 2017-2018 Zawy (pseudocode)
 // MIT license http://www.opensource.org/licenses/mit-license.php
 // Copyright (c) 2018 The Masari Project (10x for quicker recoveries, minimum to be symmetric with FTL)
-// Copyright (c) 2018 Wownero Inc., a Monero Enterprise Alliance partner company
+// Copyright (c) 2018 Wownero Inc., a Stellite Enterprise Alliance partner company
 // Copyright (c) 2018 The Karbowanec developers (initial code)
 // Copyright (c) 2018 Haven Protocol (refinements)
 // Degnr8, Karbowanec, Masari, Bitcoin Gold, Bitcoin Candy, and Haven have contributed.

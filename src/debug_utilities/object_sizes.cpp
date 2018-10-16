@@ -1,4 +1,4 @@
-// Copyright (c) 2017, The Monero Project
+// Copyright (c) 2017-2018, The MoNerO Project
 //
 // All rights reserved.
 //
@@ -31,7 +31,7 @@
 #include "cryptonote_basic/tx_extra.h"
 #include "cryptonote_core/blockchain.h"
 #include "p2p/p2p_protocol_defs.h"
-#include "p2p/connection_basic.hpp"
+#include "net/connection_basic.hpp"
 #include "p2p/net_peerlist.h"
 #include "p2p/net_node.h"
 #include "cryptonote_protocol/cryptonote_protocol_handler.h"
@@ -51,7 +51,7 @@ class size_logger
 public:
   ~size_logger()
   {
-    for (const auto i: types)
+    for (const auto &i: types)
       std::cout << std::to_string(i.first) << "\t" << i.second << std::endl;
   }
   void add(const char *type, size_t size) { types.insert(std::make_pair(size, type)); }
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 {
   size_logger sl;
 
-  tools::sanitize_locale();
+  tools::on_startup();
 
   mlog_configure("", true);
 
@@ -84,7 +84,6 @@ int main(int argc, char* argv[])
 
   SL(cryptonote::txpool_tx_meta_t);
 
-  SL(epee::net_utils::network_address_base);
   SL(epee::net_utils::ipv4_network_address);
   SL(epee::net_utils::network_address);
   SL(epee::net_utils::connection_context_base);
@@ -95,6 +94,11 @@ int main(int argc, char* argv[])
   SL(nodetool::node_server<cryptonote::t_cryptonote_protocol_handler<cryptonote::core>>);
   SL(nodetool::p2p_connection_context_t<cryptonote::t_cryptonote_protocol_handler<cryptonote::core>::connection_context>);
   SL(nodetool::network_address_old);
+  SL(nodetool::peerlist_entry_base<nodetool::network_address_old>);
+
+  SL(nodetool::network_config);
+  SL(nodetool::basic_node_data);
+  SL(cryptonote::CORE_SYNC_DATA);
 
   SL(tools::wallet2::transfer_details);
   SL(tools::wallet2::payment_details);
@@ -105,12 +109,12 @@ int main(int argc, char* argv[])
   SL(tools::wallet2::unsigned_tx_set);
   SL(tools::wallet2::signed_tx_set);
 
-  SL(Monero::WalletImpl);
-  SL(Monero::AddressBookRow);
-  SL(Monero::TransactionInfoImpl);
-  SL(Monero::TransactionHistoryImpl);
-  SL(Monero::PendingTransactionImpl);
-  SL(Monero::UnsignedTransactionImpl);
+  SL(Stellite::WalletImpl);
+  SL(Stellite::AddressBookRow);
+  SL(Stellite::TransactionInfoImpl);
+  SL(Stellite::TransactionHistoryImpl);
+  SL(Stellite::PendingTransactionImpl);
+  SL(Stellite::UnsignedTransactionImpl);
 
   return 0;
 }
