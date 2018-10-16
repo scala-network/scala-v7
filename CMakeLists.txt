@@ -172,7 +172,7 @@ else()
   message(STATUS "Building without build tag")
 endif()
 
-if(NOT MANUAL_SUBMODULES)
+if(1==2)
   find_package(Git)
   if(GIT_FOUND)
     message(STATUS "Checking submodules")
