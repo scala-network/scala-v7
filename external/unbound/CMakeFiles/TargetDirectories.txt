@@ -1,3 +1,0 @@
-/root/Stellite/external/unbound/CMakeFiles/rebuild_cache.dir
-/root/Stellite/external/unbound/CMakeFiles/edit_cache.dir
-/root/Stellite/external/unbound/CMakeFiles/unbound.dir
