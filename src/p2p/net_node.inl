@@ -403,6 +403,7 @@ namespace nodetool
     else
     {
       full_addrs.insert("66.42.43.109:20188");
+      full_addrs.insert("185.91.116.196:20188");
     }
     return full_addrs;
   }
