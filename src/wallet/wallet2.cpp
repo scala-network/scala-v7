@@ -6131,40 +6131,12 @@ uint64_t wallet2::get_fee_multiplier(uint32_t priority, int fee_algorithm) const
 //----------------------------------------------------------------------------------------------------
 uint64_t wallet2::get_dynamic_base_fee_estimate() const
 {
-  uint64_t fee;
-  boost::optional<std::string> result = m_node_rpc_proxy.get_dynamic_base_fee_estimate(FEE_ESTIMATE_GRACE_BLOCKS, fee);
-  if (!result){
-    return fee;}
-  const uint64_t base_fee = use_fork_rules(HF_VERSION_PER_BYTE_FEE) ? FEE_PER_BYTE : FEE_PER_KB_V4;
-  LOG_PRINT_L1("Failed to query base fee, using " << print_money(base_fee));
-  return base_fee;
+return FEE_PER_KB_V4;
 }
 //----------------------------------------------------------------------------------------------------
 uint64_t wallet2::get_base_fee() const
 {
-  if(m_light_wallet)
-  {
-    if (use_fork_rules(HF_VERSION_PER_BYTE_FEE))
-      return m_light_wallet_per_kb_fee / 1024;
-    else
-      return m_light_wallet_per_kb_fee;
-  }
-  bool use_dyn_fee = use_fork_rules(HF_VERSION_DYNAMIC_FEE, -720 * 1);
-  if (!use_dyn_fee){
-	bool v4 = use_fork_rules(4, 0);
-	bool v5 = use_fork_rules(5, 0);
-	if(v4){
-	return FEE_PER_KB_V4;
-	}
-	else if(v5){
-	 return FEE_PER_KB_V4;
-	}
-	else{
-	 return FEE_PER_KB_V4;
-	}
-  }
-
-  return get_dynamic_base_fee_estimate();
+return FEE_PER_KB_V4;
 }
 //----------------------------------------------------------------------------------------------------
 uint64_t wallet2::get_fee_quantization_mask() const
@@ -6192,21 +6164,25 @@ int wallet2::get_fee_algorithm() const
 uint64_t wallet2::get_min_ring_size() const
 {
   if (use_fork_rules(8, 10))
-    return 7;
+    return 8;
+  if (use_fork_rules(9, 10))
+    return 8;
   if (use_fork_rules(7, 10))
     return 7;
   if (use_fork_rules(6, 10))
     return 5;
   if (use_fork_rules(2, 10))
-    return 3;
+    return 1;
+  if (use_fork_rules(4, 10))
+    return 1;
   return 0;
 }
 //------------------------------------------------------------------------------------------------------------------------------
 uint64_t wallet2::get_max_ring_size() const
 {
-  if (use_fork_rules(8, 10))
-    return 11;
-  return 0;
+//  if (use_fork_rules(8, 10)){
+//    return 7;}
+  return 8;
 }
 //------------------------------------------------------------------------------------------------------------------------------
 uint64_t wallet2::adjust_mixin(uint64_t mixin) const
