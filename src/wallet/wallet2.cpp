@@ -6087,20 +6087,11 @@ bool wallet2::sign_multisig_tx_from_file(const std::string &filename, std::vecto
   return sign_multisig_tx_to_file(exported_txs, filename, txids);
 }
 //----------------------------------------------------------------------------------------------------
-uint64_t wallet2::get_fee_multiplier(uint32_t priority, int fee_algorithm) const
+uint64_t wallet2::get_fee_multiplier(uint32_t priority, int fee_algorithm)
 {
-  static const struct
-  {
-    size_t count;
-    uint64_t multipliers[4];
-  }
-  multipliers[] =
-  {
-    { 3, {1, 2, 3} },
-    { 3, {1, 20, 166} },
-    { 4, {1, 4, 20, 166} },
-    { 4, {1, 5, 25, 1000} },
-  };
+  static const uint64_t old_multipliers[3] = {1, 2, 3};
+  static const uint64_t new_multipliers[3] = {1, 20, 166};
+  static const uint64_t newer_multipliers[4] = {1, 4, 20, 166};
 
   if (fee_algorithm == -1)
     fee_algorithm = get_fee_algorithm();
@@ -6116,13 +6107,17 @@ uint64_t wallet2::get_fee_multiplier(uint32_t priority, int fee_algorithm) const
       priority = 1;
   }
 
-  THROW_WALLET_EXCEPTION_IF(fee_algorithm < 0 || fee_algorithm > 3, error::invalid_priority);
-
   // 1 to 3/4 are allowed as priorities
-  const uint32_t max_priority = multipliers[fee_algorithm].count;
+  uint32_t max_priority = (fee_algorithm >= 2) ? 4 : 3;
   if (priority >= 1 && priority <= max_priority)
   {
-    return multipliers[fee_algorithm].multipliers[priority-1];
+    switch (fee_algorithm)
+    {
+      case 0: return old_multipliers[priority-1];
+      case 1: return new_multipliers[priority-1];
+      case 2: return newer_multipliers[priority-1];
+      default: THROW_WALLET_EXCEPTION_IF (true, error::invalid_priority);
+    }
   }
 
   THROW_WALLET_EXCEPTION_IF (false, error::invalid_priority);
