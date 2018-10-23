@@ -402,7 +402,7 @@ namespace nodetool
     }
     else
     {
-      full_addrs.insert("104.237.129.22:20188");
+      full_addrs.insert("139.180.198.68:20188");
     }
     return full_addrs;
   }

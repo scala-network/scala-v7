@@ -90,15 +90,10 @@ static const struct {
   uint8_t threshold;
   time_t time;
 } mainnet_hard_forks[] = {
-  // version 1 from the start of the blockchain
-   { 1, 1, 0, 1341378000 },   
-  // Version 2 starts from block 67500, fork time decided on 2018-03-09
-   { 2, 67500, 0, 1520584977 },
-  // Version 3 starts from block 100800, fork time decided on 2018-04-01 
-  { 3, 100800, 0, 1522557835 },
-  // Version 4 starts from block 194600, fork time decided about midday UTC on 2018-06-08
-  { 4, 194600, 0, 1522557836 },
-  // Version 4 starts from block 194600, fork time decided about midday UTC on 2018-06-08
+  { 1, 1, 0, 1341378000 },
+  { 2, 10, 0, 1520584977 },
+  { 3, 15, 0, 1522557835 },
+  { 4, 20, 0, 1522557836 },
   { 9, V9_TMFORK_HEIGHT, 0, 1539719641 },
 };
 static const uint64_t mainnet_hard_fork_version_1_till = (uint64_t)-1;
