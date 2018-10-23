@@ -868,8 +868,8 @@ namespace cryptonote
 
       }
       else if(m_blockchain_storage.have_tx(results[i].hash))
-         already_have[i] = true;
       {
+        already_have[i] = true;
         LOG_PRINT_L2("tx " << results[i].hash << " already have transaction in blockchain");
       }
       else
