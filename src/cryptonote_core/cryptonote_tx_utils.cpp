@@ -117,7 +117,7 @@ namespace cryptonote
       [&out_amounts](uint64_t a_dust) { out_amounts.push_back(a_dust); });
 
     CHECK_AND_ASSERT_MES(1 <= max_outs, false, "max_out must be non-zero");
-    if (height == 0 || hard_fork_version >= 4)
+    if (height == 0 || hard_fork_version >= 5)
     {
       // the genesis block was not decomposed, for unknown reasons
       while (max_outs < out_amounts.size())
