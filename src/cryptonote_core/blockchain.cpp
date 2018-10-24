@@ -2951,8 +2951,12 @@ uint64_t Blockchain::get_dynamic_base_fee_estimate(uint64_t grace_blocks) const
 {
   const uint8_t version = get_current_hard_fork_version();
 
-  if (version < HF_VERSION_DYNAMIC_FEE)
-    return FEE_PER_KB;
+  if (version < HF_VERSION_DYNAMIC_FEE && version >= 4){
+    return FEE_PER_KB_V4;}
+
+  if (version < 4){
+   return FEE_PER_KB;
+  }
 
   if (grace_blocks >= CRYPTONOTE_REWARD_BLOCKS_WINDOW)
     grace_blocks = CRYPTONOTE_REWARD_BLOCKS_WINDOW - 1;
