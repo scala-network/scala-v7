@@ -951,6 +951,7 @@ bool Blockchain::switch_to_alternative_blockchain(std::list<blocks_ext_by_hash::
     for (auto& old_ch_ent : disconnected_chain)
     {
       block_verification_context bvc = boost::value_initialized<block_verification_context>();
+      LOG_PRINT_L0("disconnected, c est la vie");
       bool r = handle_alternative_block(old_ch_ent, get_block_hash(old_ch_ent), bvc);
       if(!r)
       {
@@ -3620,6 +3621,7 @@ bool Blockchain::add_new_block(const block& bl_, block_verification_context& bvc
   if(!(bl.prev_id == get_tail_id()))
   {
     //chain switching or wrong block
+    LOG_PRINT_L0("block previous id  = " << bl.prev_id << " is not ok with db previous id  ");
     bvc.m_added_to_main_chain = false;
     m_db->block_txn_stop();
     bool r = handle_alternative_block(bl, id, bvc);
