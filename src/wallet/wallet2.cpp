@@ -6093,18 +6093,13 @@ uint64_t wallet2::get_fee_multiplier(uint32_t priority, int fee_algorithm) const
   static const uint64_t new_multipliers[3] = {1, 20, 166};
   static const uint64_t newer_multipliers[4] = {1, 4, 20, 166};
 
-  if (fee_algorithm == -1)
+  if (fee_algorithm == -1){
     fee_algorithm = get_fee_algorithm();
-
+  }
   // 0 -> default (here, x1 till fee algorithm 2, x4 from it)
-  if (priority == 0)
-    priority = m_default_priority;
-  if (priority == 0)
+  if (priority == 0 || priority == 1)
   {
-    if (fee_algorithm >= 2)
       priority = 2;
-    else
-      priority = 1;
   }
 
   // 1 to 3/4 are allowed as priorities
