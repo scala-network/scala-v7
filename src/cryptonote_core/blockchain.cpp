@@ -775,21 +775,9 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
     // requires the blockchain lock will have acquired it in the first place,
     // and it will be unlocked only when called from the getinfo RPC
     if (top_hash == m_difficulty_for_next_block_top_hash){
-  size_t target = get_difficulty_target();
-
-  if(get_current_hard_fork_version() < 2){
-    return next_difficulty(timestamps, difficulties, target);
-  }
-  if(get_current_hard_fork_version() < 4){
-    return next_difficulty_v3(timestamps, difficulties, target, true);
-  }
-  if(get_current_hard_fork_version() < 5){{
-      return next_difficulty_v4(timestamps, difficulties, target);
-  }
-  else{
-      return next_difficulty_v5(timestamps, difficulties, target);
-  }
-                                                         }
+    return m_difficulty_for_next_block;
+    
+    }
   }
 
   CRITICAL_REGION_LOCAL(m_blockchain_lock);
@@ -848,23 +836,28 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
     m_timestamps = timestamps;
     m_difficulties = difficulties;
   }
-  CRITICAL_REGION_LOCAL1(m_difficulty_lock);
-  m_difficulty_for_next_block_top_hash = top_hash;
 
   size_t target = get_difficulty_target();
+  difficulty_type diff;
 
   if(get_current_hard_fork_version() < 2){
-    return next_difficulty(timestamps, difficulties, target);
+    diff = next_difficulty(timestamps, difficulties, target);
   }
   if(get_current_hard_fork_version() < 4){
-    return next_difficulty_v3(timestamps, difficulties, target, true);
+    diff = next_difficulty_v3(timestamps, difficulties, target, true);
   }
   if(get_current_hard_fork_version() < 5){{
-      return next_difficulty_v4(timestamps, difficulties, target);
+    diff = next_difficulty_v4(timestamps, difficulties, target);
   }
   else{
-      return next_difficulty_v5(timestamps, difficulties, target);
+    diff = next_difficulty_v5(timestamps, difficulties, target);
   }
+
+  CRITICAL_REGION_LOCAL1(m_difficulty_lock);
+  m_difficulty_for_next_block_top_hash = top_hash;
+  m_difficulty_for_next_block = diff;
+  return diff;  
+
 }
 //------------------------------------------------------------------
 // This function removes blocks from the blockchain until it gets to the
