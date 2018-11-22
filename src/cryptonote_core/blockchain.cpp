@@ -91,10 +91,10 @@ static const struct {
   time_t time;
 } mainnet_hard_forks[] = {
   { 1, 1, 0, 1341378000 },
-  { 2, 10, 0, 1520584977 },
-  { 3, 15, 0, 1522557835 },
-  { 4, 20, 0, 1522557836 },
-  { 9, V9_TMFORK_HEIGHT, 0, 1539719641 },
+  { 2, 67500, 0, 1520584977 },
+  { 3, 100800, 0, 1522557835 },
+  { 4, 194600, 0, 1522557836 },
+  { 9, V9_TMFORK_HEIGHT, 0, 1542888965 },
 };
 static const uint64_t mainnet_hard_fork_version_1_till = (uint64_t)-1;
 
@@ -762,6 +762,7 @@ bool Blockchain::get_block_by_hash(const crypto::hash &h, block &blk, bool *orph
 // last DIFFICULTY_BLOCKS_COUNT blocks and passes them to next_difficulty,
 // returning the result of that call.  Ignores the genesis block, and can use
 // less blocks than desired if there aren't enough.
+
 difficulty_type Blockchain::get_difficulty_for_next_block()
 {
 
@@ -783,6 +784,11 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
   std::vector<uint64_t> timestamps;
   std::vector<difficulty_type> difficulties;
   auto height = m_db->height();
+
+
+  if ((uint64_t)height >= V9_TMFORK_HEIGHT && (uint64_t)height <= V9_TMFORK_HEIGHT + (uint64_t)DIFFICULTY_BLOCKS_COUNT_V4){
+	    return (difficulty_type)326540;
+  }
 
   top_hash = get_tail_id();
   size_t difficult_block_count;
