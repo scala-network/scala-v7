@@ -775,8 +775,7 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
     // requires the blockchain lock will have acquired it in the first place,
     // and it will be unlocked only when called from the getinfo RPC
     if (top_hash == m_difficulty_for_next_block_top_hash){
-    return m_difficulty_for_next_block;
-    
+    return m_difficulty_for_next_block;    
     }
   }
 
@@ -846,7 +845,7 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
   if(get_current_hard_fork_version() < 4){
     diff = next_difficulty_v3(timestamps, difficulties, target, true);
   }
-  if(get_current_hard_fork_version() < 5){{
+  if(get_current_hard_fork_version() < 5){
     diff = next_difficulty_v4(timestamps, difficulties, target);
   }
   else{
