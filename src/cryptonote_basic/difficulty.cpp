@@ -35,6 +35,7 @@
 #include "include_base_utils.h"
 #include <vector>
 #include <boost/math/special_functions/round.hpp>
+#include <boost/algorithm/clamp.hpp>
 
 #include "common/int-util.h"
 #include "crypto/hash.h"
@@ -465,81 +466,70 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
     return (low / weighted_timespans);
 }
 
-// LWMA difficulty algorithm
-// Background:  https://github.com/zawy12/difficulty-algorithms/issues/3
-// Copyright (c) 2017-2018 Zawy (pseudocode)
-// MIT license http://www.opensource.org/licenses/mit-license.php
-// Copyright (c) 2018 The Masari Project (10x for quicker recoveries, minimum to be symmetric with FTL)
-// Copyright (c) 2018 Wownero Inc., a Stellite Enterprise Alliance partner company
-// Copyright (c) 2018 The Karbowanec developers (initial code)
-// Copyright (c) 2018 Haven Protocol (refinements)
-// Degnr8, Karbowanec, Masari, Bitcoin Gold, Bitcoin Candy, and Haven have contributed.
-
-// This algorithm is: next_difficulty = harmonic_mean(Difficulties) * T / LWMA(Solvetimes)
-// The harmonic_mean(Difficulties) = 1/average(Targets) so it is also:
-// next_target = avg(Targets) * LWMA(Solvetimes) / T.
-// This is "the best algorithm" because it has lowest root-mean-square error between
-// needed & actual difficulty during hash attacks while having the lowest standard
-// deviation during stable hashrate. That is, it's the fastest for a given stability and vice versa.
-// Do not use "if solvetime < 1 then solvetime = 1" which allows a catastrophic exploit.
-// Do not sort timestamps.  "Solvetimes" and "LWMA" variables must allow negatives.
-// Do not use MTP as most recent block.  Do not use (POW)Limits, filtering, or tempering.
-// Do not forget to set N (aka DIFFICULTY_WINDOW in Cryptonote) to recommendation below.
-// The nodes' future time limit (FTL) aka CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT needs to
-// be reduced from 60*60*2 to 500 seconds to prevent timestamp manipulation from miner's with
-//  > 50% hash power.  If this is too small, it can be increased to 1000 at a cost in protection.
-
-// Cryptonote clones:  #define DIFFICULTY_BLOCKS_COUNT_V2 DIFFICULTY_WINDOW_V2 + 1
-
 difficulty_type next_difficulty_v5(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds) {
 
-    const int64_t T = static_cast<int64_t>(target_seconds);
-    size_t N = DIFFICULTY_WINDOW_V4;
-    int64_t FTL = static_cast<int64_t>(CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4);
-
-    // Return a difficulty of 1 for first 3 blocks if it's the start of the chain.
-    if (timestamps.size() < 4) {
-        return 1;
-    }
-    // Otherwise, use a smaller N if the start of the chain is less than N+1.
-    else if ( timestamps.size() < N+1 ) {
-        N = timestamps.size() - 1;
-    }
-    // Otherwise make sure timestamps and cumulative_difficulties are correct size.
-    else {
-        timestamps.resize(N+1);
-        cumulative_difficulties.resize(N+1);
-    }
-    // To get an average solvetime to within +/- ~0.1%, use an adjustment factor.
-    // adjust=0.998 for N = 60
-    const double adjust = 0.998;
-    // The divisor k normalizes the LWMA sum to a standard LWMA.
-    const double k = N * (N + 1) / 2;
-
-    double LWMA(0), sum_inverse_D(0), harmonic_mean_D(0), nextDifficulty(0);
-    int64_t solveTime(0);
-    uint64_t difficulty(0), next_difficulty(0);
-
-    // Loop through N most recent blocks. N is most recently solved block.
-    for (size_t i = 1; i <= N; i++) {
-        solveTime = static_cast<int64_t>(timestamps[i]) - static_cast<int64_t>(timestamps[i - 1]);
-        solveTime = std::min<int64_t>((T * 10), std::max<int64_t>(solveTime, -FTL));
-        difficulty = cumulative_difficulties[i] - cumulative_difficulties[i - 1];
-        LWMA += (int64_t)(solveTime * i) / k;
-        sum_inverse_D += 1 / static_cast<double>(difficulty);
+    if (timestamps.size() > DIFFICULTY_BLOCKS_COUNT_V4)
+    {
+        timestamps.resize(DIFFICULTY_BLOCKS_COUNT_V4);
+        cumulative_difficulties.resize(DIFFICULTY_BLOCKS_COUNT_V4);
     }
 
-    harmonic_mean_D = N / sum_inverse_D;
+    size_t timestamp_count = timestamps.size();
+    assert(timestamp_count == cumulative_difficulties.size());
+    if (timestamp_count <= 1) {
+       return 1;
+    }
 
-    // Limit LWMA same as Bitcoin's 1/4 in case something unforeseen occurs.
-    if (static_cast<int64_t>(boost::math::round(LWMA)) < T / 4)
-        LWMA = static_cast<double>(T / 4);
+    uint64_t prev_max_timestamp = timestamps[0];
+    uint64_t weighted_timespans = 0;
+    uint64_t target;
 
-    nextDifficulty = harmonic_mean_D * T / LWMA * adjust;
+    int short_time_count = 0;
+    bool last_was_short_time = false;
 
-    // No limits should be employed, but this is correct way to employ a 20% symmetrical limit:
-    // nextDifficulty=max(previous_Difficulty*0.8,min(previous_Difficulty/0.8, next_Difficulty));
-    next_difficulty = static_cast<uint64_t>(nextDifficulty);
-    return next_difficulty;
+    for (size_t i = 1; i < timestamp_count; i++) {
+	uint64_t max_timestamp = std::max(prev_max_timestamp, timestamps[i]);
+        uint64_t timespan = boost::algorithm::clamp<uint64_t>(max_timestamp - prev_max_timestamp, 1, 11 * target_seconds);
+ 	last_was_short_time = false;
+
+        if (i >= (timestamp_count - 7)) {
+	    if (timespan < 90) {
+                short_time_count++;
+                last_was_short_time = true;
+            }
+        }
+        weighted_timespans += i * timespan;
+ 	prev_max_timestamp = max_timestamp;
+    }
+
+    // Adjust faster if many blocks found too fast
+    if (last_was_short_time) {
+	switch (short_time_count) {
+	    case 7: weighted_timespans = weighted_timespans * 3 / 5; break;
+	    case 6: weighted_timespans = weighted_timespans * 5 / 7; break;
+	    case 5: weighted_timespans = weighted_timespans * 4 / 5; break;
+	    case 4: weighted_timespans = weighted_timespans * 9 / 10; break;
+	    case 3: weighted_timespans = weighted_timespans * 11 / 12; break;
+	}
+    }
+
+    // adjust = 0.99 for N=60, leaving the + 1 for now as it's not affecting N
+    target = 99 * (((timestamp_count + 1) / 2) * target_seconds) / 100;
+
+    uint64_t minimum_timespan = target_seconds * timestamp_count / 2;
+    if (weighted_timespans < minimum_timespan) {
+        weighted_timespans = minimum_timespan;
+    }
+
+    difficulty_type total_work = cumulative_difficulties.back() - cumulative_difficulties.front();
+    assert(total_work > 0);
+
+    uint64_t low, high;
+    mul(total_work, target, low, high);
+
+    if (high != 0) {
+        return 0;
+    }
+    return (low / weighted_timespans);
 }
 }

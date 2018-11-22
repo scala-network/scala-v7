@@ -830,8 +830,11 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
   if(get_current_hard_fork_version() < 4){
     return next_difficulty_v3(timestamps, difficulties, target, true);
   }
-  else{
+  if(get_current_hard_fork_version() < 5){{
       return next_difficulty_v4(timestamps, difficulties, target);
+  }
+  else{
+      return next_difficulty_v5(timestamps, difficulties, target);
   }
 }
 //------------------------------------------------------------------
@@ -1055,8 +1058,11 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std:
   if(get_current_hard_fork_version() < 4){
     return next_difficulty_v3(timestamps, cumulative_difficulties, target, true);
   }
-  else{
+  if(get_current_hard_fork_version() < 5){
     return next_difficulty_v4(timestamps, cumulative_difficulties, target);
+  }
+  else{
+    return next_difficulty_v5(timestamps, cumulative_difficulties, target);
   }
 }
 //------------------------------------------------------------------
