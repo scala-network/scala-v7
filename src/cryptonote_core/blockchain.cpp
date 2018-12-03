@@ -1212,19 +1212,6 @@ bool Blockchain::create_block_template(block& b, const account_public_address& m
   CRITICAL_REGION_BEGIN(m_blockchain_lock);
   height = m_db->height();
   if (m_btc_valid) {
-    // The pool cookie is atomic. The lack of locking is OK, as if it changes
-    // just as we compare it, we'll just use a slightly old template, but
-    // this would be the case anyway if we'd lock, and the change happened
-    // just after the block template was created
-    if (!memcmp(&miner_address, &m_btc_address, sizeof(cryptonote::account_public_address)) && m_btc_nonce == ex_nonce && m_btc_pool_cookie == m_tx_pool.cookie()) {
-      MDEBUG("Using cached template");
-      m_btc.timestamp = time(NULL); // update timestamp unconditionally
-      b = m_btc;
-      diffic = m_btc_difficulty;
-      expected_reward = m_btc_expected_reward;
-      return true;
-    }
-    MDEBUG("Not using cached template: address " << (!memcmp(&miner_address, &m_btc_address, sizeof(cryptonote::account_public_address))) << ", nonce " << (m_btc_nonce == ex_nonce) << ", cookie " << (m_btc_pool_cookie == m_tx_pool.cookie()));
     invalidate_block_template_cache();
   }
 
