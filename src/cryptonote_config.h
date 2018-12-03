@@ -98,7 +98,7 @@
 #define DIFFICULTY_WINDOW_V3                            90
 #define DIFFICULTY_BLOCKS_COUNT_V3                      DIFFICULTY_WINDOW_V3
 
-#define V9_TMFORK_HEIGHT			        429900 //The test fork height to V5(9th fork version)
+#define V9_TMFORK_HEIGHT			        25 //The test fork height to V5(9th fork version)
 
 #define DIFFICULTY_WINDOW_V4				            90
 #define DIFFICULTY_BLOCKS_COUNT_V4                      DIFFICULTY_WINDOW_V4
