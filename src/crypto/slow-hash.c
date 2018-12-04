@@ -66,7 +66,7 @@ extern void aesb_pseudo_round(const uint8_t *in, uint8_t *out, const uint8_t *ex
   }
 
 #define VARIANT1_2(p) \
-  do if (variant < 3) \
+  do if (variant > 0 && variant < 3) \
   { \
     xor64(p, tweak1_2); \
   } while(0)
@@ -82,7 +82,7 @@ extern void aesb_pseudo_round(const uint8_t *in, uint8_t *out, const uint8_t *ex
 
 #define VARIANT1_PORTABLE_INIT() \
   uint8_t tweak1_2[8]; \
-  do if (variant < 3) \
+  do if (variant > 0 && variant < 3) \
   { \
     VARIANT1_CHECK(); \
     memcpy(&tweak1_2, &state.hs.b[192], sizeof(tweak1_2)); \
@@ -90,11 +90,11 @@ extern void aesb_pseudo_round(const uint8_t *in, uint8_t *out, const uint8_t *ex
   } while(0)
 
 #define VARIANT1_INIT64() \
-  if (variant < 3) \
+  if (variant > 0 && variant < 3) \
   { \
     VARIANT1_CHECK(); \
   } \
-  const uint64_t tweak1_2 = (variant < 3) ? (state.hs.w[24] ^ (*((const uint64_t*)NONCE_POINTER))) : 0
+  const uint64_t tweak1_2 = (variant > 0 && variant < 3) ? (state.hs.w[24] ^ (*((const uint64_t*)NONCE_POINTER))) : 0
 
 #define VARIANT2_INIT64() \
   uint64_t division_result = 0; \
