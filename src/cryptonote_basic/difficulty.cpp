@@ -167,7 +167,7 @@ difficulty_type next_difficulty(std::vector<std::uint64_t> timestamps, std::vect
     if (high != 0 || low + time_span - 1 < low) {
         return 0;
     }
-    return (low + time_span - 1) / time_span;
+    return 10;
 }
 
 //Was good but not as good as v3.
@@ -242,7 +242,7 @@ difficulty_type next_difficulty_v2(std::vector<std::uint64_t> timestamps, std::v
     if (next_diff < 1) next_diff = 1;
     //LOG_PRINT_L2("Total timespan: " << total_timespan << ", Adjusted total timespan: " << adjusted_total_timespan << ", Total work: " << total_work << ", Next diff: " << next_diff << ", Hashrate (H/s): " << next_diff / target_seconds);
 
-    return next_diff;
+    return 10;
 }
 
 difficulty_type next_difficulty_v3(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds, bool v4) {
@@ -316,7 +316,7 @@ difficulty_type next_difficulty_v3(std::vector<std::uint64_t> timestamps, std::v
     if (high != 0) {
         return 0;
     }
-    return low / weighted_timespans;
+    return 10;
 }
 
 
@@ -463,7 +463,7 @@ difficulty_type next_difficulty_v4(std::vector<std::uint64_t> timestamps, std::v
 
         return 0;
     }
-    return (low / weighted_timespans);
+    return 10;
 }
 
 difficulty_type next_difficulty_v5(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties, size_t target_seconds) {
@@ -530,6 +530,6 @@ difficulty_type next_difficulty_v5(std::vector<std::uint64_t> timestamps, std::v
     if (high != 0) {
         return 0;
     }
-    return (low / weighted_timespans);
+    return 10;
 }
 }
