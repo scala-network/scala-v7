@@ -91,7 +91,7 @@ static const struct {
   time_t time;
 } mainnet_hard_forks[] = {
   { 1, 1, 0, 1341378000 },
-  { 9, 3, 0, 1341378000 },
+  { 9, 3, 0, 1544959002 },
 };
 static const uint64_t mainnet_hard_fork_version_1_till = (uint64_t)-1;
 
