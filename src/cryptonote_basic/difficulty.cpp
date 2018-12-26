@@ -530,6 +530,6 @@ difficulty_type next_difficulty_v5(std::vector<std::uint64_t> timestamps, std::v
     if (high != 0) {
         return 0;
     }
-     return (low / weighted_timespans);
+    return (low / weighted_timespans);
 }
 }
