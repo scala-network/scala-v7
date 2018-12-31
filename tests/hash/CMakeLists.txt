@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2018, The MoNerO Project
+# Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
 #
@@ -49,3 +49,6 @@ foreach (hash IN ITEMS fast slow slow-1 slow-2 slow-3 tree extra-blake extra-gro
     COMMAND hash-tests "${hash}" "${CMAKE_CURRENT_SOURCE_DIR}/tests-${hash}.txt")
 endforeach ()
 
+add_test(
+  NAME    "hash-variant2-int-sqrt"
+  COMMAND hash-tests "variant2_int_sqrt")
