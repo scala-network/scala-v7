@@ -52,10 +52,16 @@ extern "C" {
     tree_hash((const char (*)[crypto::HASH_SIZE]) data, length >> 5, hash);
   }
   static void cn_slow_hash_0(const void *data, size_t length, char *hash) {
-    return cn_slow_hash(data, length, hash, 0/*variant*/, 0/*prehashed*/);
+    return cn_slow_hash(data, length, hash, 0/*variant*/, 0/*prehashed*/); //CN original
   }
-  static void cn_slow_hash_1(const void *data, size_t length, char *hash) {
-    return cn_slow_hash(data, length, hash, 1/*variant*/, 0/*prehashed*/);
+  static void cn_slow_hash_1(const void *data, size_t length, char *hash) { 
+    return cn_slow_hash(data, length, hash, 1/*variant*/, 0/*prehashed*/); //CN Variant 1 
+  }
+  static void cn_slow_hash_2(const void *data, size_t length, char *hash) {
+    return cn_slow_hash(data, length, hash, 3/*variant*/, 0/*prehashed*/); //CN XTL Variant
+  }
+  static void cn_slow_hash_3(const void *data, size_t length, char *hash) {
+    return cn_slow_hash(data, length, hash, 4/*variant*/, 0/*prehashed*/); //CNv8 Fast
   }
 }
 POP_WARNINGS
@@ -67,7 +73,7 @@ struct hash_func {
 } hashes[] = {{"fast", cn_fast_hash}, {"slow", cn_slow_hash_0}, {"tree", hash_tree},
   {"extra-blake", hash_extra_blake}, {"extra-groestl", hash_extra_groestl},
   {"extra-jh", hash_extra_jh}, {"extra-skein", hash_extra_skein},
-  {"slow-1", cn_slow_hash_1}};
+  {"slow-1", cn_slow_hash_1}, {"slow-2", cn_slow_hash_2}, {"slow-3", cn_slow_hash_3}};
 
 int main(int argc, char *argv[]) {
   hash_f *f;
