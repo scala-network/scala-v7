@@ -94,7 +94,7 @@ static const struct {
   { 2, 67500, 0, 1520584977 },
   { 3, 100800, 0, 1522557835 },
   { 4, 194600, 0, 1522557836 },
-  { 9, 483952, 0, 1544959005 },
+  { 9, 501501, 0, 1544959005 },
 };
 static const uint64_t mainnet_hard_fork_version_1_till = (uint64_t)-1;
 
@@ -772,11 +772,6 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
   std::vector<uint64_t> timestamps;
   std::vector<difficulty_type> difficulties;
   auto height = m_db->height();
-
-  //Difficulty reset code(DISABLE IN MAINNET)
-  if ((uint64_t)height >= V9_TMFORK_HEIGHT && (uint64_t)height <= V9_TMFORK_HEIGHT + (uint64_t)DIFFICULTY_BLOCKS_COUNT_V4){
-	    return (difficulty_type)326540;
-  }
 
   size_t difficult_block_count;
 
