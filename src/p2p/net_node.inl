@@ -403,6 +403,13 @@ namespace nodetool
     else
     {
       full_addrs.insert("139.180.198.68:20188");
+      full_addrs.insert("66.42.43.109:20188");
+      full_addrs.insert("51.38.235.241:20188); //Thanx micmac
+      full_addrs.insert("107.191.63.92:20188); //Thanx micmac again
+      full_addrs.insert("109.12.36.176:20188); //Thanx micmac again again
+      full_addrs.insert("130.193.15.191:20188"); //Thanx noreith
+      full_addrs.insert("194.59.204.194:20188"); //Thanx Gravity
+      full_addrs.insert("172.245.163.163:20188"); //Thanx Hayzam
     }
     return full_addrs;
   }
