@@ -60,7 +60,7 @@ static void do_lock(void *ptr, size_t len)
 #if defined HAVE_MLOCK
   int ret = mlock(ptr, len);
   if (ret < 0)
-    MERROR("Error locking page at " << ptr << ": " << strerror(errno));
+    LOG_PRINT_L2("Error locking page at " << ptr << ": " << strerror(errno));
 #else
 #warning Missing do_lock implementation
 #endif
