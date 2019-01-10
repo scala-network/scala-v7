@@ -142,6 +142,7 @@ usage(void)
 	printf("  ratelimit_list [+a]		list ratelimited domains\n");
 	printf("  ip_ratelimit_list [+a]	list ratelimited ip addresses\n");
 	printf("		+a		list all, also not ratelimited\n");
+	printf("  list_auth_zones		list auth zones\n");
 	printf("  view_list_local_zones	view	list local-zones in view\n");
 	printf("  view_list_local_data	view	list local-data RRs in view\n");
 	printf("  view_local_zone view name type  	add local-zone in view\n");
@@ -161,7 +162,7 @@ usage(void)
 static const int inhibit_zero = 1;
 /** divide sum of timers to get average */
 static void
-timeval_divide(struct timeval* avg, const struct timeval* sum, size_t d)
+timeval_divide(struct timeval* avg, const struct timeval* sum, long long d)
 {
 #ifndef S_SPLINT_S
 	size_t leftover;
@@ -184,12 +185,14 @@ timeval_divide(struct timeval* avg, const struct timeval* sum, size_t d)
 #define PR_UL_SUB(str, nm, var) printf(str".%s"SQ"%lu\n", nm, (unsigned long)(var));
 #define PR_TIMEVAL(str, var) printf(str SQ ARG_LL "d.%6.6d\n", \
 	(long long)var.tv_sec, (int)var.tv_usec);
+#define PR_STATSTIME(str, var) printf(str SQ ARG_LL "d.%6.6d\n", \
+	(long long)var ## _sec, (int)var ## _usec);
 #define PR_LL(str, var) printf(str SQ ARG_LL"d\n", (long long)(var));
 
 /** print stat block */
-static void pr_stats(const char* nm, struct stats_info* s)
+static void pr_stats(const char* nm, struct ub_stats_info* s)
 {
-	struct timeval avg;
+	struct timeval sumwait, avg;
 	PR_UL_NM("num.queries", s->svr.num_queries);
 	PR_UL_NM("num.queries_ip_ratelimited", 
 		s->svr.num_queries_ip_ratelimited);
@@ -205,18 +208,22 @@ static void pr_stats(const char* nm, struct stats_info* s)
     PR_UL_NM("num.dnscrypt.cleartext", s->svr.num_query_dnscrypt_cleartext);
     PR_UL_NM("num.dnscrypt.malformed",
              s->svr.num_query_dnscrypt_crypted_malformed);
-#endif
+#endif /* USE_DNSCRYPT */
 	printf("%s.requestlist.avg"SQ"%g\n", nm,
 		(s->svr.num_queries_missed_cache+s->svr.num_queries_prefetch)?
 			(double)s->svr.sum_query_list_size/
-			(s->svr.num_queries_missed_cache+
+			(double)(s->svr.num_queries_missed_cache+
 			s->svr.num_queries_prefetch) : 0.0);
 	PR_UL_NM("requestlist.max", s->svr.max_query_list_size);
 	PR_UL_NM("requestlist.overwritten", s->mesh_jostled);
 	PR_UL_NM("requestlist.exceeded", s->mesh_dropped);
 	PR_UL_NM("requestlist.current.all", s->mesh_num_states);
 	PR_UL_NM("requestlist.current.user", s->mesh_num_reply_states);
-	timeval_divide(&avg, &s->mesh_replies_sum_wait, s->mesh_replies_sent);
+#ifndef S_SPLINT_S
+	sumwait.tv_sec = s->mesh_replies_sum_wait_sec;
+	sumwait.tv_usec = s->mesh_replies_sum_wait_usec;
+#endif
+	timeval_divide(&avg, &sumwait, s->mesh_replies_sent);
 	printf("%s.", nm);
 	PR_TIMEVAL("recursion.time.avg", avg);
 	printf("%s.recursion.time.median"SQ"%g\n", nm, s->mesh_time_median);
@@ -224,27 +231,37 @@ static void pr_stats(const char* nm, struct stats_info* s)
 }
 
 /** print uptime */
-static void print_uptime(struct shm_stat_info* shm_stat)
+static void print_uptime(struct ub_shm_stat_info* shm_stat)
 {
-	PR_TIMEVAL("time.now", shm_stat->time.now);
-	PR_TIMEVAL("time.up", shm_stat->time.up);
-	PR_TIMEVAL("time.elapsed", shm_stat->time.elapsed);
+	PR_STATSTIME("time.now", shm_stat->time.now);
+	PR_STATSTIME("time.up", shm_stat->time.up);
+	PR_STATSTIME("time.elapsed", shm_stat->time.elapsed);
 }
 
 /** print memory usage */
-static void print_mem(struct shm_stat_info* shm_stat)
+static void print_mem(struct ub_shm_stat_info* shm_stat)
 {
 	PR_LL("mem.cache.rrset", shm_stat->mem.rrset);
 	PR_LL("mem.cache.message", shm_stat->mem.msg);
-	PR_LL("mem.cache.iterator", shm_stat->mem.iter);
-	PR_LL("mem.cache.validator", shm_stat->mem.val);
+	PR_LL("mem.mod.iterator", shm_stat->mem.iter);
+	PR_LL("mem.mod.validator", shm_stat->mem.val);
+	PR_LL("mem.mod.respip", shm_stat->mem.respip);
 #ifdef CLIENT_SUBNET
-	PR_LL("mem.cache.subnet", shm_stat->mem.subnet);
+	PR_LL("mem.mod.subnet", shm_stat->mem.subnet);
+#endif
+#ifdef USE_IPSECMOD
+	PR_LL("mem.mod.ipsecmod", shm_stat->mem.ipsecmod);
+#endif
+#ifdef USE_DNSCRYPT
+	PR_LL("mem.cache.dnscrypt_shared_secret",
+		shm_stat->mem.dnscrypt_shared_secret);
+	PR_LL("mem.cache.dnscrypt_nonce",
+		shm_stat->mem.dnscrypt_nonce);
 #endif
 }
 
 /** print histogram */
-static void print_hist(struct stats_info* s)
+static void print_hist(struct ub_stats_info* s)
 {
 	struct timehist* hist;
 	size_t i;
@@ -264,13 +281,13 @@ static void print_hist(struct stats_info* s)
 }
 
 /** print extended */
-static void print_extended(struct stats_info* s)
+static void print_extended(struct ub_stats_info* s)
 {
 	int i;
 	char nm[16];
 
 	/* TYPE */
-	for(i=0; i<STATS_QTYPE_NUM; i++) {
+	for(i=0; i<UB_STATS_QTYPE_NUM; i++) {
 		if(inhibit_zero && s->svr.qtype[i] == 0)
 			continue;
 		sldns_wire2str_type_buf((uint16_t)i, nm, sizeof(nm));
@@ -281,7 +298,7 @@ static void print_extended(struct stats_info* s)
 	}
 
 	/* CLASS */
-	for(i=0; i<STATS_QCLASS_NUM; i++) {
+	for(i=0; i<UB_STATS_QCLASS_NUM; i++) {
 		if(inhibit_zero && s->svr.qclass[i] == 0)
 			continue;
 		sldns_wire2str_class_buf((uint16_t)i, nm, sizeof(nm));
@@ -292,7 +309,7 @@ static void print_extended(struct stats_info* s)
 	}
 
 	/* OPCODE */
-	for(i=0; i<STATS_OPCODE_NUM; i++) {
+	for(i=0; i<UB_STATS_OPCODE_NUM; i++) {
 		if(inhibit_zero && s->svr.qopcode[i] == 0)
 			continue;
 		sldns_wire2str_opcode_buf(i, nm, sizeof(nm));
@@ -317,7 +334,7 @@ static void print_extended(struct stats_info* s)
 	PR_UL("num.query.edns.DO", s->svr.qEDNS_DO);
 
 	/* RCODE */
-	for(i=0; i<STATS_RCODE_NUM; i++) {
+	for(i=0; i<UB_STATS_RCODE_NUM; i++) {
 		/* Always include RCODEs 0-5 */
 		if(inhibit_zero && i > LDNS_RCODE_REFUSED && s->svr.ans_rcode[i] == 0)
 			continue;
@@ -327,10 +344,14 @@ static void print_extended(struct stats_info* s)
 	if(!inhibit_zero || s->svr.ans_rcode_nodata) {
 		PR_UL("num.answer.rcode.nodata", s->svr.ans_rcode_nodata);
 	}
+	/* iteration */
+	PR_UL("num.query.ratelimited", s->svr.queries_ratelimited);
 	/* validation */
 	PR_UL("num.answer.secure", s->svr.ans_secure);
 	PR_UL("num.answer.bogus", s->svr.ans_bogus);
 	PR_UL("num.rrset.bogus", s->svr.rrset_bogus);
+	PR_UL("num.query.aggressive.NOERROR", s->svr.num_neg_cache_noerror);
+	PR_UL("num.query.aggressive.NXDOMAIN", s->svr.num_neg_cache_nxdomain);
 	/* threat detection */
 	PR_UL("unwanted.queries", s->svr.unwanted_queries);
 	PR_UL("unwanted.replies", s->svr.unwanted_replies);
@@ -339,14 +360,25 @@ static void print_extended(struct stats_info* s)
 	PR_UL("rrset.cache.count", s->svr.rrset_cache_count);
 	PR_UL("infra.cache.count", s->svr.infra_cache_count);
 	PR_UL("key.cache.count", s->svr.key_cache_count);
+#ifdef USE_DNSCRYPT
+	PR_UL("dnscrypt_shared_secret.cache.count",
+			 s->svr.shared_secret_cache_count);
+	PR_UL("num.query.dnscrypt.shared_secret.cachemiss",
+			 s->svr.num_query_dnscrypt_secret_missed_cache);
+	PR_UL("dnscrypt_nonce.cache.count", s->svr.nonce_cache_count);
+	PR_UL("num.query.dnscrypt.replay",
+			 s->svr.num_query_dnscrypt_replay);
+#endif /* USE_DNSCRYPT */
+	PR_UL("num.query.authzone.up", s->svr.num_query_authzone_up);
+	PR_UL("num.query.authzone.down", s->svr.num_query_authzone_down);
 }
 
 /** print statistics out of memory structures */
-static void do_stats_shm(struct config_file* cfg, struct stats_info* stats,
-	struct shm_stat_info* shm_stat)
+static void do_stats_shm(struct config_file* cfg, struct ub_stats_info* stats,
+	struct ub_shm_stat_info* shm_stat)
 {
 	int i;
-	char nm[16];
+	char nm[32];
 	for(i=0; i<cfg->num_threads; i++) {
 		snprintf(nm, sizeof(nm), "thread%d", i);
 		pr_stats(nm, &stats[i+1]);
@@ -366,8 +398,8 @@ static void print_stats_shm(const char* cfgfile)
 {
 #ifdef HAVE_SHMGET
 	struct config_file* cfg;
-	struct stats_info* stats;
-	struct shm_stat_info* shm_stat;
+	struct ub_stats_info* stats;
+	struct ub_shm_stat_info* shm_stat;
 	int id_ctl, id_arr;
 	/* read config */
 	if(!(cfg = config_create()))
@@ -383,11 +415,11 @@ static void print_stats_shm(const char* cfgfile)
 	if(id_arr == -1) {
 		fatal_exit("shmget(%d): %s", cfg->shm_key+1, strerror(errno));
 	}
-	shm_stat = (struct shm_stat_info*)shmat(id_ctl, NULL, 0);
+	shm_stat = (struct ub_shm_stat_info*)shmat(id_ctl, NULL, 0);
 	if(shm_stat == (void*)-1) {
 		fatal_exit("shmat(%d): %s", id_ctl, strerror(errno));
 	}
-	stats = (struct stats_info*)shmat(id_arr, NULL, 0);
+	stats = (struct ub_stats_info*)shmat(id_arr, NULL, 0);
 	if(stats == (void*)-1) {
 		fatal_exit("shmat(%d): %s", id_arr, strerror(errno));
 	}
@@ -419,42 +451,33 @@ setup_ctx(struct config_file* cfg)
 	char* s_cert=NULL, *c_key=NULL, *c_cert=NULL;
 	SSL_CTX* ctx;
 
-	if(cfg->remote_control_use_cert) {
-		s_cert = fname_after_chroot(cfg->server_cert_file, cfg, 1);
-		c_key = fname_after_chroot(cfg->control_key_file, cfg, 1);
-		c_cert = fname_after_chroot(cfg->control_cert_file, cfg, 1);
-		if(!s_cert || !c_key || !c_cert)
-			fatal_exit("out of memory");
-	}
+	if(!(options_remote_is_address(cfg) && cfg->control_use_cert))
+		return NULL;
+	s_cert = fname_after_chroot(cfg->server_cert_file, cfg, 1);
+	c_key = fname_after_chroot(cfg->control_key_file, cfg, 1);
+	c_cert = fname_after_chroot(cfg->control_cert_file, cfg, 1);
+	if(!s_cert || !c_key || !c_cert)
+		fatal_exit("out of memory");
 	ctx = SSL_CTX_new(SSLv23_client_method());
 	if(!ctx)
 		ssl_err("could not allocate SSL_CTX pointer");
 	if((SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2) & SSL_OP_NO_SSLv2)
 		!= SSL_OP_NO_SSLv2)
 		ssl_err("could not set SSL_OP_NO_SSLv2");
-	if(cfg->remote_control_use_cert) {
-		if((SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv3) & SSL_OP_NO_SSLv3)
-			!= SSL_OP_NO_SSLv3)
-			ssl_err("could not set SSL_OP_NO_SSLv3");
-		if(!SSL_CTX_use_certificate_chain_file(ctx,c_cert) ||
-		    !SSL_CTX_use_PrivateKey_file(ctx,c_key,SSL_FILETYPE_PEM)
-		    || !SSL_CTX_check_private_key(ctx))
-			ssl_err("Error setting up SSL_CTX client key and cert");
-		if (SSL_CTX_load_verify_locations(ctx, s_cert, NULL) != 1)
-			ssl_err("Error setting up SSL_CTX verify, server cert");
-		SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
+	if((SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv3) & SSL_OP_NO_SSLv3)
+		!= SSL_OP_NO_SSLv3)
+		ssl_err("could not set SSL_OP_NO_SSLv3");
+	if(!SSL_CTX_use_certificate_chain_file(ctx,c_cert) ||
+	    !SSL_CTX_use_PrivateKey_file(ctx,c_key,SSL_FILETYPE_PEM)
+	    || !SSL_CTX_check_private_key(ctx))
+		ssl_err("Error setting up SSL_CTX client key and cert");
+	if (SSL_CTX_load_verify_locations(ctx, s_cert, NULL) != 1)
+		ssl_err("Error setting up SSL_CTX verify, server cert");
+	SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
 
-		free(s_cert);
-		free(c_key);
-		free(c_cert);
-	} else {
-		/* Use ciphers that don't require authentication  */
-#ifdef HAVE_SSL_CTX_SET_SECURITY_LEVEL
-		SSL_CTX_set_security_level(ctx, 0);
-#endif
-		if(!SSL_CTX_set_cipher_list(ctx, "aNULL, eNULL"))
-			ssl_err("Error setting NULL cipher!");
-	}
+	free(s_cert);
+	free(c_key);
+	free(c_cert);
 	return ctx;
 }
 
@@ -464,12 +487,12 @@ contact_server(const char* svr, struct config_file* cfg, int statuscmd)
 {
 	struct sockaddr_storage addr;
 	socklen_t addrlen;
-	int addrfamily = 0;
-	int fd;
+	int addrfamily = 0, proto = IPPROTO_TCP;
+	int fd, useport = 1;
 	/* use svr or the first config entry */
 	if(!svr) {
-		if(cfg->control_ifs) {
-			svr = cfg->control_ifs->str;
+		if(cfg->control_ifs.first) {
+			svr = cfg->control_ifs.first->str;
 		} else if(cfg->do_ip4) {
 			svr = "127.0.0.1";
 		} else {
@@ -497,6 +520,8 @@ contact_server(const char* svr, struct config_file* cfg, int statuscmd)
 		(void)strlcpy(usock->sun_path, svr, sizeof(usock->sun_path));
 		addrlen = (socklen_t)sizeof(struct sockaddr_un);
 		addrfamily = AF_LOCAL;
+		useport = 0;
+		proto = 0;
 #endif
 	} else {
 		if(!ipstrtoaddr(svr, cfg->control_port, &addr, &addrlen))
@@ -504,8 +529,8 @@ contact_server(const char* svr, struct config_file* cfg, int statuscmd)
 	}
 
 	if(addrfamily == 0)
-		addrfamily = addr_is_ip6(&addr, addrlen)?AF_INET6:AF_INET;
-	fd = socket(addrfamily, SOCK_STREAM, 0);
+		addrfamily = addr_is_ip6(&addr, addrlen)?PF_INET6:PF_INET;
+	fd = socket(addrfamily, SOCK_STREAM, proto);
 	if(fd == -1) {
 #ifndef USE_WINSOCK
 		fatal_exit("socket: %s", strerror(errno));
@@ -515,14 +540,18 @@ contact_server(const char* svr, struct config_file* cfg, int statuscmd)
 	}
 	if(connect(fd, (struct sockaddr*)&addr, addrlen) < 0) {
 #ifndef USE_WINSOCK
-		log_err_addr("connect", strerror(errno), &addr, addrlen);
-		if(errno == ECONNREFUSED && statuscmd) {
+		int err = errno;
+		if(!useport) log_err("connect: %s for %s", strerror(err), svr);
+		else log_err_addr("connect", strerror(err), &addr, addrlen);
+		if(err == ECONNREFUSED && statuscmd) {
 			printf("unbound is stopped\n");
 			exit(3);
 		}
 #else
-		log_err_addr("connect", wsa_strerror(WSAGetLastError()), &addr, addrlen);
-		if(WSAGetLastError() == WSAECONNREFUSED && statuscmd) {
+		int wsaerr = WSAGetLastError();
+		if(!useport) log_err("connect: %s for %s", wsa_strerror(wsaerr), svr);
+		else log_err_addr("connect", wsa_strerror(wsaerr), &addr, addrlen);
+		if(wsaerr == WSAECONNREFUSED && statuscmd) {
 			printf("unbound is stopped\n");
 			exit(3);
 		}
@@ -534,12 +563,13 @@ contact_server(const char* svr, struct config_file* cfg, int statuscmd)
 
 /** setup SSL on the connection */
 static SSL*
-setup_ssl(SSL_CTX* ctx, int fd, struct config_file* cfg)
+setup_ssl(SSL_CTX* ctx, int fd)
 {
 	SSL* ssl;
 	X509* x;
 	int r;
 
+	if(!ctx) return NULL;
 	ssl = SSL_new(ctx);
 	if(!ssl)
 		ssl_err("could not SSL_new");
@@ -560,78 +590,115 @@ setup_ssl(SSL_CTX* ctx, int fd, struct config_file* cfg)
 	/* check authenticity of server */
 	if(SSL_get_verify_result(ssl) != X509_V_OK)
 		ssl_err("SSL verification failed");
-	if(cfg->remote_control_use_cert) {
-		x = SSL_get_peer_certificate(ssl);
-		if(!x)
-			ssl_err("Server presented no peer certificate");
-		X509_free(x);
-	}
+	x = SSL_get_peer_certificate(ssl);
+	if(!x)
+		ssl_err("Server presented no peer certificate");
+	X509_free(x);
 
 	return ssl;
 }
 
+/** read from ssl or fd, fatalexit on error, 0 EOF, 1 success */
+static int
+remote_read(SSL* ssl, int fd, char* buf, size_t len)
+{
+	if(ssl) {
+		int r;
+		ERR_clear_error();
+		if((r = SSL_read(ssl, buf, (int)len-1)) <= 0) {
+			if(SSL_get_error(ssl, r) == SSL_ERROR_ZERO_RETURN) {
+				/* EOF */
+				return 0;
+			}
+			ssl_err("could not SSL_read");
+		}
+		buf[r] = 0;
+	} else {
+		ssize_t rr = recv(fd, buf, len-1, 0);
+		if(rr <= 0) {
+			if(rr == 0) {
+				/* EOF */
+				return 0;
+			}
+#ifndef USE_WINSOCK
+			fatal_exit("could not recv: %s", strerror(errno));
+#else
+			fatal_exit("could not recv: %s", wsa_strerror(WSAGetLastError()));
+#endif
+		}
+		buf[rr] = 0;
+	}
+	return 1;
+}
+
+/** write to ssl or fd, fatalexit on error */
+static void
+remote_write(SSL* ssl, int fd, const char* buf, size_t len)
+{
+	if(ssl) {
+		if(SSL_write(ssl, buf, (int)len) <= 0)
+			ssl_err("could not SSL_write");
+	} else {
+		if(send(fd, buf, len, 0) < (ssize_t)len) {
+#ifndef USE_WINSOCK
+			fatal_exit("could not send: %s", strerror(errno));
+#else
+			fatal_exit("could not send: %s", wsa_strerror(WSAGetLastError()));
+#endif
+		}
+	}
+}
+
 /** send stdin to server */
 static void
-send_file(SSL* ssl, FILE* in, char* buf, size_t sz)
+send_file(SSL* ssl, int fd, FILE* in, char* buf, size_t sz)
 {
 	while(fgets(buf, (int)sz, in)) {
-		if(SSL_write(ssl, buf, (int)strlen(buf)) <= 0)
-			ssl_err("could not SSL_write contents");
+		remote_write(ssl, fd, buf, strlen(buf));
 	}
 }
 
 /** send end-of-file marker to server */
 static void
-send_eof(SSL* ssl)
+send_eof(SSL* ssl, int fd)
 {
 	char e[] = {0x04, 0x0a};
-	if(SSL_write(ssl, e, (int)sizeof(e)) <= 0)
-		ssl_err("could not SSL_write end-of-file marker");
+	remote_write(ssl, fd, e, sizeof(e));
 }
 
 /** send command and display result */
 static int
-go_cmd(SSL* ssl, int quiet, int argc, char* argv[])
+go_cmd(SSL* ssl, int fd, int quiet, int argc, char* argv[])
 {
 	char pre[10];
 	const char* space=" ";
 	const char* newline="\n";
 	int was_error = 0, first_line = 1;
-	int r, i;
+	int i;
 	char buf[1024];
 	snprintf(pre, sizeof(pre), "UBCT%d ", UNBOUND_CONTROL_VERSION);
-	if(SSL_write(ssl, pre, (int)strlen(pre)) <= 0)
-		ssl_err("could not SSL_write");
+	remote_write(ssl, fd, pre, strlen(pre));
 	for(i=0; i<argc; i++) {
-		if(SSL_write(ssl, space, (int)strlen(space)) <= 0)
-			ssl_err("could not SSL_write");
-		if(SSL_write(ssl, argv[i], (int)strlen(argv[i])) <= 0)
-			ssl_err("could not SSL_write");
+		remote_write(ssl, fd, space, strlen(space));
+		remote_write(ssl, fd, argv[i], strlen(argv[i]));
 	}
-	if(SSL_write(ssl, newline, (int)strlen(newline)) <= 0)
-		ssl_err("could not SSL_write");
+	remote_write(ssl, fd, newline, strlen(newline));
 
 	if(argc == 1 && strcmp(argv[0], "load_cache") == 0) {
-		send_file(ssl, stdin, buf, sizeof(buf));
+		send_file(ssl, fd, stdin, buf, sizeof(buf));
 	}
 	else if(argc == 1 && (strcmp(argv[0], "local_zones") == 0 ||
 		strcmp(argv[0], "local_zones_remove") == 0 ||
 		strcmp(argv[0], "local_datas") == 0 ||
 		strcmp(argv[0], "local_datas_remove") == 0)) {
-		send_file(ssl, stdin, buf, sizeof(buf));
-		send_eof(ssl);
+		send_file(ssl, fd, stdin, buf, sizeof(buf));
+		send_eof(ssl, fd);
 	}
 
 	while(1) {
-		ERR_clear_error();
-		if((r = SSL_read(ssl, buf, (int)sizeof(buf)-1)) <= 0) {
-			if(SSL_get_error(ssl, r) == SSL_ERROR_ZERO_RETURN) {
-				/* EOF */
-				break;
-			}
-			ssl_err("could not SSL_read");
+		if(remote_read(ssl, fd, buf, sizeof(buf)) == 0) {
+			break; /* EOF */
 		}
-		buf[r] = 0;
 		if(first_line && strncmp(buf, "error", 5) == 0) {
 			printf("%s", buf);
 			was_error = 1;
@@ -666,18 +733,18 @@ go(const char* cfgfile, char* svr, int quiet, int argc, char* argv[])
 
 	/* contact server */
 	fd = contact_server(svr, cfg, argc>0&&strcmp(argv[0],"status")==0);
-	ssl = setup_ssl(ctx, fd, cfg);
+	ssl = setup_ssl(ctx, fd);
 
 	/* send command */
-	ret = go_cmd(ssl, quiet, argc, argv);
+	ret = go_cmd(ssl, fd, quiet, argc, argv);
 
-	SSL_free(ssl);
+	if(ssl) SSL_free(ssl);
 #ifndef USE_WINSOCK
 	close(fd);
 #else
 	closesocket(fd);
 #endif
-	SSL_CTX_free(ctx);
+	if(ctx) SSL_CTX_free(ctx);
 	config_delete(cfg);
 	return ret;
 }
@@ -699,7 +766,7 @@ int main(int argc, char* argv[])
 	WSADATA wsa_data;
 #endif
 #ifdef USE_THREAD_DEBUG
-	/* stop the file output from unbound-control, overwites the servers */
+	/* stop the file output from unbound-control, overwrites the servers */
 	extern int check_locking_order;
 	check_locking_order = 0;
 #endif /* USE_THREAD_DEBUG */
@@ -753,7 +820,9 @@ int main(int argc, char* argv[])
 #ifdef HAVE_ERR_LOAD_CRYPTO_STRINGS
 	ERR_load_crypto_strings();
 #endif
+#if OPENSSL_VERSION_NUMBER < 0x10100000 || !defined(HAVE_OPENSSL_INIT_SSL)
 	ERR_load_SSL_strings();
+#endif
 #if OPENSSL_VERSION_NUMBER < 0x10100000 || !defined(HAVE_OPENSSL_INIT_CRYPTO)
 	OpenSSL_add_all_algorithms();
 #else
@@ -764,7 +833,7 @@ int main(int argc, char* argv[])
 #if OPENSSL_VERSION_NUMBER < 0x10100000 || !defined(HAVE_OPENSSL_INIT_SSL)
 	(void)SSL_library_init();
 #else
-	(void)OPENSSL_init_ssl(0, NULL);
+	(void)OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS, NULL);
 #endif
 
 	if(!RAND_status()) {

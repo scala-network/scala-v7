@@ -212,7 +212,8 @@ int fptr_whitelist_hash_markdelfunc(lruhash_markdelfunc_type fptr);
 int fptr_whitelist_modenv_send_query(struct outbound_entry* (*fptr)(
 	struct query_info* qinfo, uint16_t flags, int dnssec, int want_dnssec,
 	int nocaps, struct sockaddr_storage* addr, socklen_t addrlen,
-	uint8_t* zone, size_t zonelen, int ssl_upstream, struct module_qstate* q));
+	uint8_t* zone, size_t zonelen, int ssl_upstream, char* tls_auth_name,
+	struct module_qstate* q));
 
 /**
  * Check function pointer whitelist for module_env detach_subs callback values.
@@ -233,6 +234,15 @@ int fptr_whitelist_modenv_attach_sub(int (*fptr)(
 	struct module_qstate* qstate, struct query_info* qinfo, 
 	uint16_t qflags, int prime, int valrec, struct module_qstate** newq));
 
+/**
+ * Check function pointer whitelist for module_env add_sub callback values.
+ *
+ * @param fptr: function pointer to check.
+ * @return false if not in whitelist.
+ */
+int fptr_whitelist_modenv_add_sub(int (*fptr)(struct module_qstate* qstate,
+	struct query_info* qinfo, uint16_t qflags, int prime, int valrec,
+	struct module_qstate** newq, struct mesh_state** sub));
 /**
  * Check function pointer whitelist for module_env kill_sub callback values.
  *

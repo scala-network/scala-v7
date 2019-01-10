@@ -1,7 +1,7 @@
 /**
 @file
 @author from CrypoNote (see copyright below; Andrey N. Sabelnikov)
-@monero rfree
+@stellite rfree
 @brief the connection templated-class for one peer connection
 */
 // Copyright (c) 2006-2013, Andrey N. Sabelnikov, www.sabelnikov.net
@@ -54,8 +54,8 @@
 #include <boost/thread/thread.hpp>
 #include "net_utils_base.h"
 #include "syncobj.h"
-#include "../../../../src/p2p/connection_basic.hpp"
-#include "../../../../src/p2p/network_throttle-detail.hpp"
+#include "connection_basic.hpp"
+#include "network_throttle-detail.hpp"
 
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "net"
@@ -119,6 +119,7 @@ namespace net_utils
     //----------------- i_service_endpoint ---------------------
     virtual bool do_send(const void* ptr, size_t cb); ///< (see do_send from i_service_endpoint)
     virtual bool do_send_chunk(const void* ptr, size_t cb); ///< will send (or queue) a part of data
+    virtual bool send_done();
     virtual bool close();
     virtual bool call_run_once_service_io();
     virtual bool request_callback();
@@ -135,6 +136,14 @@ namespace net_utils
     /// Handle completion of a write operation.
     void handle_write(const boost::system::error_code& e, size_t cb);
 
+    /// reset connection timeout timer and callback
+    void reset_timer(boost::posix_time::milliseconds ms, bool add);
+    boost::posix_time::milliseconds get_default_timeout();
+    boost::posix_time::milliseconds get_timeout_from_bytes_read(size_t bytes);
+
+    /// host connection count tracking
+    unsigned int host_count(const std::string &host, int delta = 0);
+
     /// Buffer for incoming data.
     boost::array<char, 8192> buffer_;
     //boost::array<char, 1024> buffer_;
@@ -149,6 +158,7 @@ namespace net_utils
     std::list<boost::shared_ptr<connection<t_protocol_handler> > > m_self_refs; // add_ref/release support
     critical_section m_self_refs_lock;
     critical_section m_chunking_lock; // held while we add small chunks of the big do_send() to small do_send_chunk()
+    critical_section m_shutdown_lock; // held while shutting down
     
     t_connection_type m_connection_type;
     
@@ -157,6 +167,11 @@ namespace net_utils
     network_throttle m_throttle_speed_out;
     boost::mutex m_throttle_speed_in_mutex;
     boost::mutex m_throttle_speed_out_mutex;
+
+    boost::asio::deadline_timer m_timer;
+    bool m_local;
+    bool m_ready_to_close;
+    std::string m_host;
 
 	public:
 			void setRpcStation();
@@ -207,11 +222,17 @@ namespace net_utils
 
     bool connect(const std::string& adr, const std::string& port, uint32_t conn_timeot, t_connection_context& cn, const std::string& bind_ip = "0.0.0.0");
     template<class t_callback>
-    bool connect_async(const std::string& adr, const std::string& port, uint32_t conn_timeot, t_callback cb, const std::string& bind_ip = "0.0.0.0");
+    bool connect_async(const std::string& adr, const std::string& port, uint32_t conn_timeot, const t_callback &cb, const std::string& bind_ip = "0.0.0.0");
 
     typename t_protocol_handler::config_type& get_config_object(){return m_config;}
 
     int get_binded_port(){return m_port;}
+
+    long get_connections_count() const
+    {
+      auto connections_count = (m_sock_count > 0) ? (m_sock_count - 1) : 0; // Socket count minus listening socket
+      return connections_count;
+    }
 
     boost::asio::io_service& get_io_service(){return io_service_;}
 
@@ -281,8 +302,6 @@ namespace net_utils
 
     bool is_thread_worker();
 
-    bool cleanup_connections();
-
     /// The io_service used to perform asynchronous operations.
     std::unique_ptr<boost::asio::io_service> m_io_service_local_instance;
     boost::asio::io_service& io_service_;    
@@ -309,7 +328,7 @@ namespace net_utils
     connection_ptr new_connection_;
 
     boost::mutex connections_mutex;
-    std::deque<std::pair<boost::system_time, connection_ptr>> connections_;
+    std::set<connection_ptr> connections_;
 
   }; // class <>boosted_tcp_server
 

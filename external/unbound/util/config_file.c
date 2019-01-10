@@ -69,9 +69,9 @@
 #include <pwd.h>
 #endif
 
-/** from cfg username, after daemonise setup performed */
+/** from cfg username, after daemonize setup performed */
 uid_t cfg_uid = (uid_t)-1;
-/** from cfg username, after daemonise setup performed */
+/** from cfg username, after daemonize setup performed */
 gid_t cfg_gid = (gid_t)-1;
 /** for debug allow small timeout values for fast rollovers */
 int autr_permit_small_holddown = 0;
@@ -101,12 +101,15 @@ config_create(void)
 	cfg->do_udp = 1;
 	cfg->do_tcp = 1;
 	cfg->tcp_upstream = 0;
+	cfg->udp_upstream_without_downstream = 0;
 	cfg->tcp_mss = 0;
 	cfg->outgoing_tcp_mss = 0;
 	cfg->ssl_service_key = NULL;
 	cfg->ssl_service_pem = NULL;
-	cfg->ssl_port = 853;
+	cfg->ssl_port = UNBOUND_DNS_OVER_TLS_PORT;
 	cfg->ssl_upstream = 0;
+	cfg->tls_cert_bundle = NULL;
+	cfg->tls_win_cert = 0;
 	cfg->use_syslog = 1;
 	cfg->log_identity = NULL; /* changed later with argv[0] */
 	cfg->log_time_ascii = 0;
@@ -159,6 +162,8 @@ config_create(void)
 	if(!(cfg->logfile = strdup(""))) goto error_exit;
 	if(!(cfg->pidfile = strdup(PIDFILE))) goto error_exit;
 	if(!(cfg->target_fetch_policy = strdup("3 2 1 0 0"))) goto error_exit;
+	cfg->low_rtt_permil = 0;
+	cfg->low_rtt = 45;
 	cfg->donotqueryaddrs = NULL;
 	cfg->donotquery_localhost = 1;
 	cfg->root_hints = NULL;
@@ -176,8 +181,10 @@ config_create(void)
 	cfg->out_ifs = NULL;
 	cfg->stubs = NULL;
 	cfg->forwards = NULL;
+	cfg->auths = NULL;
 #ifdef CLIENT_SUBNET
 	cfg->client_subnet = NULL;
+	cfg->client_subnet_zone = NULL;
 	cfg->client_subnet_opcode = LDNS_EDNS_CLIENT_SUBNET;
 	cfg->client_subnet_always_forward = 0;
 	cfg->max_client_subnet_ipv4 = 24;
@@ -206,6 +213,8 @@ config_create(void)
 	cfg->trust_anchor_file_list = NULL;
 	cfg->trust_anchor_list = NULL;
 	cfg->trusted_keys_file_list = NULL;
+	cfg->trust_anchor_signaling = 1;
+	cfg->root_key_sentinel = 1;
 	cfg->dlv_anchor_file = NULL;
 	cfg->dlv_anchor_list = NULL;
 	cfg->domain_insecure = NULL;
@@ -216,6 +225,7 @@ config_create(void)
 	cfg->val_log_level = 0;
 	cfg->val_log_squelch = 0;
 	cfg->val_permissive_mode = 0;
+	cfg->aggressive_nsec = 0;
 	cfg->ignore_cd = 0;
 	cfg->serve_expired = 0;
 	cfg->add_holddown = 30*24*3600;
@@ -227,15 +237,17 @@ config_create(void)
 	cfg->neg_cache_size = 1 * 1024 * 1024;
 	cfg->local_zones = NULL;
 	cfg->local_zones_nodefault = NULL;
+	cfg->local_zones_disable_default = 0;
 	cfg->local_data = NULL;
 	cfg->local_zone_overrides = NULL;
 	cfg->unblock_lan_zones = 0;
 	cfg->insecure_lan_zones = 0;
 	cfg->python_script = NULL;
 	cfg->remote_control_enable = 0;
-	cfg->control_ifs = NULL;
+	cfg->control_ifs.first = NULL;
+	cfg->control_ifs.last = NULL;
 	cfg->control_port = UNBOUND_CONTROL_PORT;
-	cfg->remote_control_use_cert = 1;
+	cfg->control_use_cert = 1;
 	cfg->minimal_responses = 0;
 	cfg->rrset_roundrobin = 0;
 	cfg->max_udp_size = 4096;
@@ -270,7 +282,7 @@ config_create(void)
 	cfg->ratelimit_below_domain = NULL;
 	cfg->ip_ratelimit_factor = 10;
 	cfg->ratelimit_factor = 10;
-	cfg->qname_minimisation = 0;
+	cfg->qname_minimisation = 1;
 	cfg->qname_minimisation_strict = 0;
 	cfg->shm_enable = 0;
 	cfg->shm_key = 11777;
@@ -278,7 +290,24 @@ config_create(void)
 	cfg->dnscrypt_port = 0;
 	cfg->dnscrypt_provider = NULL;
 	cfg->dnscrypt_provider_cert = NULL;
+	cfg->dnscrypt_provider_cert_rotated = NULL;
 	cfg->dnscrypt_secret_key = NULL;
+	cfg->dnscrypt_shared_secret_cache_size = 4*1024*1024;
+	cfg->dnscrypt_shared_secret_cache_slabs = 4;
+	cfg->dnscrypt_nonce_cache_size = 4*1024*1024;
+	cfg->dnscrypt_nonce_cache_slabs = 4;
+#ifdef USE_IPSECMOD
+	cfg->ipsecmod_enabled = 1;
+	cfg->ipsecmod_ignore_bogus = 0;
+	cfg->ipsecmod_hook = NULL;
+	cfg->ipsecmod_max_ttl = 3600;
+	cfg->ipsecmod_whitelist = NULL;
+	cfg->ipsecmod_strict = 0;
+#endif
+#ifdef USE_CACHEDB
+	cfg->cachedb_backend = NULL;
+	cfg->cachedb_secret = NULL;
+#endif
 	return cfg;
 error_exit:
 	config_delete(cfg); 
@@ -354,10 +383,23 @@ struct config_file* config_create_forlib(void)
 /** put string into strlist */
 #define S_STRLIST(str, var) if(strcmp(opt, str)==0) \
 	{ return cfg_strlist_insert(&cfg->var, strdup(val)); }
+/** put string into strlist if not present yet*/
+#define S_STRLIST_UNIQ(str, var) if(strcmp(opt, str)==0) \
+	{ if(cfg_strlist_find(cfg->var, val)) { return 0;} \
+	  return cfg_strlist_insert(&cfg->var, strdup(val)); }
+/** append string to strlist */
+#define S_STRLIST_APPEND(str, var) if(strcmp(opt, str)==0) \
+	{ return cfg_strlist_append(&cfg->var, strdup(val)); }
 
 int config_set_option(struct config_file* cfg, const char* opt,
 	const char* val)
 {
+	char buf[64];
+	if(!opt) return 0;
+	if(opt[strlen(opt)-1] != ':' && strlen(opt)+2<sizeof(buf)) {
+		snprintf(buf, sizeof(buf), "%s:", opt);
+		opt = buf;
+	}
 	S_NUMBER_OR_ZERO("verbosity:", verbosity)
 	else if(strcmp(opt, "statistics-interval:") == 0) {
 		if(strcmp(val, "0") == 0 || strcmp(val, "") == 0)
@@ -409,12 +451,19 @@ int config_set_option(struct config_file* cfg, const char* opt,
 	else S_YNO("do-udp:", do_udp)
 	else S_YNO("do-tcp:", do_tcp)
 	else S_YNO("tcp-upstream:", tcp_upstream)
+	else S_YNO("udp-upstream-without-downstream:",
+		udp_upstream_without_downstream)
 	else S_NUMBER_NONZERO("tcp-mss:", tcp_mss)
 	else S_NUMBER_NONZERO("outgoing-tcp-mss:", outgoing_tcp_mss)
 	else S_YNO("ssl-upstream:", ssl_upstream)
 	else S_STR("ssl-service-key:", ssl_service_key)
 	else S_STR("ssl-service-pem:", ssl_service_pem)
 	else S_NUMBER_NONZERO("ssl-port:", ssl_port)
+	else S_STR("tls-cert-bundle:", tls_cert_bundle)
+	else S_YNO("tls-win-cert:", tls_win_cert)
+	else S_STRLIST("additional-tls-port:", tls_additional_port)
+	else S_STRLIST("tls-additional-ports:", tls_additional_port)
+	else S_STRLIST("tls-additional-port:", tls_additional_port)
 	else S_YNO("interface-automatic:", if_automatic)
 	else S_YNO("use-systemd:", use_systemd)
 	else S_YNO("do-daemonize:", do_daemonize)
@@ -469,7 +518,7 @@ int config_set_option(struct config_file* cfg, const char* opt,
 	else S_YNO("harden-below-nxdomain:", harden_below_nxdomain)
 	else S_YNO("harden-referral-path:", harden_referral_path)
 	else S_YNO("harden-algo-downgrade:", harden_algo_downgrade)
-	else S_YNO("use-caps-for-id", use_caps_bits_for_id)
+	else S_YNO("use-caps-for-id:", use_caps_bits_for_id)
 	else S_STRLIST("caps-whitelist:", caps_whitelist)
 	else S_SIZET_OR_ZERO("unwanted-reply-threshold:", unwanted_threshold)
 	else S_STRLIST("private-address:", private_address)
@@ -480,6 +529,8 @@ int config_set_option(struct config_file* cfg, const char* opt,
 	else S_STRLIST("trust-anchor-file:", trust_anchor_file_list)
 	else S_STRLIST("trust-anchor:", trust_anchor_list)
 	else S_STRLIST("trusted-keys-file:", trusted_keys_file_list)
+	else S_YNO("trust-anchor-signaling:", trust_anchor_signaling)
+	else S_YNO("root-key-sentinel:", root_key_sentinel)
 	else S_STR("dlv-anchor-file:", dlv_anchor_file)
 	else S_STRLIST("dlv-anchor:", dlv_anchor_list)
 	else S_STRLIST("domain-insecure:", domain_insecure)
@@ -490,6 +541,7 @@ int config_set_option(struct config_file* cfg, const char* opt,
 	else S_YNO("log-queries:", log_queries)
 	else S_YNO("log-replies:", log_replies)
 	else S_YNO("val-permissive-mode:", val_permissive_mode)
+	else S_YNO("aggressive-nsec:", aggressive_nsec)
 	else S_YNO("ignore-cd-flag:", ignore_cd)
 	else S_YNO("serve-expired:", serve_expired)
 	else S_STR("val-nsec3-keysize-iterations:", val_nsec3_key_iterations)
@@ -508,7 +560,7 @@ int config_set_option(struct config_file* cfg, const char* opt,
 	else S_YNO("unblock-lan-zones:", unblock_lan_zones)
 	else S_YNO("insecure-lan-zones:", insecure_lan_zones)
 	else S_YNO("control-enable:", remote_control_enable)
-	else S_STRLIST("control-interface:", control_ifs)
+	else S_STRLIST_APPEND("control-interface:", control_ifs)
 	else S_NUMBER_NONZERO("control-port:", control_port)
 	else S_STR("server-key-file:", server_key_file)
 	else S_STR("server-cert-file:", server_cert_file)
@@ -522,6 +574,42 @@ int config_set_option(struct config_file* cfg, const char* opt,
 	 * generating the address tree. */
 	/* No client-subnet-always-forward here, module registration depends on
 	 * this option. */
+#endif
+#ifdef USE_DNSTAP
+	else S_YNO("dnstap-enable:", dnstap)
+	else S_STR("dnstap-socket-path:", dnstap_socket_path)
+	else S_YNO("dnstap-send-identity:", dnstap_send_identity)
+	else S_YNO("dnstap-send-version:", dnstap_send_version)
+	else S_STR("dnstap-identity:", dnstap_identity)
+	else S_STR("dnstap-version:", dnstap_version)
+	else S_YNO("dnstap-log-resolver-query-messages:",
+		dnstap_log_resolver_query_messages)
+	else S_YNO("dnstap-log-resolver-response-messages:",
+		dnstap_log_resolver_response_messages)
+	else S_YNO("dnstap-log-client-query-messages:",
+		dnstap_log_client_query_messages)
+	else S_YNO("dnstap-log-client-response-messages:",
+		dnstap_log_client_response_messages)
+	else S_YNO("dnstap-log-forwarder-query-messages:",
+		dnstap_log_forwarder_query_messages)
+	else S_YNO("dnstap-log-forwarder-response-messages:",
+		dnstap_log_forwarder_response_messages)
+#endif
+#ifdef USE_DNSCRYPT
+	else S_YNO("dnscrypt-enable:", dnscrypt)
+	else S_NUMBER_NONZERO("dnscrypt-port:", dnscrypt_port)
+	else S_STR("dnscrypt-provider:", dnscrypt_provider)
+	else S_STRLIST_UNIQ("dnscrypt-provider-cert:", dnscrypt_provider_cert)
+	else S_STRLIST("dnscrypt-provider-cert-rotated:", dnscrypt_provider_cert_rotated)
+	else S_STRLIST_UNIQ("dnscrypt-secret-key:", dnscrypt_secret_key)
+	else S_MEMSIZE("dnscrypt-shared-secret-cache-size:",
+		dnscrypt_shared_secret_cache_size)
+	else S_POW2("dnscrypt-shared-secret-cache-slabs:",
+		dnscrypt_shared_secret_cache_slabs)
+	else S_MEMSIZE("dnscrypt-nonce-cache-size:",
+		dnscrypt_nonce_cache_size)
+	else S_POW2("dnscrypt-nonce-cache-slabs:",
+		dnscrypt_nonce_cache_slabs)
 #endif
 	else if(strcmp(opt, "ip-ratelimit:") == 0) {
 	    IS_NUMBER_OR_ZERO; cfg->ip_ratelimit = atoi(val);
@@ -537,8 +625,18 @@ int config_set_option(struct config_file* cfg, const char* opt,
 	else S_POW2("ratelimit-slabs:", ratelimit_slabs)
 	else S_NUMBER_OR_ZERO("ip-ratelimit-factor:", ip_ratelimit_factor)
 	else S_NUMBER_OR_ZERO("ratelimit-factor:", ratelimit_factor)
+	else S_NUMBER_OR_ZERO("low-rtt:", low_rtt)
+	else S_NUMBER_OR_ZERO("low-rtt-pct:", low_rtt_permil)
+	else S_NUMBER_OR_ZERO("low-rtt-permil:", low_rtt_permil)
 	else S_YNO("qname-minimisation:", qname_minimisation)
 	else S_YNO("qname-minimisation-strict:", qname_minimisation_strict)
+#ifdef USE_IPSECMOD
+	else S_YNO("ipsecmod-enabled:", ipsecmod_enabled)
+	else S_YNO("ipsecmod-ignore-bogus:", ipsecmod_ignore_bogus)
+	else if(strcmp(opt, "ipsecmod-max-ttl:") == 0)
+	{ IS_NUMBER_OR_ZERO; cfg->ipsecmod_max_ttl = atoi(val); }
+	else S_YNO("ipsecmod-strict:", ipsecmod_strict)
+#endif
 	else if(strcmp(opt, "define-tag:") ==0) {
 		return config_add_tag(cfg, val);
 	/* val_sig_skew_min and max are copied into val_env during init,
@@ -560,15 +658,16 @@ int config_set_option(struct config_file* cfg, const char* opt,
 		cfg->out_ifs = oi;
 	} else {
 		/* unknown or unsupported (from the set_option interface):
-		 * interface, outgoing-interface, access-control, 
+		 * interface, outgoing-interface, access-control,
 		 * stub-zone, name, stub-addr, stub-host, stub-prime
 		 * forward-first, stub-first, forward-ssl-upstream,
-		 * stub-ssl-upstream, forward-zone,
+		 * stub-ssl-upstream, forward-zone, auth-zone
 		 * name, forward-addr, forward-host,
 		 * ratelimit-for-domain, ratelimit-below-domain,
-		 * local-zone-tag, access-control-view 
-		 * send-client-subnet client-subnet-always-forward
-		 * max-client-subnet-ipv4 max-client-subnet-ipv6 */
+		 * local-zone-tag, access-control-view,
+		 * send-client-subnet, client-subnet-always-forward,
+		 * max-client-subnet-ipv4, max-client-subnet-ipv6, ipsecmod_hook,
+		 * ipsecmod_whitelist. */
 		return 0;
 	}
 	return 1;
@@ -723,8 +822,13 @@ int
 config_get_option(struct config_file* cfg, const char* opt, 
 	void (*func)(char*,void*), void* arg)
 {
-	char buf[1024];
+	char buf[1024], nopt[64];
 	size_t len = sizeof(buf);
+	if(opt && opt[strlen(opt)-1] == ':' && strlen(opt)<sizeof(nopt)) {
+		memmove(nopt, opt, strlen(opt));
+		nopt[strlen(opt)-1] = 0;
+		opt = nopt;
+	}
 	fptr_ok(fptr_whitelist_print_func(func));
 	O_DEC(opt, "verbosity", verbosity)
 	else O_DEC(opt, "statistics-interval", stat_interval)
@@ -771,12 +875,16 @@ config_get_option(struct config_file* cfg, const char* opt,
 	else O_YNO(opt, "do-udp", do_udp)
 	else O_YNO(opt, "do-tcp", do_tcp)
 	else O_YNO(opt, "tcp-upstream", tcp_upstream)
+	else O_YNO(opt, "udp-upstream-without-downstream", udp_upstream_without_downstream)
 	else O_DEC(opt, "tcp-mss", tcp_mss)
 	else O_DEC(opt, "outgoing-tcp-mss", outgoing_tcp_mss)
 	else O_YNO(opt, "ssl-upstream", ssl_upstream)
 	else O_STR(opt, "ssl-service-key", ssl_service_key)
 	else O_STR(opt, "ssl-service-pem", ssl_service_pem)
 	else O_DEC(opt, "ssl-port", ssl_port)
+	else O_STR(opt, "tls-cert-bundle", tls_cert_bundle)
+	else O_YNO(opt, "tls-win-cert", tls_win_cert)
+	else O_LST(opt, "tls-additional-port", tls_additional_port)
 	else O_YNO(opt, "use-systemd", use_systemd)
 	else O_YNO(opt, "do-daemonize", do_daemonize)
 	else O_STR(opt, "chroot", chrootdir)
@@ -809,6 +917,7 @@ config_get_option(struct config_file* cfg, const char* opt,
 	else O_YNO(opt, "val-clean-additional", val_clean_additional)
 	else O_DEC(opt, "val-log-level", val_log_level)
 	else O_YNO(opt, "val-permissive-mode", val_permissive_mode)
+	else O_YNO(opt, "aggressive-nsec", aggressive_nsec)
 	else O_YNO(opt, "ignore-cd-flag", ignore_cd)
 	else O_YNO(opt, "serve-expired", serve_expired)
 	else O_STR(opt, "val-nsec3-keysize-iterations",val_nsec3_key_iterations)
@@ -834,18 +943,57 @@ config_get_option(struct config_file* cfg, const char* opt,
 	else O_LST(opt, "trust-anchor-file", trust_anchor_file_list)
 	else O_LST(opt, "trust-anchor", trust_anchor_list)
 	else O_LST(opt, "trusted-keys-file", trusted_keys_file_list)
+	else O_YNO(opt, "trust-anchor-signaling", trust_anchor_signaling)
+	else O_YNO(opt, "root-key-sentinel", root_key_sentinel)
 	else O_LST(opt, "dlv-anchor", dlv_anchor_list)
-	else O_LST(opt, "control-interface", control_ifs)
+	else O_LST(opt, "control-interface", control_ifs.first)
 	else O_LST(opt, "domain-insecure", domain_insecure)
 	else O_UNS(opt, "val-override-date", val_date_override)
 	else O_YNO(opt, "minimal-responses", minimal_responses)
 	else O_YNO(opt, "rrset-roundrobin", rrset_roundrobin)
 #ifdef CLIENT_SUBNET
 	else O_LST(opt, "send-client-subnet", client_subnet)
+	else O_LST(opt, "client-subnet-zone", client_subnet_zone)
 	else O_DEC(opt, "max-client-subnet-ipv4", max_client_subnet_ipv4)
 	else O_DEC(opt, "max-client-subnet-ipv6", max_client_subnet_ipv6)
 	else O_YNO(opt, "client-subnet-always-forward:",
 		client_subnet_always_forward)
+#endif
+#ifdef USE_DNSTAP
+	else O_YNO(opt, "dnstap-enable", dnstap)
+	else O_STR(opt, "dnstap-socket-path", dnstap_socket_path)
+	else O_YNO(opt, "dnstap-send-identity", dnstap_send_identity)
+	else O_YNO(opt, "dnstap-send-version", dnstap_send_version)
+	else O_STR(opt, "dnstap-identity", dnstap_identity)
+	else O_STR(opt, "dnstap-version", dnstap_version)
+	else O_YNO(opt, "dnstap-log-resolver-query-messages",
+		dnstap_log_resolver_query_messages)
+	else O_YNO(opt, "dnstap-log-resolver-response-messages",
+		dnstap_log_resolver_response_messages)
+	else O_YNO(opt, "dnstap-log-client-query-messages",
+		dnstap_log_client_query_messages)
+	else O_YNO(opt, "dnstap-log-client-response-messages",
+		dnstap_log_client_response_messages)
+	else O_YNO(opt, "dnstap-log-forwarder-query-messages",
+		dnstap_log_forwarder_query_messages)
+	else O_YNO(opt, "dnstap-log-forwarder-response-messages",
+		dnstap_log_forwarder_response_messages)
+#endif
+#ifdef USE_DNSCRYPT
+	else O_YNO(opt, "dnscrypt-enable", dnscrypt)
+	else O_DEC(opt, "dnscrypt-port", dnscrypt_port)
+	else O_STR(opt, "dnscrypt-provider", dnscrypt_provider)
+	else O_LST(opt, "dnscrypt-provider-cert", dnscrypt_provider_cert)
+	else O_LST(opt, "dnscrypt-provider-cert-rotated", dnscrypt_provider_cert_rotated)
+	else O_LST(opt, "dnscrypt-secret-key", dnscrypt_secret_key)
+	else O_MEM(opt, "dnscrypt-shared-secret-cache-size",
+		dnscrypt_shared_secret_cache_size)
+	else O_DEC(opt, "dnscrypt-shared-secret-cache-slabs",
+		dnscrypt_shared_secret_cache_slabs)
+	else O_MEM(opt, "dnscrypt-nonce-cache-size",
+		dnscrypt_nonce_cache_size)
+	else O_DEC(opt, "dnscrypt-nonce-cache-slabs",
+		dnscrypt_nonce_cache_slabs)
 #endif
 	else O_YNO(opt, "unblock-lan-zones", unblock_lan_zones)
 	else O_YNO(opt, "insecure-lan-zones", insecure_lan_zones)
@@ -862,6 +1010,9 @@ config_get_option(struct config_file* cfg, const char* opt,
 	else O_LS2(opt, "ratelimit-below-domain", ratelimit_below_domain)
 	else O_DEC(opt, "ip-ratelimit-factor", ip_ratelimit_factor)
 	else O_DEC(opt, "ratelimit-factor", ratelimit_factor)
+	else O_DEC(opt, "low-rtt", low_rtt)
+	else O_DEC(opt, "low-rtt-pct", low_rtt_permil)
+	else O_DEC(opt, "low-rtt-permil", low_rtt_permil)
 	else O_DEC(opt, "val-sig-skew-min", val_sig_skew_min)
 	else O_DEC(opt, "val-sig-skew-max", val_sig_skew_max)
 	else O_YNO(opt, "qname-minimisation", qname_minimisation)
@@ -874,6 +1025,18 @@ config_get_option(struct config_file* cfg, const char* opt,
 	else O_LS3(opt, "access-control-tag-action", acl_tag_actions)
 	else O_LS3(opt, "access-control-tag-data", acl_tag_datas)
 	else O_LS2(opt, "access-control-view", acl_view)
+#ifdef USE_IPSECMOD
+	else O_YNO(opt, "ipsecmod-enabled", ipsecmod_enabled)
+	else O_YNO(opt, "ipsecmod-ignore-bogus", ipsecmod_ignore_bogus)
+	else O_STR(opt, "ipsecmod-hook", ipsecmod_hook)
+	else O_DEC(opt, "ipsecmod-max-ttl", ipsecmod_max_ttl)
+	else O_LST(opt, "ipsecmod-whitelist", ipsecmod_whitelist)
+	else O_YNO(opt, "ipsecmod-strict", ipsecmod_strict)
+#endif
+#ifdef USE_CACHEDB
+	else O_STR(opt, "backend", cachedb_backend)
+	else O_STR(opt, "secret-seed", cachedb_secret)
+#endif
 	/* not here:
 	 * outgoing-permit, outgoing-avoid - have list of ports
 	 * local-zone - zones and nodefault variables
@@ -1042,6 +1205,29 @@ config_deltrplstrlist(struct config_str3list* p)
 }
 
 void
+config_delauth(struct config_auth* p)
+{
+	if(!p) return;
+	free(p->name);
+	config_delstrlist(p->masters);
+	config_delstrlist(p->urls);
+	config_delstrlist(p->allow_notify);
+	free(p->zonefile);
+	free(p);
+}
+
+void
+config_delauths(struct config_auth* p)
+{
+	struct config_auth* np;
+	while(p) {
+		np = p->next;
+		config_delauth(p);
+		p = np;
+	}
+}
+
+void
 config_delstub(struct config_stub* p)
 {
 	if(!p) return;
@@ -1121,21 +1307,26 @@ config_delete(struct config_file* cfg)
 	free(cfg->target_fetch_policy);
 	free(cfg->ssl_service_key);
 	free(cfg->ssl_service_pem);
+	free(cfg->tls_cert_bundle);
+	config_delstrlist(cfg->tls_additional_port);
 	free(cfg->log_identity);
 	config_del_strarray(cfg->ifs, cfg->num_ifs);
 	config_del_strarray(cfg->out_ifs, cfg->num_out_ifs);
 	config_delstubs(cfg->stubs);
 	config_delstubs(cfg->forwards);
+	config_delauths(cfg->auths);
 	config_delviews(cfg->views);
 	config_delstrlist(cfg->donotqueryaddrs);
 	config_delstrlist(cfg->root_hints);
 #ifdef CLIENT_SUBNET
 	config_delstrlist(cfg->client_subnet);
+	config_delstrlist(cfg->client_subnet_zone);
 #endif
 	free(cfg->identity);
 	free(cfg->version);
 	free(cfg->module_conf);
 	free(cfg->outgoing_avail_ports);
+	free(cfg->python_script);
 	config_delstrlist(cfg->caps_whitelist);
 	config_delstrlist(cfg->private_address);
 	config_delstrlist(cfg->private_domain);
@@ -1158,7 +1349,7 @@ config_delete(struct config_file* cfg)
 	config_del_strbytelist(cfg->respip_tags);
 	config_deltrplstrlist(cfg->acl_tag_actions);
 	config_deltrplstrlist(cfg->acl_tag_datas);
-	config_delstrlist(cfg->control_ifs);
+	config_delstrlist(cfg->control_ifs.first);
 	free(cfg->server_key_file);
 	free(cfg->server_cert_file);
 	free(cfg->control_key_file);
@@ -1169,6 +1360,14 @@ config_delete(struct config_file* cfg)
 	free(cfg->dnstap_version);
 	config_deldblstrlist(cfg->ratelimit_for_domain);
 	config_deldblstrlist(cfg->ratelimit_below_domain);
+#ifdef USE_IPSECMOD
+	free(cfg->ipsecmod_hook);
+	config_delstrlist(cfg->ipsecmod_whitelist);
+#endif
+#ifdef USE_CACHEDB
+	free(cfg->cachedb_backend);
+	free(cfg->cachedb_secret);
+#endif
 	free(cfg);
 }
 
@@ -1330,6 +1529,22 @@ cfg_region_strlist_insert(struct regional* region,
 	s->next = *head;
 	*head = s;
 	return 1;
+}
+
+struct config_strlist*
+cfg_strlist_find(struct config_strlist* head, const char *item)
+{
+	struct config_strlist *s = head;
+	if(!head){
+		return NULL;
+	}
+	while(s) {
+		if(strcmp(s->str, item) == 0) {
+			return s;
+		}
+		s = s->next;
+	}
+	return NULL;
 }
 
 int 
@@ -2053,4 +2268,13 @@ void errinf_dname(struct module_qstate* qstate, const char* str, uint8_t* dname)
 	dname_str(dname, buf);
 	snprintf(b, sizeof(b), "%s %s", str, buf);
 	errinf(qstate, b);
+}
+
+int options_remote_is_address(struct config_file* cfg)
+{
+	if(!cfg->remote_control_enable) return 0;
+	if(!cfg->control_ifs.first) return 1;
+	if(!cfg->control_ifs.first->str) return 1;
+	if(cfg->control_ifs.first->str[0] == 0) return 1;
+	return (cfg->control_ifs.first->str[0] != '/');
 }

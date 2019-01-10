@@ -1,0 +1,1689 @@
+The system is: Linux - 4.4.0-127-generic - x86_64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /usr/bin/cc 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/root/PoW/external/unbound/CMakeFiles/3.12.1/CompilerIdC/a.out"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_9f7ae/fast"
+/usr/bin/make -f CMakeFiles/cmTC_9f7ae.dir/build.make CMakeFiles/cmTC_9f7ae.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_9f7ae.dir/testCCompiler.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_9f7ae.dir/testCCompiler.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTC_9f7ae
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9f7ae.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_9f7ae.dir/testCCompiler.c.o  -o cmTC_9f7ae 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_f402e/fast"
+/usr/bin/make -f CMakeFiles/cmTC_f402e.dir/build.make CMakeFiles/cmTC_f402e.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f402e.dir/CMakeCCompilerABI.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_f402e.dir/CMakeCCompilerABI.c.o   -c /usr/local/share/cmake-3.12/Modules/CMakeCCompilerABI.c
+Linking C executable cmTC_f402e
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f402e.dir/link.txt --verbose=1
+/usr/bin/cc     -v -rdynamic CMakeFiles/cmTC_f402e.dir/CMakeCCompilerABI.c.o  -o cmTC_f402e 
+Using built-in specs.
+COLLECT_GCC=/usr/bin/cc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 5.4.0-6ubuntu1~16.04.10' --with-bugurl=file:///usr/share/doc/gcc-5/README.Bugs --enable-languages=c,ada,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-5 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-5-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-5-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-5-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
+Thread model: posix
+gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.10) 
+COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_f402e' '-mtune=generic' '-march=x86-64'
+ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/cc3zhwOT.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_f402e /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_f402e.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:"/usr/bin/make" "cmTC_f402e/fast"]
+  ignore line: [/usr/bin/make -f CMakeFiles/cmTC_f402e.dir/build.make CMakeFiles/cmTC_f402e.dir/build]
+  ignore line: [make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_f402e.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/cc    -o CMakeFiles/cmTC_f402e.dir/CMakeCCompilerABI.c.o   -c /usr/local/share/cmake-3.12/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTC_f402e]
+  ignore line: [/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f402e.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/cc     -v -rdynamic CMakeFiles/cmTC_f402e.dir/CMakeCCompilerABI.c.o  -o cmTC_f402e ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/bin/cc]
+  ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper]
+  ignore line: [Target: x86_64-linux-gnu]
+  ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 5.4.0-6ubuntu1~16.04.10' --with-bugurl=file:///usr/share/doc/gcc-5/README.Bugs --enable-languages=c,ada,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-5 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-libmpx --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-5-amd64/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-5-amd64 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-5-amd64 --with-arch-directory=amd64 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-multiarch --disable-werror --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.10) ]
+  ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/]
+  ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-rdynamic' '-o' 'cmTC_f402e' '-mtune=generic' '-march=x86-64']
+  link line: [ /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/cc3zhwOT.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o cmTC_f402e /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. CMakeFiles/cmTC_f402e.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o]
+    arg [/usr/lib/gcc/x86_64-linux-gnu/5/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/cc3zhwOT.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [--sysroot=/] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [--hash-style=gnu] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+    arg [-zrelro] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_f402e] ==> ignore
+    arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o] ==> ignore
+    arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o] ==> ignore
+    arg [/usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o] ==> ignore
+    arg [-L/usr/lib/gcc/x86_64-linux-gnu/5] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/5]
+    arg [-L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu]
+    arg [-L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib]
+    arg [-L/lib/x86_64-linux-gnu] ==> dir [/lib/x86_64-linux-gnu]
+    arg [-L/lib/../lib] ==> dir [/lib/../lib]
+    arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
+    arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
+    arg [-L/usr/lib/gcc/x86_64-linux-gnu/5/../../..] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/5/../../..]
+    arg [CMakeFiles/cmTC_f402e.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [/usr/lib/gcc/x86_64-linux-gnu/5/crtend.o] ==> ignore
+    arg [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o] ==> ignore
+  collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/5] ==> [/usr/lib/gcc/x86_64-linux-gnu/5]
+  collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu] ==> [/usr/lib/x86_64-linux-gnu]
+  collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib] ==> [/usr/lib]
+  collapse library dir [/lib/x86_64-linux-gnu] ==> [/lib/x86_64-linux-gnu]
+  collapse library dir [/lib/../lib] ==> [/lib]
+  collapse library dir [/usr/lib/x86_64-linux-gnu] ==> [/usr/lib/x86_64-linux-gnu]
+  collapse library dir [/usr/lib/../lib] ==> [/usr/lib]
+  collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/5/../../..] ==> [/usr/lib]
+  implicit libs: [gcc;gcc_s;c;gcc;gcc_s]
+  implicit dirs: [/usr/lib/gcc/x86_64-linux-gnu/5;/usr/lib/x86_64-linux-gnu;/usr/lib;/lib/x86_64-linux-gnu;/lib]
+  implicit fwks: []
+
+
+
+
+Detecting C [-std=c11] compiler features compiled with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_ec014/fast"
+/usr/bin/make -f CMakeFiles/cmTC_ec014.dir/build.make CMakeFiles/cmTC_ec014.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ec014.dir/feature_tests.c.o
+/usr/bin/cc   -std=c11 -o CMakeFiles/cmTC_ec014.dir/feature_tests.c.o   -c /root/PoW/external/unbound/CMakeFiles/feature_tests.c
+Linking C executable cmTC_ec014
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ec014.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_ec014.dir/feature_tests.c.o  -o cmTC_ec014 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:1c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c99] compiler features compiled with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_3a7e8/fast"
+/usr/bin/make -f CMakeFiles/cmTC_3a7e8.dir/build.make CMakeFiles/cmTC_3a7e8.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_3a7e8.dir/feature_tests.c.o
+/usr/bin/cc   -std=c99 -o CMakeFiles/cmTC_3a7e8.dir/feature_tests.c.o   -c /root/PoW/external/unbound/CMakeFiles/feature_tests.c
+Linking C executable cmTC_3a7e8
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3a7e8.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_3a7e8.dir/feature_tests.c.o  -o cmTC_3a7e8 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:1c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:1c_variadic_macros
+
+
+Detecting C [-std=c90] compiler features compiled with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_96f2d/fast"
+/usr/bin/make -f CMakeFiles/cmTC_96f2d.dir/build.make CMakeFiles/cmTC_96f2d.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_96f2d.dir/feature_tests.c.o
+/usr/bin/cc   -std=c90 -o CMakeFiles/cmTC_96f2d.dir/feature_tests.c.o   -c /root/PoW/external/unbound/CMakeFiles/feature_tests.c
+Linking C executable cmTC_96f2d
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_96f2d.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_96f2d.dir/feature_tests.c.o  -o cmTC_96f2d 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+    Feature record: C_FEATURE:1c_function_prototypes
+    Feature record: C_FEATURE:0c_restrict
+    Feature record: C_FEATURE:0c_static_assert
+    Feature record: C_FEATURE:0c_variadic_macros
+Determining if the include file pthread.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_1457b/fast"
+/usr/bin/make -f CMakeFiles/cmTC_1457b.dir/build.make CMakeFiles/cmTC_1457b.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_1457b.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_1457b.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_1457b
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1457b.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_1457b.dir/CheckIncludeFile.c.o  -o cmTC_1457b 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function pthread_create exists in the pthread passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_368bb/fast"
+/usr/bin/make -f CMakeFiles/cmTC_368bb.dir/build.make CMakeFiles/cmTC_368bb.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_368bb.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_368bb.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_368bb
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_368bb.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_368bb.dir/CheckFunctionExists.c.o  -o cmTC_368bb -lpthread 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file arpa/inet.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_43662/fast"
+/usr/bin/make -f CMakeFiles/cmTC_43662.dir/build.make CMakeFiles/cmTC_43662.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_43662.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_43662.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_43662
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_43662.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_43662.dir/CheckIncludeFile.c.o  -o cmTC_43662 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file endian.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_4cef8/fast"
+/usr/bin/make -f CMakeFiles/cmTC_4cef8.dir/build.make CMakeFiles/cmTC_4cef8.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4cef8.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_4cef8.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_4cef8
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4cef8.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_4cef8.dir/CheckIncludeFile.c.o  -o cmTC_4cef8 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file dlfcn.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_4d600/fast"
+/usr/bin/make -f CMakeFiles/cmTC_4d600.dir/build.make CMakeFiles/cmTC_4d600.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4d600.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_4d600.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_4d600
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4d600.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_4d600.dir/CheckIncludeFile.c.o  -o cmTC_4d600 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file getopt.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c1be6/fast"
+/usr/bin/make -f CMakeFiles/cmTC_c1be6.dir/build.make CMakeFiles/cmTC_c1be6.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c1be6.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_c1be6.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_c1be6
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c1be6.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_c1be6.dir/CheckIncludeFile.c.o  -o cmTC_c1be6 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file glob.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_0ddc8/fast"
+/usr/bin/make -f CMakeFiles/cmTC_0ddc8.dir/build.make CMakeFiles/cmTC_0ddc8.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_0ddc8.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_0ddc8.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_0ddc8
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0ddc8.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_0ddc8.dir/CheckIncludeFile.c.o  -o cmTC_0ddc8 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file grp.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_82295/fast"
+/usr/bin/make -f CMakeFiles/cmTC_82295.dir/build.make CMakeFiles/cmTC_82295.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_82295.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_82295.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_82295
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_82295.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_82295.dir/CheckIncludeFile.c.o  -o cmTC_82295 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file inttypes.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_1330d/fast"
+/usr/bin/make -f CMakeFiles/cmTC_1330d.dir/build.make CMakeFiles/cmTC_1330d.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_1330d.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_1330d.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_1330d
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1330d.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_1330d.dir/CheckIncludeFile.c.o  -o cmTC_1330d 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file memory.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_9dff2/fast"
+/usr/bin/make -f CMakeFiles/cmTC_9dff2.dir/build.make CMakeFiles/cmTC_9dff2.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_9dff2.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_9dff2.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_9dff2
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9dff2.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_9dff2.dir/CheckIncludeFile.c.o  -o cmTC_9dff2 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file netdb.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_dec88/fast"
+/usr/bin/make -f CMakeFiles/cmTC_dec88.dir/build.make CMakeFiles/cmTC_dec88.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_dec88.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_dec88.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_dec88
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_dec88.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_dec88.dir/CheckIncludeFile.c.o  -o cmTC_dec88 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file netinet/in.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_9bb5d/fast"
+/usr/bin/make -f CMakeFiles/cmTC_9bb5d.dir/build.make CMakeFiles/cmTC_9bb5d.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_9bb5d.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_9bb5d.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_9bb5d
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9bb5d.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_9bb5d.dir/CheckIncludeFile.c.o  -o cmTC_9bb5d 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file pthread.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_02a7e/fast"
+/usr/bin/make -f CMakeFiles/cmTC_02a7e.dir/build.make CMakeFiles/cmTC_02a7e.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_02a7e.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_02a7e.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_02a7e
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_02a7e.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_02a7e.dir/CheckIncludeFile.c.o  -o cmTC_02a7e 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file pwd.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_af592/fast"
+/usr/bin/make -f CMakeFiles/cmTC_af592.dir/build.make CMakeFiles/cmTC_af592.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_af592.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_af592.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_af592
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_af592.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_af592.dir/CheckIncludeFile.c.o  -o cmTC_af592 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file stdarg.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c9413/fast"
+/usr/bin/make -f CMakeFiles/cmTC_c9413.dir/build.make CMakeFiles/cmTC_c9413.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c9413.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_c9413.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_c9413
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c9413.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_c9413.dir/CheckIncludeFile.c.o  -o cmTC_c9413 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file stdbool.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_27f78/fast"
+/usr/bin/make -f CMakeFiles/cmTC_27f78.dir/build.make CMakeFiles/cmTC_27f78.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_27f78.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_27f78.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_27f78
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_27f78.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_27f78.dir/CheckIncludeFile.c.o  -o cmTC_27f78 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file stdint.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_3e7f1/fast"
+/usr/bin/make -f CMakeFiles/cmTC_3e7f1.dir/build.make CMakeFiles/cmTC_3e7f1.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_3e7f1.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_3e7f1.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_3e7f1
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3e7f1.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_3e7f1.dir/CheckIncludeFile.c.o  -o cmTC_3e7f1 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file stdlib.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_b7f08/fast"
+/usr/bin/make -f CMakeFiles/cmTC_b7f08.dir/build.make CMakeFiles/cmTC_b7f08.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b7f08.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_b7f08.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_b7f08
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b7f08.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_b7f08.dir/CheckIncludeFile.c.o  -o cmTC_b7f08 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file strings.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_72327/fast"
+/usr/bin/make -f CMakeFiles/cmTC_72327.dir/build.make CMakeFiles/cmTC_72327.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_72327.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_72327.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_72327
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_72327.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_72327.dir/CheckIncludeFile.c.o  -o cmTC_72327 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file string.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_1a577/fast"
+/usr/bin/make -f CMakeFiles/cmTC_1a577.dir/build.make CMakeFiles/cmTC_1a577.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_1a577.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_1a577.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_1a577
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1a577.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_1a577.dir/CheckIncludeFile.c.o  -o cmTC_1a577 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file sys/param.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_f866e/fast"
+/usr/bin/make -f CMakeFiles/cmTC_f866e.dir/build.make CMakeFiles/cmTC_f866e.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f866e.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_f866e.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_f866e
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f866e.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_f866e.dir/CheckIncludeFile.c.o  -o cmTC_f866e 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file sys/resource.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_fa70b/fast"
+/usr/bin/make -f CMakeFiles/cmTC_fa70b.dir/build.make CMakeFiles/cmTC_fa70b.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_fa70b.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_fa70b.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_fa70b
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_fa70b.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_fa70b.dir/CheckIncludeFile.c.o  -o cmTC_fa70b 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file sys/socket.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_1c062/fast"
+/usr/bin/make -f CMakeFiles/cmTC_1c062.dir/build.make CMakeFiles/cmTC_1c062.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_1c062.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_1c062.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_1c062
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1c062.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_1c062.dir/CheckIncludeFile.c.o  -o cmTC_1c062 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file sys/stat.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_2d9de/fast"
+/usr/bin/make -f CMakeFiles/cmTC_2d9de.dir/build.make CMakeFiles/cmTC_2d9de.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_2d9de.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_2d9de.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_2d9de
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2d9de.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_2d9de.dir/CheckIncludeFile.c.o  -o cmTC_2d9de 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file sys/sysctl.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_4db10/fast"
+/usr/bin/make -f CMakeFiles/cmTC_4db10.dir/build.make CMakeFiles/cmTC_4db10.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4db10.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_4db10.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_4db10
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4db10.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_4db10.dir/CheckIncludeFile.c.o  -o cmTC_4db10 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file sys/types.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_d6dd3/fast"
+/usr/bin/make -f CMakeFiles/cmTC_d6dd3.dir/build.make CMakeFiles/cmTC_d6dd3.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d6dd3.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_d6dd3.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_d6dd3
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d6dd3.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_d6dd3.dir/CheckIncludeFile.c.o  -o cmTC_d6dd3 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file sys/uio.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_51a7c/fast"
+/usr/bin/make -f CMakeFiles/cmTC_51a7c.dir/build.make CMakeFiles/cmTC_51a7c.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_51a7c.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_51a7c.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_51a7c
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_51a7c.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_51a7c.dir/CheckIncludeFile.c.o  -o cmTC_51a7c 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file sys/un.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_0d6b9/fast"
+/usr/bin/make -f CMakeFiles/cmTC_0d6b9.dir/build.make CMakeFiles/cmTC_0d6b9.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_0d6b9.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_0d6b9.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_0d6b9
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0d6b9.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_0d6b9.dir/CheckIncludeFile.c.o  -o cmTC_0d6b9 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file sys/wait.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_ee73b/fast"
+/usr/bin/make -f CMakeFiles/cmTC_ee73b.dir/build.make CMakeFiles/cmTC_ee73b.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ee73b.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_ee73b.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_ee73b
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ee73b.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_ee73b.dir/CheckIncludeFile.c.o  -o cmTC_ee73b 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file syslog.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_9d201/fast"
+/usr/bin/make -f CMakeFiles/cmTC_9d201.dir/build.make CMakeFiles/cmTC_9d201.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_9d201.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_9d201.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_9d201
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9d201.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_9d201.dir/CheckIncludeFile.c.o  -o cmTC_9d201 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file time.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_66f22/fast"
+/usr/bin/make -f CMakeFiles/cmTC_66f22.dir/build.make CMakeFiles/cmTC_66f22.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_66f22.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_66f22.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_66f22
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_66f22.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_66f22.dir/CheckIncludeFile.c.o  -o cmTC_66f22 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file unistd.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_0be95/fast"
+/usr/bin/make -f CMakeFiles/cmTC_0be95.dir/build.make CMakeFiles/cmTC_0be95.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_0be95.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_0be95.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_0be95
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0be95.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_0be95.dir/CheckIncludeFile.c.o  -o cmTC_0be95 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function chown exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_e6fd1/fast"
+/usr/bin/make -f CMakeFiles/cmTC_e6fd1.dir/build.make CMakeFiles/cmTC_e6fd1.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_e6fd1.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=chown   -o CMakeFiles/cmTC_e6fd1.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_e6fd1
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e6fd1.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=chown    -rdynamic CMakeFiles/cmTC_e6fd1.dir/CheckFunctionExists.c.o  -o cmTC_e6fd1 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function chroot exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_489f2/fast"
+/usr/bin/make -f CMakeFiles/cmTC_489f2.dir/build.make CMakeFiles/cmTC_489f2.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_489f2.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=chroot   -o CMakeFiles/cmTC_489f2.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_489f2
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_489f2.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=chroot    -rdynamic CMakeFiles/cmTC_489f2.dir/CheckFunctionExists.c.o  -o cmTC_489f2 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function ctime_r exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_edd8e/fast"
+/usr/bin/make -f CMakeFiles/cmTC_edd8e.dir/build.make CMakeFiles/cmTC_edd8e.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_edd8e.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=ctime_r   -o CMakeFiles/cmTC_edd8e.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_edd8e
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_edd8e.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=ctime_r    -rdynamic CMakeFiles/cmTC_edd8e.dir/CheckFunctionExists.c.o  -o cmTC_edd8e 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function daemon exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_63e34/fast"
+/usr/bin/make -f CMakeFiles/cmTC_63e34.dir/build.make CMakeFiles/cmTC_63e34.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_63e34.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=daemon   -o CMakeFiles/cmTC_63e34.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_63e34
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_63e34.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=daemon    -rdynamic CMakeFiles/cmTC_63e34.dir/CheckFunctionExists.c.o  -o cmTC_63e34 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function endprotoent exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_50117/fast"
+/usr/bin/make -f CMakeFiles/cmTC_50117.dir/build.make CMakeFiles/cmTC_50117.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_50117.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=endprotoent   -o CMakeFiles/cmTC_50117.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_50117
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_50117.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=endprotoent    -rdynamic CMakeFiles/cmTC_50117.dir/CheckFunctionExists.c.o  -o cmTC_50117 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function endservent exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_795fa/fast"
+/usr/bin/make -f CMakeFiles/cmTC_795fa.dir/build.make CMakeFiles/cmTC_795fa.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_795fa.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=endservent   -o CMakeFiles/cmTC_795fa.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_795fa
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_795fa.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=endservent    -rdynamic CMakeFiles/cmTC_795fa.dir/CheckFunctionExists.c.o  -o cmTC_795fa 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function fork exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_17ed6/fast"
+/usr/bin/make -f CMakeFiles/cmTC_17ed6.dir/build.make CMakeFiles/cmTC_17ed6.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_17ed6.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=fork   -o CMakeFiles/cmTC_17ed6.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+<command-line>:0:23: warning: conflicting types for built-in function 'fork'
+/usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c:7:3: note: in expansion of macro 'CHECK_FUNCTION_EXISTS'
+   CHECK_FUNCTION_EXISTS(void);
+   ^
+Linking C executable cmTC_17ed6
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_17ed6.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=fork    -rdynamic CMakeFiles/cmTC_17ed6.dir/CheckFunctionExists.c.o  -o cmTC_17ed6 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function fseeko exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_cfc4c/fast"
+/usr/bin/make -f CMakeFiles/cmTC_cfc4c.dir/build.make CMakeFiles/cmTC_cfc4c.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_cfc4c.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=fseeko   -o CMakeFiles/cmTC_cfc4c.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_cfc4c
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cfc4c.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=fseeko    -rdynamic CMakeFiles/cmTC_cfc4c.dir/CheckFunctionExists.c.o  -o cmTC_cfc4c 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function fsync exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_2af0a/fast"
+/usr/bin/make -f CMakeFiles/cmTC_2af0a.dir/build.make CMakeFiles/cmTC_2af0a.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_2af0a.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=fsync   -o CMakeFiles/cmTC_2af0a.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_2af0a
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2af0a.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=fsync    -rdynamic CMakeFiles/cmTC_2af0a.dir/CheckFunctionExists.c.o  -o cmTC_2af0a 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function getauxval exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_136ee/fast"
+/usr/bin/make -f CMakeFiles/cmTC_136ee.dir/build.make CMakeFiles/cmTC_136ee.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_136ee.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=getauxval   -o CMakeFiles/cmTC_136ee.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_136ee
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_136ee.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=getauxval    -rdynamic CMakeFiles/cmTC_136ee.dir/CheckFunctionExists.c.o  -o cmTC_136ee 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function getpwnam exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_4e047/fast"
+/usr/bin/make -f CMakeFiles/cmTC_4e047.dir/build.make CMakeFiles/cmTC_4e047.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4e047.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=getpwnam   -o CMakeFiles/cmTC_4e047.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_4e047
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4e047.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=getpwnam    -rdynamic CMakeFiles/cmTC_4e047.dir/CheckFunctionExists.c.o  -o cmTC_4e047 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function getrlimit exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_891ba/fast"
+/usr/bin/make -f CMakeFiles/cmTC_891ba.dir/build.make CMakeFiles/cmTC_891ba.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_891ba.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=getrlimit   -o CMakeFiles/cmTC_891ba.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_891ba
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_891ba.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=getrlimit    -rdynamic CMakeFiles/cmTC_891ba.dir/CheckFunctionExists.c.o  -o cmTC_891ba 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function glob exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_91dfe/fast"
+/usr/bin/make -f CMakeFiles/cmTC_91dfe.dir/build.make CMakeFiles/cmTC_91dfe.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_91dfe.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=glob   -o CMakeFiles/cmTC_91dfe.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_91dfe
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_91dfe.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=glob    -rdynamic CMakeFiles/cmTC_91dfe.dir/CheckFunctionExists.c.o  -o cmTC_91dfe 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function gmtime_r exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_19504/fast"
+/usr/bin/make -f CMakeFiles/cmTC_19504.dir/build.make CMakeFiles/cmTC_19504.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_19504.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=gmtime_r   -o CMakeFiles/cmTC_19504.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_19504
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_19504.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=gmtime_r    -rdynamic CMakeFiles/cmTC_19504.dir/CheckFunctionExists.c.o  -o cmTC_19504 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function fcntl exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_90c7c/fast"
+/usr/bin/make -f CMakeFiles/cmTC_90c7c.dir/build.make CMakeFiles/cmTC_90c7c.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_90c7c.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=fcntl   -o CMakeFiles/cmTC_90c7c.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_90c7c
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_90c7c.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=fcntl    -rdynamic CMakeFiles/cmTC_90c7c.dir/CheckFunctionExists.c.o  -o cmTC_90c7c 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function inet_aton exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_e1cb1/fast"
+/usr/bin/make -f CMakeFiles/cmTC_e1cb1.dir/build.make CMakeFiles/cmTC_e1cb1.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_e1cb1.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=inet_aton   -o CMakeFiles/cmTC_e1cb1.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_e1cb1
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e1cb1.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=inet_aton    -rdynamic CMakeFiles/cmTC_e1cb1.dir/CheckFunctionExists.c.o  -o cmTC_e1cb1 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function inet_ntop exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_b6db8/fast"
+/usr/bin/make -f CMakeFiles/cmTC_b6db8.dir/build.make CMakeFiles/cmTC_b6db8.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b6db8.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=inet_ntop   -o CMakeFiles/cmTC_b6db8.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_b6db8
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b6db8.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=inet_ntop    -rdynamic CMakeFiles/cmTC_b6db8.dir/CheckFunctionExists.c.o  -o cmTC_b6db8 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function inet_pton exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_02ab4/fast"
+/usr/bin/make -f CMakeFiles/cmTC_02ab4.dir/build.make CMakeFiles/cmTC_02ab4.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_02ab4.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=inet_pton   -o CMakeFiles/cmTC_02ab4.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_02ab4
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_02ab4.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=inet_pton    -rdynamic CMakeFiles/cmTC_02ab4.dir/CheckFunctionExists.c.o  -o cmTC_02ab4 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function initgroups exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_d1033/fast"
+/usr/bin/make -f CMakeFiles/cmTC_d1033.dir/build.make CMakeFiles/cmTC_d1033.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d1033.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=initgroups   -o CMakeFiles/cmTC_d1033.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_d1033
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d1033.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=initgroups    -rdynamic CMakeFiles/cmTC_d1033.dir/CheckFunctionExists.c.o  -o cmTC_d1033 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function isblank exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_1d6fa/fast"
+/usr/bin/make -f CMakeFiles/cmTC_1d6fa.dir/build.make CMakeFiles/cmTC_1d6fa.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_1d6fa.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=isblank   -o CMakeFiles/cmTC_1d6fa.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+<command-line>:0:23: warning: conflicting types for built-in function 'isblank'
+/usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c:7:3: note: in expansion of macro 'CHECK_FUNCTION_EXISTS'
+   CHECK_FUNCTION_EXISTS(void);
+   ^
+Linking C executable cmTC_1d6fa
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1d6fa.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=isblank    -rdynamic CMakeFiles/cmTC_1d6fa.dir/CheckFunctionExists.c.o  -o cmTC_1d6fa 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function kill exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c0af6/fast"
+/usr/bin/make -f CMakeFiles/cmTC_c0af6.dir/build.make CMakeFiles/cmTC_c0af6.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c0af6.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=kill   -o CMakeFiles/cmTC_c0af6.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_c0af6
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c0af6.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=kill    -rdynamic CMakeFiles/cmTC_c0af6.dir/CheckFunctionExists.c.o  -o cmTC_c0af6 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function localtime_r exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_65743/fast"
+/usr/bin/make -f CMakeFiles/cmTC_65743.dir/build.make CMakeFiles/cmTC_65743.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_65743.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=localtime_r   -o CMakeFiles/cmTC_65743.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_65743
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_65743.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=localtime_r    -rdynamic CMakeFiles/cmTC_65743.dir/CheckFunctionExists.c.o  -o cmTC_65743 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function malloc exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_6802c/fast"
+/usr/bin/make -f CMakeFiles/cmTC_6802c.dir/build.make CMakeFiles/cmTC_6802c.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_6802c.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=malloc   -o CMakeFiles/cmTC_6802c.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+<command-line>:0:23: warning: conflicting types for built-in function 'malloc'
+/usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c:7:3: note: in expansion of macro 'CHECK_FUNCTION_EXISTS'
+   CHECK_FUNCTION_EXISTS(void);
+   ^
+Linking C executable cmTC_6802c
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6802c.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=malloc    -rdynamic CMakeFiles/cmTC_6802c.dir/CheckFunctionExists.c.o  -o cmTC_6802c 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function memmove exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c43f5/fast"
+/usr/bin/make -f CMakeFiles/cmTC_c43f5.dir/build.make CMakeFiles/cmTC_c43f5.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c43f5.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=memmove   -o CMakeFiles/cmTC_c43f5.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+<command-line>:0:23: warning: conflicting types for built-in function 'memmove'
+/usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c:7:3: note: in expansion of macro 'CHECK_FUNCTION_EXISTS'
+   CHECK_FUNCTION_EXISTS(void);
+   ^
+Linking C executable cmTC_c43f5
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c43f5.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=memmove    -rdynamic CMakeFiles/cmTC_c43f5.dir/CheckFunctionExists.c.o  -o cmTC_c43f5 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function random exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_45265/fast"
+/usr/bin/make -f CMakeFiles/cmTC_45265.dir/build.make CMakeFiles/cmTC_45265.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_45265.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=random   -o CMakeFiles/cmTC_45265.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_45265
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_45265.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=random    -rdynamic CMakeFiles/cmTC_45265.dir/CheckFunctionExists.c.o  -o cmTC_45265 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function recvmsg exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_ed6c8/fast"
+/usr/bin/make -f CMakeFiles/cmTC_ed6c8.dir/build.make CMakeFiles/cmTC_ed6c8.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ed6c8.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=recvmsg   -o CMakeFiles/cmTC_ed6c8.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_ed6c8
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ed6c8.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=recvmsg    -rdynamic CMakeFiles/cmTC_ed6c8.dir/CheckFunctionExists.c.o  -o cmTC_ed6c8 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function sbrk exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_d80b5/fast"
+/usr/bin/make -f CMakeFiles/cmTC_d80b5.dir/build.make CMakeFiles/cmTC_d80b5.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d80b5.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=sbrk   -o CMakeFiles/cmTC_d80b5.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_d80b5
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d80b5.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=sbrk    -rdynamic CMakeFiles/cmTC_d80b5.dir/CheckFunctionExists.c.o  -o cmTC_d80b5 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function sendmsg exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_58bfe/fast"
+/usr/bin/make -f CMakeFiles/cmTC_58bfe.dir/build.make CMakeFiles/cmTC_58bfe.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_58bfe.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=sendmsg   -o CMakeFiles/cmTC_58bfe.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_58bfe
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_58bfe.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=sendmsg    -rdynamic CMakeFiles/cmTC_58bfe.dir/CheckFunctionExists.c.o  -o cmTC_58bfe 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function setregid exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_ab197/fast"
+/usr/bin/make -f CMakeFiles/cmTC_ab197.dir/build.make CMakeFiles/cmTC_ab197.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ab197.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=setregid   -o CMakeFiles/cmTC_ab197.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_ab197
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ab197.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=setregid    -rdynamic CMakeFiles/cmTC_ab197.dir/CheckFunctionExists.c.o  -o cmTC_ab197 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function setresgid exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_b4cf3/fast"
+/usr/bin/make -f CMakeFiles/cmTC_b4cf3.dir/build.make CMakeFiles/cmTC_b4cf3.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b4cf3.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=setresgid   -o CMakeFiles/cmTC_b4cf3.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_b4cf3
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b4cf3.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=setresgid    -rdynamic CMakeFiles/cmTC_b4cf3.dir/CheckFunctionExists.c.o  -o cmTC_b4cf3 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function setresuid exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_40fdb/fast"
+/usr/bin/make -f CMakeFiles/cmTC_40fdb.dir/build.make CMakeFiles/cmTC_40fdb.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_40fdb.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=setresuid   -o CMakeFiles/cmTC_40fdb.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_40fdb
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_40fdb.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=setresuid    -rdynamic CMakeFiles/cmTC_40fdb.dir/CheckFunctionExists.c.o  -o cmTC_40fdb 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function setreuid exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_f87df/fast"
+/usr/bin/make -f CMakeFiles/cmTC_f87df.dir/build.make CMakeFiles/cmTC_f87df.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f87df.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=setreuid   -o CMakeFiles/cmTC_f87df.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_f87df
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f87df.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=setreuid    -rdynamic CMakeFiles/cmTC_f87df.dir/CheckFunctionExists.c.o  -o cmTC_f87df 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function setrlimit exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_22083/fast"
+/usr/bin/make -f CMakeFiles/cmTC_22083.dir/build.make CMakeFiles/cmTC_22083.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_22083.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=setrlimit   -o CMakeFiles/cmTC_22083.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_22083
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_22083.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=setrlimit    -rdynamic CMakeFiles/cmTC_22083.dir/CheckFunctionExists.c.o  -o cmTC_22083 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function setsid exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_1247b/fast"
+/usr/bin/make -f CMakeFiles/cmTC_1247b.dir/build.make CMakeFiles/cmTC_1247b.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_1247b.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=setsid   -o CMakeFiles/cmTC_1247b.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_1247b
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1247b.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=setsid    -rdynamic CMakeFiles/cmTC_1247b.dir/CheckFunctionExists.c.o  -o cmTC_1247b 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function sigprocmask exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_286f0/fast"
+/usr/bin/make -f CMakeFiles/cmTC_286f0.dir/build.make CMakeFiles/cmTC_286f0.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_286f0.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=sigprocmask   -o CMakeFiles/cmTC_286f0.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_286f0
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_286f0.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=sigprocmask    -rdynamic CMakeFiles/cmTC_286f0.dir/CheckFunctionExists.c.o  -o cmTC_286f0 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function sleep exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_7a035/fast"
+/usr/bin/make -f CMakeFiles/cmTC_7a035.dir/build.make CMakeFiles/cmTC_7a035.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_7a035.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=sleep   -o CMakeFiles/cmTC_7a035.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_7a035
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7a035.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=sleep    -rdynamic CMakeFiles/cmTC_7a035.dir/CheckFunctionExists.c.o  -o cmTC_7a035 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function snprintf exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_f3c9b/fast"
+/usr/bin/make -f CMakeFiles/cmTC_f3c9b.dir/build.make CMakeFiles/cmTC_f3c9b.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f3c9b.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=snprintf   -o CMakeFiles/cmTC_f3c9b.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+<command-line>:0:23: warning: conflicting types for built-in function 'snprintf'
+/usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c:7:3: note: in expansion of macro 'CHECK_FUNCTION_EXISTS'
+   CHECK_FUNCTION_EXISTS(void);
+   ^
+Linking C executable cmTC_f3c9b
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f3c9b.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=snprintf    -rdynamic CMakeFiles/cmTC_f3c9b.dir/CheckFunctionExists.c.o  -o cmTC_f3c9b 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function socketpair exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c33c3/fast"
+/usr/bin/make -f CMakeFiles/cmTC_c33c3.dir/build.make CMakeFiles/cmTC_c33c3.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c33c3.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=socketpair   -o CMakeFiles/cmTC_c33c3.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_c33c3
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c33c3.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=socketpair    -rdynamic CMakeFiles/cmTC_c33c3.dir/CheckFunctionExists.c.o  -o cmTC_c33c3 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function srandom exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_daaa4/fast"
+/usr/bin/make -f CMakeFiles/cmTC_daaa4.dir/build.make CMakeFiles/cmTC_daaa4.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_daaa4.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=srandom   -o CMakeFiles/cmTC_daaa4.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_daaa4
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_daaa4.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=srandom    -rdynamic CMakeFiles/cmTC_daaa4.dir/CheckFunctionExists.c.o  -o cmTC_daaa4 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function strsep exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_a48d3/fast"
+/usr/bin/make -f CMakeFiles/cmTC_a48d3.dir/build.make CMakeFiles/cmTC_a48d3.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a48d3.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=strsep   -o CMakeFiles/cmTC_a48d3.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_a48d3
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a48d3.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=strsep    -rdynamic CMakeFiles/cmTC_a48d3.dir/CheckFunctionExists.c.o  -o cmTC_a48d3 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function strftime exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_5e513/fast"
+/usr/bin/make -f CMakeFiles/cmTC_5e513.dir/build.make CMakeFiles/cmTC_5e513.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_5e513.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=strftime   -o CMakeFiles/cmTC_5e513.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+<command-line>:0:23: warning: conflicting types for built-in function 'strftime'
+/usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c:7:3: note: in expansion of macro 'CHECK_FUNCTION_EXISTS'
+   CHECK_FUNCTION_EXISTS(void);
+   ^
+Linking C executable cmTC_5e513
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5e513.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=strftime    -rdynamic CMakeFiles/cmTC_5e513.dir/CheckFunctionExists.c.o  -o cmTC_5e513 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function strptime exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_d0229/fast"
+/usr/bin/make -f CMakeFiles/cmTC_d0229.dir/build.make CMakeFiles/cmTC_d0229.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d0229.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=strptime   -o CMakeFiles/cmTC_d0229.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_d0229
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d0229.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=strptime    -rdynamic CMakeFiles/cmTC_d0229.dir/CheckFunctionExists.c.o  -o cmTC_d0229 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function tzset exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_bd5ce/fast"
+/usr/bin/make -f CMakeFiles/cmTC_bd5ce.dir/build.make CMakeFiles/cmTC_bd5ce.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_bd5ce.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=tzset   -o CMakeFiles/cmTC_bd5ce.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_bd5ce
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_bd5ce.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=tzset    -rdynamic CMakeFiles/cmTC_bd5ce.dir/CheckFunctionExists.c.o  -o cmTC_bd5ce 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function usleep exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_eab91/fast"
+/usr/bin/make -f CMakeFiles/cmTC_eab91.dir/build.make CMakeFiles/cmTC_eab91.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_eab91.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=usleep   -o CMakeFiles/cmTC_eab91.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_eab91
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_eab91.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=usleep    -rdynamic CMakeFiles/cmTC_eab91.dir/CheckFunctionExists.c.o  -o cmTC_eab91 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the function writev exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c752c/fast"
+/usr/bin/make -f CMakeFiles/cmTC_c752c.dir/build.make CMakeFiles/cmTC_c752c.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c752c.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=writev   -o CMakeFiles/cmTC_c752c.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.12/Modules/CheckFunctionExists.c
+Linking C executable cmTC_c752c
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c752c.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=writev    -rdynamic CMakeFiles/cmTC_c752c.dir/CheckFunctionExists.c.o  -o cmTC_c752c 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the getaddrinfo exist passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_a25e8/fast"
+/usr/bin/make -f CMakeFiles/cmTC_a25e8.dir/build.make CMakeFiles/cmTC_a25e8.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a25e8.dir/CheckSymbolExists.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_a25e8.dir/CheckSymbolExists.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_a25e8
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a25e8.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_a25e8.dir/CheckSymbolExists.c.o  -o cmTC_a25e8 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+File /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <netdb.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef getaddrinfo
+  return ((int*)(&getaddrinfo))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the include file stddef.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_d2d1d/fast"
+/usr/bin/make -f CMakeFiles/cmTC_d2d1d.dir/build.make CMakeFiles/cmTC_d2d1d.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d2d1d.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_d2d1d.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_d2d1d
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d2d1d.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_d2d1d.dir/CheckIncludeFile.c.o  -o cmTC_d2d1d 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining size of time_t passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_ce3c1/fast"
+/usr/bin/make -f CMakeFiles/cmTC_ce3c1.dir/build.make CMakeFiles/cmTC_ce3c1.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ce3c1.dir/SIZEOF_TIME_T.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_ce3c1.dir/SIZEOF_TIME_T.c.o   -c /root/PoW/external/unbound/CMakeFiles/CheckTypeSize/SIZEOF_TIME_T.c
+Linking C executable cmTC_ce3c1
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ce3c1.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_ce3c1.dir/SIZEOF_TIME_T.c.o  -o cmTC_ce3c1 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining size of gid_t passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_4c95c/fast"
+/usr/bin/make -f CMakeFiles/cmTC_4c95c.dir/build.make CMakeFiles/cmTC_4c95c.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4c95c.dir/gid_t.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_4c95c.dir/gid_t.c.o   -c /root/PoW/external/unbound/CMakeFiles/CheckTypeSize/gid_t.c
+Linking C executable cmTC_4c95c
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4c95c.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_4c95c.dir/gid_t.c.o  -o cmTC_4c95c 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining size of in_addr_t passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_66b8b/fast"
+/usr/bin/make -f CMakeFiles/cmTC_66b8b.dir/build.make CMakeFiles/cmTC_66b8b.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_66b8b.dir/in_addr_t.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_66b8b.dir/in_addr_t.c.o   -c /root/PoW/external/unbound/CMakeFiles/CheckTypeSize/in_addr_t.c
+Linking C executable cmTC_66b8b
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_66b8b.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_66b8b.dir/in_addr_t.c.o  -o cmTC_66b8b 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining size of in_port_t passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_56e3c/fast"
+/usr/bin/make -f CMakeFiles/cmTC_56e3c.dir/build.make CMakeFiles/cmTC_56e3c.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_56e3c.dir/in_port_t.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_56e3c.dir/in_port_t.c.o   -c /root/PoW/external/unbound/CMakeFiles/CheckTypeSize/in_port_t.c
+Linking C executable cmTC_56e3c
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_56e3c.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_56e3c.dir/in_port_t.c.o  -o cmTC_56e3c 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining size of int16_t passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_def6d/fast"
+/usr/bin/make -f CMakeFiles/cmTC_def6d.dir/build.make CMakeFiles/cmTC_def6d.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_def6d.dir/int16_t.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_def6d.dir/int16_t.c.o   -c /root/PoW/external/unbound/CMakeFiles/CheckTypeSize/int16_t.c
+Linking C executable cmTC_def6d
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_def6d.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_def6d.dir/int16_t.c.o  -o cmTC_def6d 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining size of int32_t passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_a7159/fast"
+/usr/bin/make -f CMakeFiles/cmTC_a7159.dir/build.make CMakeFiles/cmTC_a7159.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a7159.dir/int32_t.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_a7159.dir/int32_t.c.o   -c /root/PoW/external/unbound/CMakeFiles/CheckTypeSize/int32_t.c
+Linking C executable cmTC_a7159
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a7159.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_a7159.dir/int32_t.c.o  -o cmTC_a7159 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining size of int64_t passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_5e114/fast"
+/usr/bin/make -f CMakeFiles/cmTC_5e114.dir/build.make CMakeFiles/cmTC_5e114.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_5e114.dir/int64_t.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_5e114.dir/int64_t.c.o   -c /root/PoW/external/unbound/CMakeFiles/CheckTypeSize/int64_t.c
+Linking C executable cmTC_5e114
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5e114.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_5e114.dir/int64_t.c.o  -o cmTC_5e114 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining size of int8_t passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_fb246/fast"
+/usr/bin/make -f CMakeFiles/cmTC_fb246.dir/build.make CMakeFiles/cmTC_fb246.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_fb246.dir/int8_t.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_fb246.dir/int8_t.c.o   -c /root/PoW/external/unbound/CMakeFiles/CheckTypeSize/int8_t.c
+Linking C executable cmTC_fb246
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_fb246.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_fb246.dir/int8_t.c.o  -o cmTC_fb246 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining size of pid_t passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_d41c7/fast"
+/usr/bin/make -f CMakeFiles/cmTC_d41c7.dir/build.make CMakeFiles/cmTC_d41c7.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d41c7.dir/pid_t.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_d41c7.dir/pid_t.c.o   -c /root/PoW/external/unbound/CMakeFiles/CheckTypeSize/pid_t.c
+Linking C executable cmTC_d41c7
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d41c7.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_d41c7.dir/pid_t.c.o  -o cmTC_d41c7 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining size of rlim_t passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_67440/fast"
+/usr/bin/make -f CMakeFiles/cmTC_67440.dir/build.make CMakeFiles/cmTC_67440.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_67440.dir/rlim_t.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_67440.dir/rlim_t.c.o   -c /root/PoW/external/unbound/CMakeFiles/CheckTypeSize/rlim_t.c
+Linking C executable cmTC_67440
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_67440.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_67440.dir/rlim_t.c.o  -o cmTC_67440 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining size of ssize_t passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_fc07b/fast"
+/usr/bin/make -f CMakeFiles/cmTC_fc07b.dir/build.make CMakeFiles/cmTC_fc07b.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_fc07b.dir/ssize_t.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_fc07b.dir/ssize_t.c.o   -c /root/PoW/external/unbound/CMakeFiles/CheckTypeSize/ssize_t.c
+Linking C executable cmTC_fc07b
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_fc07b.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_fc07b.dir/ssize_t.c.o  -o cmTC_fc07b 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining size of uid_t passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_2dd91/fast"
+/usr/bin/make -f CMakeFiles/cmTC_2dd91.dir/build.make CMakeFiles/cmTC_2dd91.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_2dd91.dir/uid_t.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_2dd91.dir/uid_t.c.o   -c /root/PoW/external/unbound/CMakeFiles/CheckTypeSize/uid_t.c
+Linking C executable cmTC_2dd91
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2dd91.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_2dd91.dir/uid_t.c.o  -o cmTC_2dd91 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining size of uint16_t passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_03a91/fast"
+/usr/bin/make -f CMakeFiles/cmTC_03a91.dir/build.make CMakeFiles/cmTC_03a91.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_03a91.dir/uint16_t.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_03a91.dir/uint16_t.c.o   -c /root/PoW/external/unbound/CMakeFiles/CheckTypeSize/uint16_t.c
+Linking C executable cmTC_03a91
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_03a91.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_03a91.dir/uint16_t.c.o  -o cmTC_03a91 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining size of uint32_t passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_489de/fast"
+/usr/bin/make -f CMakeFiles/cmTC_489de.dir/build.make CMakeFiles/cmTC_489de.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_489de.dir/uint32_t.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_489de.dir/uint32_t.c.o   -c /root/PoW/external/unbound/CMakeFiles/CheckTypeSize/uint32_t.c
+Linking C executable cmTC_489de
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_489de.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_489de.dir/uint32_t.c.o  -o cmTC_489de 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining size of uint64_t passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_f32a3/fast"
+/usr/bin/make -f CMakeFiles/cmTC_f32a3.dir/build.make CMakeFiles/cmTC_f32a3.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f32a3.dir/uint64_t.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_f32a3.dir/uint64_t.c.o   -c /root/PoW/external/unbound/CMakeFiles/CheckTypeSize/uint64_t.c
+Linking C executable cmTC_f32a3
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f32a3.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_f32a3.dir/uint64_t.c.o  -o cmTC_f32a3 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining size of uint8_t passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_037da/fast"
+/usr/bin/make -f CMakeFiles/cmTC_037da.dir/build.make CMakeFiles/cmTC_037da.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_037da.dir/uint8_t.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_037da.dir/uint8_t.c.o   -c /root/PoW/external/unbound/CMakeFiles/CheckTypeSize/uint8_t.c
+Linking C executable cmTC_037da
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_037da.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_037da.dir/uint8_t.c.o  -o cmTC_037da 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file openssl/conf.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_1427d/fast"
+/usr/bin/make -f CMakeFiles/cmTC_1427d.dir/build.make CMakeFiles/cmTC_1427d.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_1427d.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_1427d.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_1427d
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1427d.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_1427d.dir/CheckIncludeFile.c.o  -o cmTC_1427d 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file openssl/engine.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_b0385/fast"
+/usr/bin/make -f CMakeFiles/cmTC_b0385.dir/build.make CMakeFiles/cmTC_b0385.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b0385.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_b0385.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_b0385
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b0385.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_b0385.dir/CheckIncludeFile.c.o  -o cmTC_b0385 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file openssl/err.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_ced2c/fast"
+/usr/bin/make -f CMakeFiles/cmTC_ced2c.dir/build.make CMakeFiles/cmTC_ced2c.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ced2c.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_ced2c.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_ced2c
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ced2c.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_ced2c.dir/CheckIncludeFile.c.o  -o cmTC_ced2c 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file openssl/rand.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_4f31d/fast"
+/usr/bin/make -f CMakeFiles/cmTC_4f31d.dir/build.make CMakeFiles/cmTC_4f31d.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4f31d.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_4f31d.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_4f31d
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4f31d.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_4f31d.dir/CheckIncludeFile.c.o  -o cmTC_4f31d 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the include file openssl/ssl.h exists passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_aef68/fast"
+/usr/bin/make -f CMakeFiles/cmTC_aef68.dir/build.make CMakeFiles/cmTC_aef68.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_aef68.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_aef68.dir/CheckIncludeFile.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_aef68
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_aef68.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_aef68.dir/CheckIncludeFile.c.o  -o cmTC_aef68 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+
+Determining if the NID_secp384r1 exist passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_75205/fast"
+/usr/bin/make -f CMakeFiles/cmTC_75205.dir/build.make CMakeFiles/cmTC_75205.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_75205.dir/CheckSymbolExists.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_75205.dir/CheckSymbolExists.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_75205
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_75205.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_75205.dir/CheckSymbolExists.c.o  -o cmTC_75205 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+File /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <openssl/evp.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef NID_secp384r1
+  return ((int*)(&NID_secp384r1))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the NID_X9_62_prime256v1 exist passed with the following output:
+Change Dir: /root/PoW/external/unbound/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_f9cf1/fast"
+/usr/bin/make -f CMakeFiles/cmTC_f9cf1.dir/build.make CMakeFiles/cmTC_f9cf1.dir/build
+make[1]: Entering directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f9cf1.dir/CheckSymbolExists.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_f9cf1.dir/CheckSymbolExists.c.o   -c /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_f9cf1
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f9cf1.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_f9cf1.dir/CheckSymbolExists.c.o  -o cmTC_f9cf1 
+make[1]: Leaving directory '/root/PoW/external/unbound/CMakeFiles/CMakeTmp'
+
+File /root/PoW/external/unbound/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <openssl/evp.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef NID_X9_62_prime256v1
+  return ((int*)(&NID_X9_62_prime256v1))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+

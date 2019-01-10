@@ -38,7 +38,7 @@ extern "C" {
 #define LDNS_KEY_REVOKE_KEY 0x0080 /* used to revoke KSK, rfc 5011 */
 
 /* The first fields are contiguous and can be referenced instantly */
-#define LDNS_RDATA_FIELD_DESCRIPTORS_COMMON 258
+#define LDNS_RDATA_FIELD_DESCRIPTORS_COMMON 259
 
 /** lookuptable for rr classes  */
 extern struct sldns_struct_lookup_table* sldns_rr_classes;
@@ -226,6 +226,7 @@ enum sldns_enum_rr_type
 	LDNS_RR_TYPE_ANY = 255,
 	LDNS_RR_TYPE_URI = 256, /* RFC 7553 */
 	LDNS_RR_TYPE_CAA = 257, /* RFC 6844 */
+	LDNS_RR_TYPE_AVC = 258,
 
 	/** DNSSEC Trust Authorities */
 	LDNS_RR_TYPE_TA = 32768,
@@ -330,13 +331,13 @@ enum sldns_enum_rdf_type
         LDNS_RDF_TYPE_NSEC3_NEXT_OWNER,
 
         /** 4 shorts represented as 4 * 16 bit hex numbers
-         *  seperated by colons. For NID and L64.
+         *  separated by colons. For NID and L64.
          */
         LDNS_RDF_TYPE_ILNP64,
 
-        /** 6 * 8 bit hex numbers seperated by dashes. For EUI48. */
+        /** 6 * 8 bit hex numbers separated by dashes. For EUI48. */
         LDNS_RDF_TYPE_EUI48,
-        /** 8 * 8 bit hex numbers seperated by dashes. For EUI64. */
+        /** 8 * 8 bit hex numbers separated by dashes. For EUI64. */
         LDNS_RDF_TYPE_EUI64,
 
         /** A non-zero sequence of US-ASCII letters and numbers in lower case.
@@ -349,6 +350,9 @@ enum sldns_enum_rdf_type
          * For CAA, URI.
          */
         LDNS_RDF_TYPE_LONG_STR,
+
+	/** TSIG extended 16bit error value */
+	LDNS_RDF_TYPE_TSIGERROR,
 
         /* Aliases */
         LDNS_RDF_TYPE_BITMAP = LDNS_RDF_TYPE_NSEC
@@ -429,6 +433,15 @@ enum sldns_enum_edns_option
 typedef enum sldns_enum_edns_option sldns_edns_option;
 
 #define LDNS_EDNS_MASK_DO_BIT 0x8000
+
+/** TSIG and TKEY extended rcodes (16bit), 0-15 are the normal rcodes. */
+#define LDNS_TSIG_ERROR_NOERROR  0
+#define LDNS_TSIG_ERROR_BADSIG   16
+#define LDNS_TSIG_ERROR_BADKEY   17
+#define LDNS_TSIG_ERROR_BADTIME  18
+#define LDNS_TSIG_ERROR_BADMODE  19
+#define LDNS_TSIG_ERROR_BADNAME  20
+#define LDNS_TSIG_ERROR_BADALG   21
 
 /**
  * Contains all information about resource record types.

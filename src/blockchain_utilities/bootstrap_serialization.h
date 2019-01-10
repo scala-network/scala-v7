@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The MoNerO Project
 //
 // All rights reserved.
 //
@@ -70,14 +70,14 @@ namespace cryptonote
     {
       cryptonote::block block;
       std::vector<transaction> txs;
-      size_t block_size;
+      size_t block_weight;
       difficulty_type cumulative_difficulty;
       uint64_t coins_generated;
 
       BEGIN_SERIALIZE()
         FIELD(block)
         FIELD(txs)
-        VARINT_FIELD(block_size)
+        VARINT_FIELD(block_weight)
         VARINT_FIELD(cumulative_difficulty)
         VARINT_FIELD(coins_generated)
       END_SERIALIZE()

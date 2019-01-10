@@ -540,6 +540,7 @@ dns64_operate(struct module_qstate* qstate, enum module_ev event, int id,
 		case module_event_new:
 			/* Tag this query as being new and fall through. */
 			qstate->minfo[id] = (void*)DNS64_NEW_QUERY;
+  			/* fallthrough */
 		case module_event_pass:
 			qstate->ext_state[id] = handle_event_pass(qstate, id);
 			break;
@@ -790,6 +791,10 @@ dns64_inform_super(struct module_qstate* qstate, int id,
 	    || !reply_find_answer_rrset(&qstate->qinfo,
 					qstate->return_msg->rep))
 		return;
+
+	/* Use return code from A query in response to client. */
+	if (super->return_rcode != LDNS_RCODE_NOERROR)
+		super->return_rcode = qstate->return_rcode;
 
 	/* Generate a response suitable for the original query. */
 	if (qstate->qinfo.qtype == LDNS_RR_TYPE_A) {

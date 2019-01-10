@@ -403,6 +403,8 @@ config_tag_test(void)
 }
 	
 #include "util/rtt.h"
+#include "util/timehist.h"
+#include "libunbound/unbound.h"
 /** test RTT code */
 static void
 rtt_test(void)
@@ -426,10 +428,11 @@ rtt_test(void)
 		unit_assert( rtt_timeout(&r) > RTT_MIN_TIMEOUT-1);
 		unit_assert( rtt_timeout(&r) < RTT_MAX_TIMEOUT+1);
 	}
+	/* must be the same, timehist bucket is used in stats */
+	unit_assert(UB_STATS_BUCKET_NUM == NUM_BUCKETS_HIST);
 }
 
 #include "services/cache/infra.h"
-#include "util/config_file.h"
 
 /* lookup and get key and data structs easily */
 static struct infra_data* infra_lookup_host(struct infra_cache* infra,
@@ -623,6 +626,9 @@ respip_conf_actions_test(void)
 	}
 	unit_assert(respip_global_apply_cfg(set, &cfg));
 	verify_respip_set_actions(set, config_response_ip, clen);
+
+	respip_set_delete(set);
+	config_deldblstrlist(cfg.respip_actions);
 }
 
 /** Per-view respip actions test; apply raw configuration with two views
@@ -690,6 +696,12 @@ respip_view_conf_actions_test(void)
 	unit_assert(v);
 	verify_respip_set_actions(v->respip_set, config_response_ip_view2, clen2);
 	lock_rw_unlock(&v->lock);
+
+	views_delete(views);
+	free(cv1->name);
+	free(cv1);
+	free(cv2->name);
+	free(cv2);
 }
 
 typedef struct addr_data {char* ip; char* data;} addr_data_t;
@@ -774,6 +786,8 @@ respip_conf_data_test(void)
 	verify_rrset(set, "192.0.1.0/24", "11.12.13.14", 1, LDNS_RR_TYPE_A);
 	verify_rrset(set, "192.0.2.0/24", "www.example.com", 0, LDNS_RR_TYPE_CNAME);
 	verify_rrset(set, "2001:db8:1::/48", "2001:db8:1::2:1", 0, LDNS_RR_TYPE_AAAA);
+
+	respip_set_delete(set);
 }
 
 /** Test per-view respip redirect w/ data directives */
@@ -810,6 +824,11 @@ respip_view_conf_data_test(void)
 		0, LDNS_RR_TYPE_CNAME);
 	verify_rrset(v->respip_set, "2001:db8:1::/48", "2001:db8:1::2:1",
 		0, LDNS_RR_TYPE_AAAA);
+	lock_rw_unlock(&v->lock);
+
+	views_delete(views);
+	free(cv->name);
+	free(cv);
 }
 
 /** respip unit tests */
@@ -865,6 +884,7 @@ main(int argc, char* argv[])
 		fatal_exit("could not init NSS");
 #endif /* HAVE_SSL or HAVE_NSS*/
 	checklock_start();
+	authzone_test();
 	neg_test();
 	rnd_test();
 	respip_test();
@@ -885,6 +905,9 @@ main(int argc, char* argv[])
 #ifdef CLIENT_SUBNET
 	ecs_test();
 #endif /* CLIENT_SUBNET */
+	if(log_get_lock()) {
+		lock_quick_destroy((lock_quick_type*)log_get_lock());
+	}
 	checklock_stop();
 	printf("%d checks ok.\n", testcount);
 #ifdef HAVE_SSL

@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The MoNerO Project
 //
 // All rights reserved.
 //
@@ -35,7 +35,7 @@
 
 using namespace std;
 
-namespace Monero {
+namespace Stellite {
 namespace Utils {
 
 bool isAddressLocal(const std::string &address)
@@ -48,9 +48,17 @@ bool isAddressLocal(const std::string &address)
     }
 }
 
+void onStartup()
+{
+    tools::on_startup();
+#ifdef NDEBUG
+    tools::disable_core_dumps();
+#endif
+}
+
 }
 
 
 } // namespace
 
-namespace Bitmonero = Monero;
+namespace Bitstellite = Stellite;

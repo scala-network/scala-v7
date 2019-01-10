@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, The Monero Project
+# Copyright (c) 2014-2018, The MoNerO Project
 #
 # All rights reserved.
 #
@@ -34,29 +34,30 @@ set(simplewallet_headers)
 set(simplewallet_private_headers
   simplewallet.h)
 
-monero_private_headers(simplewallet
+stellite_private_headers(simplewallet
   ${simplewallet_private_headers})
-monero_add_executable(simplewallet
+stellite_add_executable(simplewallet
   ${simplewallet_sources}
   ${simplewallet_headers}
   ${simplewallet_private_headers})
 target_link_libraries(simplewallet
   PRIVATE
     wallet
-    rpc
+    rpc_base
     cryptonote_core
     cncrypto
     common
     mnemonics
-    p2p
+    ${EPEE_READLINE}
+    version
     ${Boost_CHRONO_LIBRARY}
     ${Boost_PROGRAM_OPTIONS_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}
+    ${ICU_LIBRARIES}
     ${Boost_THREAD_LIBRARY}
     ${CMAKE_THREAD_LIBS_INIT}
+    ${GNU_READLINE_LIBRARY}
     ${EXTRA_LIBRARIES})
-add_dependencies(simplewallet
-  version)
 set_property(TARGET simplewallet
   PROPERTY
     OUTPUT_NAME "stellite-wallet-cli")

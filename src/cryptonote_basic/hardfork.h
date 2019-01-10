@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2014-2018, The MoNerO Project
 // 
 // All rights reserved.
 // 
@@ -46,7 +46,7 @@ namespace cryptonote
 
     static const uint64_t DEFAULT_ORIGINAL_VERSION_TILL_HEIGHT = 0; // <= actual height
     static const time_t DEFAULT_FORKED_TIME = 31557600; // a year in seconds
-    static const time_t DEFAULT_UPDATE_TIME = 31557600;
+    static const time_t DEFAULT_UPDATE_TIME = 31557600 / 2;
     static const uint64_t DEFAULT_WINDOW_SIZE = 10080; // supermajority window check length - a week
     static const uint8_t DEFAULT_THRESHOLD_PERCENT = 80;
 
@@ -79,7 +79,6 @@ namespace cryptonote
      * returns true if no error, false otherwise
      *
      * @param version the major block version for the fork
-     * @param voting_version the minor block version for the fork, used for voting
      * @param height The height the hardfork takes effect
      * @param time Approximate time of the hardfork (seconds since epoch)
      */
@@ -221,6 +220,14 @@ namespace cryptonote
      */
     uint64_t get_window_size() const { return window_size; }
 
+    struct Params {
+      uint8_t version;
+      uint8_t threshold;
+      uint64_t height;
+      time_t time;
+      Params(uint8_t version, uint64_t height, uint8_t threshold, time_t time): version(version), threshold(threshold), height(height), time(time) {}
+    };
+
   private:
 
     uint8_t get_block_version(uint64_t height) const;
@@ -245,13 +252,6 @@ namespace cryptonote
     uint8_t original_version;
     uint64_t original_version_till_height;
 
-    struct Params {
-      uint8_t version;
-      uint8_t threshold;
-      uint64_t height;
-      time_t time;
-      Params(uint8_t version, uint64_t height, uint8_t threshold, time_t time): version(version), threshold(threshold), height(height), time(time) {}
-    };
     std::vector<Params> heights;
 
     std::deque<uint8_t> versions; /* rolling window of the last N blocks' versions */

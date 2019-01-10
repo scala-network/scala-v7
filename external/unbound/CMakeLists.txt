@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, The Monero Project
+# Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
 #
@@ -44,11 +44,19 @@ endif ()
 
 set(RETSIGTYPE void)
 
+if(CMAKE_SYSTEM_NAME MATCHES "(SunOS|Solaris)")
+add_definitions(-D_XOPEN_SOURCE=600)
+else()
 add_definitions(-D_GNU_SOURCE)
+endif()
+add_definitions(-std=c99)
+add_definitions(-fPIC)
 
 option(USE_ECDSA "Use ECDSA algorithms" ON)
 option(USE_SHA2 "Enable SHA2 support" ON)
+option(USE_SHA1 "Enable SHA1 support" ON)
 set(ENABLE_DNSTAP 0)
+set(ENABLE_DNSCRYPT 0)
 set(HAVE_SSL 1)
 if (CMAKE_USE_PTHREADS_INIT AND NOT CMAKE_USE_WIN32_THREADS_INIT)
   set(HAVE_PTHREAD 1)
@@ -60,14 +68,27 @@ if (CMAKE_USE_WIN32_THREADS_INIT)
 else ()
   set(HAVE_WINDOWS_THREADS 0)
 endif ()
+
+# determine if we have libressl
+check_symbol_exists(LIBRESSL_VERSION_TEXT "openssl/opensslv.h" HAVE_LIBRESSL)
+# check if we have found HAVE_DECL_REALLOCARRAY already, so we can safely undefine and redefine it with value 1
+if (HAVE_LIBRESSL AND HAVE_DECL_REALLOCARRAY)
+  unset(HAVE_DECL_REALLOCARRAY CACHE)
+  add_definitions(-DHAVE_DECL_REALLOCARRAY=1)
+endif ()
+
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/config.h")
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/dnstap/dnstap_config.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/dnstap/dnstap_config.h")
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/dnscrypt/dnscrypt_config.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/dnscrypt/dnscrypt_config.h")
 
 set(common_src
+  services/authzone.c
   services/cache/dns.c
   services/cache/infra.c
   services/cache/rrset.c
@@ -200,23 +221,6 @@ if (WIN32)
       iphlpapi
       ws2_32)
 endif ()
-
-if (MINGW)
-  # There is no variable for this (probably due to the fact that the pthread
-  # library is implicit with a link in msys).
-  find_library(win32pthread
-    NAMES libwinpthread-1.dll)
-  foreach (input IN LISTS win32pthread OPENSSL_LIBRARIES)
-    # Copy shared libraries into the build tree so that no PATH manipulation is
-    # necessary.
-    get_filename_component(name "${input}" NAME)
-    configure_file(
-      "${input}"
-      "${CMAKE_BINARY_DIR}/bin/${name}"
-      COPYONLY)
-  endforeach ()
-endif ()
-
 
 if (INSTALL_VENDORED_LIBUNBOUND)
     if(IOS)

@@ -59,8 +59,8 @@ namespace epee
       storage_entry load_storage_entry();
       void read(section& sec);
       void read(std::string& str);
-      void read(array_entry &ae); 
-   private:
+      void read(array_entry &ae);
+    private:
       struct recursuion_limitation_guard
       {
         size_t& m_counter_ref;

@@ -232,24 +232,22 @@ infra_create(struct config_file* cfg)
 	infra->host_ttl = cfg->host_ttl;
 	name_tree_init(&infra->domain_limits);
 	infra_dp_ratelimit = cfg->ratelimit;
-	if(cfg->ratelimit != 0) {
-		infra->domain_rates = slabhash_create(cfg->ratelimit_slabs,
-			INFRA_HOST_STARTSIZE, cfg->ratelimit_size,
-			&rate_sizefunc, &rate_compfunc, &rate_delkeyfunc,
-			&rate_deldatafunc, NULL);
-		if(!infra->domain_rates) {
-			infra_delete(infra);
-			return NULL;
-		}
-		/* insert config data into ratelimits */
-		if(!infra_ratelimit_cfg_insert(infra, cfg)) {
-			infra_delete(infra);
-			return NULL;
-		}
-		name_tree_init_parents(&infra->domain_limits);
+	infra->domain_rates = slabhash_create(cfg->ratelimit_slabs,
+		INFRA_HOST_STARTSIZE, cfg->ratelimit_size,
+		&rate_sizefunc, &rate_compfunc, &rate_delkeyfunc,
+		&rate_deldatafunc, NULL);
+	if(!infra->domain_rates) {
+		infra_delete(infra);
+		return NULL;
 	}
+	/* insert config data into ratelimits */
+	if(!infra_ratelimit_cfg_insert(infra, cfg)) {
+		infra_delete(infra);
+		return NULL;
+	}
+	name_tree_init_parents(&infra->domain_limits);
 	infra_ip_ratelimit = cfg->ip_ratelimit;
-	infra->client_ip_rates = slabhash_create(cfg->ratelimit_slabs,
+	infra->client_ip_rates = slabhash_create(cfg->ip_ratelimit_slabs,
 	    INFRA_HOST_STARTSIZE, cfg->ip_ratelimit_size, &ip_rate_sizefunc,
 	    &ip_rate_compfunc, &ip_rate_delkeyfunc, &ip_rate_deldatafunc, NULL);
 	if(!infra->client_ip_rates) {
@@ -893,6 +891,8 @@ int infra_ratelimit_inc(struct infra_cache* infra, uint8_t* name,
 
 	/* find ratelimit */
 	lim = infra_find_ratelimit(infra, name, namelen);
+	if(!lim)
+		return 1; /* disabled for this domain */
 	
 	/* find or insert ratedata */
 	entry = infra_find_ratedata(infra, name, namelen, 1);
@@ -941,6 +941,8 @@ int infra_ratelimit_exceeded(struct infra_cache* infra, uint8_t* name,
 
 	/* find ratelimit */
 	lim = infra_find_ratelimit(infra, name, namelen);
+	if(!lim)
+		return 0; /* disabled for this domain */
 
 	/* find current rate */
 	entry = infra_find_ratedata(infra, name, namelen, 0);

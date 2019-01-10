@@ -10,7 +10,7 @@ sinclude(dnscrypt/dnscrypt.m4)
 
 # must be numbers. ac_defun because of later processing
 m4_define([VERSION_MAJOR],[1])
-m4_define([VERSION_MINOR],[6])
+m4_define([VERSION_MINOR],[7])
 m4_define([VERSION_MICRO],[3])
 AC_INIT(unbound, m4_defn([VERSION_MAJOR]).m4_defn([VERSION_MINOR]).m4_defn([VERSION_MICRO]), unbound-bugs@nlnetlabs.nl, unbound)
 AC_SUBST(UNBOUND_VERSION_MAJOR, [VERSION_MAJOR])
@@ -18,7 +18,7 @@ AC_SUBST(UNBOUND_VERSION_MINOR, [VERSION_MINOR])
 AC_SUBST(UNBOUND_VERSION_MICRO, [VERSION_MICRO])
 
 LIBUNBOUND_CURRENT=7
-LIBUNBOUND_REVISION=2
+LIBUNBOUND_REVISION=11
 LIBUNBOUND_AGE=5
 # 1.0.0 had 0:12:0
 # 1.0.1 had 0:13:0
@@ -72,6 +72,15 @@ LIBUNBOUND_AGE=5
 # 1.6.1 had 7:0:5 # ub_callback_t typedef renamed to ub_callback_type
 # 1.6.2 had 7:1:5
 # 1.6.3 had 7:2:5
+# 1.6.4 had 7:3:5
+# 1.6.5 had 7:4:5
+# 1.6.6 had 7:5:5
+# 1.6.7 had 7:6:5
+# 1.6.8 had 7:7:5
+# 1.7.0 had 7:8:5
+# 1.7.1 had 7:9:5
+# 1.7.2 had 7:10:5
+# 1.7.3 had 7:11:5
 
 #   Current  -- the number of the binary API that we're implementing
 #   Revision -- which iteration of the implementation of the binary
@@ -87,7 +96,7 @@ LIBUNBOUND_AGE=5
 # Current and Age.  Set Revision to 0, since this is the first
 # implementation of the new API.
 #
-# Otherwise, we're changing the binary API and breaking bakward
+# Otherwise, we're changing the binary API and breaking backward
 # compatibility with old binaries.  Increment Current.  Set Age to 0,
 # since we're backward compatible with no previous APIs.  Set Revision
 # to 0 too.
@@ -109,6 +118,11 @@ case "$prefix" in
 		prefix="/usr/local"
         ;;
 esac
+case "$exec_prefix" in
+        NONE)
+		exec_prefix="$prefix"
+        ;;
+esac
 
 # are we on MinGW?
 if uname -s 2>&1 | grep MINGW32 >/dev/null; then on_mingw="yes"
@@ -120,6 +134,12 @@ fi
 #
 # Determine configuration file
 # the eval is to evaluate shell expansion twice
+UNBOUND_SBIN_DIR=`eval echo "${sbindir}"`
+AC_SUBST(UNBOUND_SBIN_DIR)
+UNBOUND_SYSCONF_DIR=`eval echo "${sysconfdir}"`
+AC_SUBST(UNBOUND_SYSCONF_DIR)
+UNBOUND_LOCALSTATE_DIR=`eval echo "${localstatedir}"`
+AC_SUBST(UNBOUND_LOCALSTATE_DIR)
 if test $on_mingw = "no"; then
   ub_conf_file=`eval echo "${sysconfdir}/unbound/unbound.conf"`
 else
@@ -230,9 +250,11 @@ AC_DEFINE_UNQUOTED(RSRC_PACKAGE_VERSION, [$wnvs], [version number for resource f
 AC_C_CONST
 AC_LANG_C
 # allow user to override the -g -O2 flags.
+default_cflags=no
 if test "x$CFLAGS" = "x" ; then
 ACX_CHECK_COMPILER_FLAG(g, [CFLAGS="$CFLAGS -g"])
 ACX_CHECK_COMPILER_FLAG(O2, [CFLAGS="$CFLAGS -O2"])
+default_cflags=yes
 fi
 AC_PROG_CC
 ACX_DEPFLAG
@@ -256,9 +278,14 @@ case "$debug_enabled" in
 		# nothing to do.
 		;;
 esac
-ACX_CHECK_FLTO
-ACX_CHECK_PIE
-ACX_CHECK_RELRO_NOW
+if test "$default_cflags" = "yes"; then
+	# only when CFLAGS was "" at the start, if the users wants to
+	# override we shouldn't add default cflags, because they wouldn't
+	# be able to turn off these options and set the CFLAGS wanted.
+	ACX_CHECK_FLTO
+	ACX_CHECK_PIE
+	ACX_CHECK_RELRO_NOW
+fi
 
 AC_C_INLINE
 ACX_CHECK_FORMAT_ATTRIBUTE
@@ -307,7 +334,7 @@ AC_CHECK_TOOL(STRIP, strip)
 ACX_LIBTOOL_C_ONLY
 
 # Checks for header files.
-AC_CHECK_HEADERS([stdarg.h stdbool.h netinet/in.h netinet/tcp.h sys/param.h sys/socket.h sys/un.h sys/uio.h sys/resource.h arpa/inet.h syslog.h netdb.h sys/wait.h pwd.h glob.h grp.h login_cap.h winsock2.h ws2tcpip.h endian.h sys/ipc.h sys/shm.h],,, [AC_INCLUDES_DEFAULT])
+AC_CHECK_HEADERS([stdarg.h stdbool.h netinet/in.h netinet/tcp.h sys/param.h sys/socket.h sys/un.h sys/uio.h sys/resource.h arpa/inet.h syslog.h netdb.h sys/wait.h pwd.h glob.h grp.h login_cap.h winsock2.h ws2tcpip.h endian.h sys/endian.h libkern/OSByteOrder.h sys/ipc.h sys/shm.h],,, [AC_INCLUDES_DEFAULT])
 
 # check for types.  
 # Using own tests for int64* because autoconf builtin only give 32bit.
@@ -443,7 +470,9 @@ ub_have_pthreads=no
 if test x_$withval != x_no; then
 	AX_PTHREAD([
 		AC_DEFINE(HAVE_PTHREAD,1,[Define if you have POSIX threads libraries and header files.])
-		LIBS="$PTHREAD_LIBS $LIBS"
+		if test -n "$PTHREAD_LIBS"; then
+		  LIBS="$PTHREAD_LIBS $LIBS"
+		fi
 		CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
 		CC="$PTHREAD_CC"
 		ub_have_pthreads=yes
@@ -545,15 +574,28 @@ if test x_$ub_test_python != x_no; then
       AC_SUBST(PY_MAJOR_VERSION)
       # Have Python
       AC_DEFINE(HAVE_PYTHON,1,[Define if you have Python libraries and header files.])
-      LIBS="$PYTHON_LDFLAGS $LIBS"
-      CPPFLAGS="$CPPFLAGS $PYTHON_CPPFLAGS"
+      if test -n "$LIBS"; then
+        LIBS="$PYTHON_LDFLAGS $LIBS"
+      else
+        LIBS="$PYTHON_LDFLAGS"
+      fi
+      if test -n "$CPPFLAGS"; then
+        CPPFLAGS="$CPPFLAGS $PYTHON_CPPFLAGS"
+      else
+        CPPFLAGS="$PYTHON_CPPFLAGS"
+      fi
       ub_have_python=yes
       PC_PY_DEPENDENCY="python"
       AC_SUBST(PC_PY_DEPENDENCY)
 
       # Check for SWIG
       ub_have_swig=no
-      AC_PROG_SWIG(2.0.1)
+      AC_ARG_ENABLE(swig-version-check, AC_HELP_STRING([--disable-swig-version-check], [Disable swig version check to build python modules with older swig even though that is unreliable]))
+      if test "$enable_swig_version_check" = "yes"; then
+      	AC_PROG_SWIG(2.0.1)
+      else
+      	AC_PROG_SWIG
+      fi
       AC_MSG_CHECKING(SWIG)
       if test ! -x "$SWIG"; then
          AC_ERROR([failed to find swig tool, install it, or do not build Python module and PyUnbound])
@@ -680,12 +722,12 @@ else
 	AC_MSG_RESULT([no])
 fi
 AC_CHECK_HEADERS([openssl/conf.h openssl/engine.h openssl/bn.h openssl/dh.h openssl/dsa.h openssl/rsa.h],,, [AC_INCLUDES_DEFAULT])
-AC_CHECK_FUNCS([OPENSSL_config EVP_sha1 EVP_sha256 EVP_sha512 FIPS_mode EVP_MD_CTX_new OpenSSL_add_all_digests OPENSSL_init_crypto EVP_cleanup ERR_load_crypto_strings CRYPTO_cleanup_all_ex_data ERR_free_strings RAND_cleanup DSA_SIG_set0 EVP_dss1])
+AC_CHECK_FUNCS([OPENSSL_config EVP_sha1 EVP_sha256 EVP_sha512 FIPS_mode EVP_MD_CTX_new OpenSSL_add_all_digests OPENSSL_init_crypto EVP_cleanup ERR_load_crypto_strings CRYPTO_cleanup_all_ex_data ERR_free_strings RAND_cleanup DSA_SIG_set0 EVP_dss1 EVP_DigestVerify])
 
 # these check_funcs need -lssl
 BAKLIBS="$LIBS"
 LIBS="-lssl $LIBS"
-AC_CHECK_FUNCS([OPENSSL_init_ssl SSL_CTX_set_security_level])
+AC_CHECK_FUNCS([OPENSSL_init_ssl SSL_CTX_set_security_level SSL_set1_host SSL_get0_peername])
 LIBS="$BAKLIBS"
 
 AC_CHECK_DECLS([SSL_COMP_get_compression_methods,sk_SSL_COMP_pop_free,SSL_CTX_set_ecdh_auto], [], [], [
@@ -899,13 +941,79 @@ case "$enable_dsa" in
       ;;
     *)
       # detect if DSA is supported, and turn it off if not.
+      if test $USE_NSS = "no" -a $USE_NETTLE = "no"; then
       AC_CHECK_FUNC(DSA_SIG_new, [
+      AC_CHECK_TYPE(DSA_SIG*, [
       AC_DEFINE_UNQUOTED([USE_DSA], [1], [Define this to enable DSA support.])
       ], [if test "x$enable_dsa" = "xyes"; then AC_MSG_ERROR([OpenSSL does not support DSA and you used --enable-dsa.])
+               fi ], [
+AC_INCLUDES_DEFAULT
+#ifdef HAVE_OPENSSL_ERR_H
+#include <openssl/err.h>
+#endif
+
+#ifdef HAVE_OPENSSL_RAND_H
+#include <openssl/rand.h>
+#endif
+
+#ifdef HAVE_OPENSSL_CONF_H
+#include <openssl/conf.h>
+#endif
+
+#ifdef HAVE_OPENSSL_ENGINE_H
+#include <openssl/engine.h>
+#endif
+      ])
+      ], [if test "x$enable_dsa" = "xyes"; then AC_MSG_ERROR([OpenSSL does not support DSA and you used --enable-dsa.])
                fi ])
+      else
+      AC_DEFINE_UNQUOTED([USE_DSA], [1], [Define this to enable DSA support.])
+      fi
       ;;
 esac
 
+AC_ARG_ENABLE(ed25519, AC_HELP_STRING([--disable-ed25519], [Disable ED25519 support]))
+use_ed25519="no"
+case "$enable_ed25519" in
+    no)
+      ;;
+    *)
+      if test $USE_NSS = "no" -a $USE_NETTLE = "no"; then
+	      AC_CHECK_DECLS([NID_ED25519], [
+      		use_ed25519="yes"
+	      ], [ if test "x$enable_ed25519" = "xyes"; then AC_MSG_ERROR([OpenSSL does not support ED25519 and you used --enable-ed25519.])
+	      	fi ], [AC_INCLUDES_DEFAULT
+#include <openssl/evp.h>
+	      ])
+      fi
+      if test $USE_NETTLE = "yes"; then
+		AC_CHECK_HEADERS([nettle/eddsa.h], use_ed25519="yes",, [AC_INCLUDES_DEFAULT])
+      fi
+      if test $use_ed25519 = "yes"; then
+      		AC_DEFINE_UNQUOTED([USE_ED25519], [1], [Define this to enable ED25519 support.])
+      fi
+      ;;
+esac
+
+AC_ARG_ENABLE(ed448, AC_HELP_STRING([--disable-ed448], [Disable ED448 support]))
+use_ed448="no"
+case "$enable_ed448" in
+    no)
+      ;;
+    *)
+      if test $USE_NSS = "no" -a $USE_NETTLE = "no"; then
+	      AC_CHECK_DECLS([NID_ED448], [
+      		use_ed448="yes"
+	      ], [ if test "x$enable_ed448" = "xyes"; then AC_MSG_ERROR([OpenSSL does not support ED448 and you used --enable-ed448.])
+	      	fi ], [AC_INCLUDES_DEFAULT
+#include <openssl/evp.h>
+	      ])
+      fi
+      if test $use_ed448 = "yes"; then
+      		AC_DEFINE_UNQUOTED([USE_ED448], [1], [Define this to enable ED448 support.])
+      fi
+      ;;
+esac
 
 AC_ARG_ENABLE(event-api, AC_HELP_STRING([--enable-event-api], [Enable (experimental) pluggable event base libunbound API installed to unbound-event.h]))
 case "$enable_event_api" in
@@ -1065,6 +1173,39 @@ AC_CHECK_DECLS([XML_StopParser], [], [], [AC_INCLUDES_DEFAULT
 #include <expat.h>
 ])
 
+# hiredis (redis C client for cachedb)
+AC_ARG_WITH(libhiredis, AC_HELP_STRING([--with-libhiredis=path],
+    [specify explicit path for libhiredis.]),
+    [ ],[ withval="no" ])
+AC_MSG_CHECKING(for libhiredis)
+found_libhiredis="no"
+if test x_$withval = x_yes -o x_$withval != x_no; then
+   if test x_$withval = x_ -o x_$withval = x_yes; then
+            withval="/usr/local /opt/local /usr/lib /usr/pkg /usr/sfw /usr"
+   fi
+   for dir in $withval ; do
+            if test -f "$dir/include/hiredis/hiredis.h"; then
+		found_libhiredis="yes"
+		dnl assume /usr is in default path.
+		if test "$dir" != "/usr"; then
+                    CPPFLAGS="$CPPFLAGS -I$dir/include"
+		    LDFLAGS="$LDFLAGS -L$dir/lib"
+		fi
+		AC_MSG_RESULT(found in $dir)
+		AC_DEFINE([USE_REDIS], [1], [Define this to use hiredis client.])
+		LIBS="$LIBS -lhiredis"
+                break;
+            fi
+    done
+    if test x_$found_libhiredis != x_yes; then
+	AC_ERROR([Could not find libhiredis, hiredis.h])
+    fi
+    AC_CHECK_HEADERS([hiredis/hiredis.h],,, [AC_INCLUDES_DEFAULT])
+    AC_CHECK_DECLS([redisConnect], [], [], [AC_INCLUDES_DEFAULT
+    #include <hiredis/hiredis.h>
+    ])
+fi
+
 # set static linking if requested
 AC_SUBST(staticexe)
 staticexe=""
@@ -1076,7 +1217,12 @@ if test x_$enable_static_exe = x_yes; then
 	if test "$on_mingw" = yes; then
 		staticexe="-all-static"
 		# for static compile, include gdi32 and zlib here.
-		LIBS="$LIBS -lgdi32 -lz"
+		if echo $LIBS | grep 'lgdi32' >/dev/null; then
+			:
+		else
+			LIBS="$LIBS -lgdi32"
+		fi
+		LIBS="$LIBS -lz"
 	fi
 fi
 
@@ -1101,7 +1247,7 @@ if test "$USE_WINSOCK" = 1; then
 #include <windows.h>
 	])
 	AC_CHECK_TOOL(WINDRES, windres)
-	LIBS="$LIBS -liphlpapi"
+	LIBS="$LIBS -liphlpapi -lcrypt32"
 	WINAPPS="unbound-service-install.exe unbound-service-remove.exe anchor-update.exe"
 	AC_SUBST(WINAPPS)
 	WIN_DAEMON_SRC="winrc/win_svc.c winrc/w_inst.c"
@@ -1174,12 +1320,12 @@ AC_INCLUDES_DEFAULT
 #endif
 ])
 AC_SEARCH_LIBS([setusercontext], [util])
-AC_CHECK_FUNCS([tzset sigprocmask fcntl getpwnam endpwent getrlimit setrlimit setsid chroot kill chown sleep usleep random srandom recvmsg sendmsg writev socketpair glob initgroups strftime localtime_r setusercontext _beginthreadex endservent endprotoent fsync shmget])
+AC_CHECK_FUNCS([tzset sigprocmask fcntl getpwnam endpwent getrlimit setrlimit setsid chroot kill chown sleep usleep random srandom recvmsg sendmsg writev socketpair glob initgroups strftime localtime_r setusercontext _beginthreadex endservent endprotoent fsync shmget accept4])
 AC_CHECK_FUNCS([setresuid],,[AC_CHECK_FUNCS([setreuid])])
 AC_CHECK_FUNCS([setresgid],,[AC_CHECK_FUNCS([setregid])])
 
 # check if setreuid en setregid fail, on MacOSX10.4(darwin8).
-if echo $build_os | grep darwin8 > /dev/null; then
+if echo $target_os | grep darwin8 > /dev/null; then
 	AC_DEFINE(DARWIN_BROKEN_SETREUID, 1, [Define this if on macOSX10.4-darwin8 and setreuid and setregid do not work])
 fi
 AC_CHECK_DECLS([inet_pton,inet_ntop], [], [], [
@@ -1344,6 +1490,8 @@ dnsc_DNSCRYPT([
 
 # check for cachedb if requested
 AC_ARG_ENABLE(cachedb, AC_HELP_STRING([--enable-cachedb], [enable cachedb module that can use external cache storage]))
+# turn on cachedb when hiredis support is enabled.
+if test "$found_libhiredis" = "yes"; then enable_cachedb="yes"; fi
 case "$enable_cachedb" in
     yes)
     	AC_DEFINE([USE_CACHEDB], [1], [Define to 1 to use cachedb support])
@@ -1351,6 +1499,21 @@ case "$enable_cachedb" in
     no|*)
     	# nothing
     	;;
+esac
+
+# check for ipsecmod if requested
+AC_ARG_ENABLE(ipsecmod, AC_HELP_STRING([--enable-ipsecmod], [Enable ipsecmod module that facilitates opportunistic IPsec]))
+case "$enable_ipsecmod" in
+	yes)
+		AC_DEFINE([USE_IPSECMOD], [1], [Define to 1 to use ipsecmod support.])
+		IPSECMOD_OBJ="ipsecmod.lo ipsecmod-whitelist.lo"
+		AC_SUBST(IPSECMOD_OBJ)
+		IPSECMOD_HEADER='$(srcdir)/ipsecmod/ipsecmod.h $(srcdir)/ipsecmod/ipsecmod-whitelist.h'
+		AC_SUBST(IPSECMOD_HEADER)
+		;;
+	no|*)
+		# nothing
+		;;
 esac
 
 AC_MSG_CHECKING([if ${MAKE:-make} supports $< with implicit rule in scope])
@@ -1399,11 +1562,25 @@ AC_ARG_WITH(libunbound-only, AC_HELP_STRING([--with-libunbound-only],
 		INSTALLTARGET="install-lib"
 	fi
 ])
+if test $ALLTARGET = "alltargets"; then
+	if test $USE_NSS = "yes"; then 
+		AC_ERROR([--with-nss can only be used in combination with --with-libunbound-only.])	
+	fi
+	if test $USE_NETTLE = "yes"; then
+		AC_ERROR([--with-nettle can only be used in combination with --with-libunbound-only.])	
+	fi
+fi
+
 AC_SUBST(ALLTARGET)
 AC_SUBST(INSTALLTARGET)
 
 ACX_STRIP_EXT_FLAGS
-LDFLAGS="$LATE_LDFLAGS $LDFLAGS"
+if test -n "$LATE_LDFLAGS"; then
+  LDFLAGS="$LATE_LDFLAGS $LDFLAGS"
+fi
+# remove start spaces 
+LDFLAGS=`echo "$LDFLAGS"|sed -e 's/^ *//'`
+LIBS=`echo "$LIBS"|sed -e 's/^ *//'`
 
 AC_DEFINE_UNQUOTED([MAXSYSLOGMSGLEN], [10240], [Define to the maximum message length to pass to syslog.])
 
@@ -1567,6 +1744,7 @@ uint32_t arc4random(void);
 void arc4random_buf(void* buf, size_t n);
 void _ARC4_LOCK(void);
 void _ARC4_UNLOCK(void);
+void _ARC4_LOCK_DESTROY(void);
 #endif
 #ifndef HAVE_ARC4RANDOM_UNIFORM
 uint32_t arc4random_uniform(uint32_t upper_bound);
@@ -1632,6 +1810,8 @@ void *unbound_stat_realloc_log(void *ptr, size_t size, const char* file,
 
 /** default port for DNS traffic. */
 #define UNBOUND_DNS_PORT 53
+/** default port for DNS over TLS traffic. */
+#define UNBOUND_DNS_OVER_TLS_PORT 853
 /** default port for unbound control traffic, registered port with IANA,
     ub-dns-control  8953/tcp    unbound dns nameserver control */
 #define UNBOUND_CONTROL_PORT 8953

@@ -186,7 +186,9 @@ verifytest_rrset(struct module_env* env, struct val_env* ve,
 			ntohs(rrset->rk.rrset_class));
 	}
 	setup_sigalg(dnskey, sigalg); /* check all algorithms in the dnskey */
-	sec = dnskeyset_verify_rrset(env, ve, rrset, dnskey, sigalg, &reason);
+	/* ok to give null as qstate here, won't be used for answer section. */
+	sec = dnskeyset_verify_rrset(env, ve, rrset, dnskey, sigalg, &reason,
+		LDNS_SECTION_ANSWER, NULL);
 	if(vsig) {
 		printf("verify outcome is: %s %s\n", sec_status_to_string(sec),
 			reason?reason:"");
@@ -299,6 +301,7 @@ verifytest_file(const char* fname, const char* at_date)
 	struct module_env env;
 	struct val_env ve;
 	time_t now = time(NULL);
+	unit_show_func("signature verify", fname);
 
 	if(!list)
 		fatal_exit("could not read %s: %s", fname, strerror(errno));
@@ -341,6 +344,7 @@ dstest_file(const char* fname)
 	struct entry* e;
 	struct entry* list = read_datafile(fname, 1);
 	struct module_env env;
+	unit_show_func("DS verify", fname);
 
 	if(!list)
 		fatal_exit("could not read %s: %s", fname, strerror(errno));
@@ -474,6 +478,7 @@ nsec3_hash_test(const char* fname)
 	sldns_buffer* buf = sldns_buffer_new(65535);
 	struct entry* e;
 	struct entry* list = read_datafile(fname, 1);
+	unit_show_func("NSEC3 hash", fname);
 
 	if(!list)
 		fatal_exit("could not read %s: %s", fname, strerror(errno));
@@ -519,6 +524,7 @@ verify_test(void)
 #endif
 #if (defined(HAVE_EVP_SHA512) || defined(HAVE_NSS) || defined(HAVE_NETTLE)) && defined(USE_SHA2)
 	verifytest_file("testdata/test_sigs.rsasha512_draft", "20070829144150");
+	verifytest_file("testdata/test_signatures.9", "20171215000000");
 #endif
 #ifdef USE_SHA1
 	verifytest_file("testdata/test_sigs.hinfo", "20090107100022");
@@ -536,6 +542,16 @@ verify_test(void)
 		verifytest_file("testdata/test_sigs.ecdsa_p384", "20100908100439");
 	}
 	dstest_file("testdata/test_ds.sha384");
+#endif
+#ifdef USE_ED25519
+	if(dnskey_algo_id_is_supported(LDNS_ED25519)) {
+		verifytest_file("testdata/test_sigs.ed25519", "20170530140439");
+	}
+#endif
+#ifdef USE_ED448
+	if(dnskey_algo_id_is_supported(LDNS_ED448)) {
+		verifytest_file("testdata/test_sigs.ed448", "20180408143630");
+	}
 #endif
 #ifdef USE_SHA1
 	dstest_file("testdata/test_ds.sha1");

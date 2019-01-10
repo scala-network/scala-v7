@@ -167,7 +167,7 @@ create_udp_sock(int family, int socktype, struct sockaddr* addr,
 	int freebind, int use_systemd)
 {
 	int s;
-#if defined(SO_REUSEADDR) || defined(SO_REUSEPORT) || defined(IPV6_USE_MIN_MTU)  || defined(IP_TRANSPARENT) || defined(IP_BINDANY) || defined(IP_FREEBIND)
+#if defined(SO_REUSEADDR) || defined(SO_REUSEPORT) || defined(IPV6_USE_MIN_MTU)  || defined(IP_TRANSPARENT) || defined(IP_BINDANY) || defined(IP_FREEBIND) || defined (SO_BINDANY)
 	int on=1;
 #endif
 #ifdef IPV6_MTU
@@ -182,7 +182,7 @@ create_udp_sock(int family, int socktype, struct sockaddr* addr,
 #ifndef IPV6_V6ONLY
 	(void)v6only;
 #endif
-#if !defined(IP_TRANSPARENT) && !defined(IP_BINDANY)
+#if !defined(IP_TRANSPARENT) && !defined(IP_BINDANY) && !defined(SO_BINDANY)
 	(void)transparent;
 #endif
 #if !defined(IP_FREEBIND)
@@ -281,7 +281,14 @@ create_udp_sock(int family, int socktype, struct sockaddr* addr,
 			log_warn("setsockopt(.. IP%s_BINDANY ..) failed: %s",
 			(family==AF_INET6?"V6":""), strerror(errno));
 		}
-#endif /* IP_TRANSPARENT || IP_BINDANY */
+#elif defined(SO_BINDANY)
+		if (transparent &&
+		    setsockopt(s, SOL_SOCKET, SO_BINDANY, (void*)&on,
+		    (socklen_t)sizeof(on)) < 0) {
+			log_warn("setsockopt(.. SO_BINDANY ..) failed: %s",
+			strerror(errno));
+		}
+#endif /* IP_TRANSPARENT || IP_BINDANY || SO_BINDANY */
 	}
 #ifdef IP_FREEBIND
 	if(freebind &&
@@ -592,7 +599,7 @@ create_tcp_accept_sock(struct addrinfo *addr, int v6only, int* noproto,
 	int* reuseport, int transparent, int mss, int freebind, int use_systemd)
 {
 	int s;
-#if defined(SO_REUSEADDR) || defined(SO_REUSEPORT) || defined(IPV6_V6ONLY) || defined(IP_TRANSPARENT) || defined(IP_BINDANY) || defined(IP_FREEBIND)
+#if defined(SO_REUSEADDR) || defined(SO_REUSEPORT) || defined(IPV6_V6ONLY) || defined(IP_TRANSPARENT) || defined(IP_BINDANY) || defined(IP_FREEBIND) || defined(SO_BINDANY)
 	int on = 1;
 #endif
 #ifdef HAVE_SYSTEMD
@@ -601,7 +608,7 @@ create_tcp_accept_sock(struct addrinfo *addr, int v6only, int* noproto,
 #ifdef USE_TCP_FASTOPEN
 	int qlen;
 #endif
-#if !defined(IP_TRANSPARENT) && !defined(IP_BINDANY)
+#if !defined(IP_TRANSPARENT) && !defined(IP_BINDANY) && !defined(SO_BINDANY)
 	(void)transparent;
 #endif
 #if !defined(IP_FREEBIND)
@@ -736,7 +743,14 @@ create_tcp_accept_sock(struct addrinfo *addr, int v6only, int* noproto,
 		log_warn("setsockopt(.. IP%s_BINDANY ..) failed: %s",
 		(addr->ai_family==AF_INET6?"V6":""), strerror(errno));
 	}
-#endif /* IP_TRANSPARENT || IP_BINDANY */
+#elif defined(SO_BINDANY)
+	if (transparent &&
+	    setsockopt(s, SOL_SOCKET, SO_BINDANY, (void*)&on, (socklen_t)
+	    sizeof(on)) < 0) {
+		log_warn("setsockopt(.. SO_BINDANY ..) failed: %s",
+		strerror(errno));
+	}
+#endif /* IP_TRANSPARENT || IP_BINDANY || SO_BINDANY */
 	if(
 #ifdef HAVE_SYSTEMD
 		!got_fd_from_systemd &&
@@ -792,7 +806,12 @@ create_tcp_accept_sock(struct addrinfo *addr, int v6only, int* noproto,
 #endif
 	if ((setsockopt(s, IPPROTO_TCP, TCP_FASTOPEN, &qlen, 
 		  sizeof(qlen))) == -1 ) {
-		log_err("Setting TCP Fast Open as server failed: %s", strerror(errno));
+#ifdef ENOPROTOOPT
+		/* squelch ENOPROTOOPT: freebsd server mode with kernel support
+		   disabled, except when verbosity enabled for debugging */
+		if(errno != ENOPROTOOPT || verbosity >= 3)
+#endif
+		  log_err("Setting TCP Fast Open as server failed: %s", strerror(errno));
 	}
 #endif
 	return s;
@@ -1037,6 +1056,26 @@ set_recvpktinfo(int s, int family)
 	return 1;
 }
 
+/** see if interface is ssl, its port number == the ssl port number */
+static int
+if_is_ssl(const char* ifname, const char* port, int ssl_port,
+	struct config_strlist* tls_additional_port)
+{
+	struct config_strlist* s;
+	char* p = strchr(ifname, '@');
+	if(!p && atoi(port) == ssl_port)
+		return 1;
+	if(p && atoi(p+1) == ssl_port)
+		return 1;
+	for(s = tls_additional_port; s; s = s->next) {
+		if(p && atoi(p+1) == atoi(s->str))
+			return 1;
+		if(!p && atoi(port) == atoi(s->str))
+			return 1;
+	}
+	return 0;
+}
+
 /**
  * Helper for ports_open. Creates one interface (or NULL for default).
  * @param ifname: The interface ip address.
@@ -1050,6 +1089,7 @@ set_recvpktinfo(int s, int family)
  * @param rcv: receive buffer size for UDP
  * @param snd: send buffer size for UDP
  * @param ssl_port: ssl service port number
+ * @param tls_additional_port: list of additional ssl service port numbers.
  * @param reuseport: try to set SO_REUSEPORT if nonNULL and true.
  * 	set to false on exit if reuseport failed due to no kernel support.
  * @param transparent: set IP_TRANSPARENT socket option.
@@ -1062,8 +1102,10 @@ set_recvpktinfo(int s, int family)
 static int
 ports_create_if(const char* ifname, int do_auto, int do_udp, int do_tcp, 
 	struct addrinfo *hints, const char* port, struct listen_port** list,
-	size_t rcv, size_t snd, int ssl_port, int* reuseport, int transparent,
-	int tcp_mss, int freebind, int use_systemd, int dnscrypt_port)
+	size_t rcv, size_t snd, int ssl_port,
+	struct config_strlist* tls_additional_port, int* reuseport,
+	int transparent, int tcp_mss, int freebind, int use_systemd,
+	int dnscrypt_port)
 {
 	int s, noip6=0;
 #ifdef USE_DNSCRYPT
@@ -1127,9 +1169,8 @@ ports_create_if(const char* ifname, int do_auto, int do_udp, int do_tcp,
 		}
 	}
 	if(do_tcp) {
-		int is_ssl = ((strchr(ifname, '@') && 
-			atoi(strchr(ifname, '@')+1) == ssl_port) ||
-			(!strchr(ifname, '@') && atoi(port) == ssl_port));
+		int is_ssl = if_is_ssl(ifname, port, ssl_port,
+			tls_additional_port);
 		if((s = make_sock_port(SOCK_STREAM, ifname, port, hints, 1, 
 			&noip6, 0, 0, reuseport, transparent, tcp_mss,
 			freebind, use_systemd)) == -1) {
@@ -1223,15 +1264,15 @@ listen_create(struct comm_base* base, struct listen_port* ports,
 			ports->ftype == listen_type_tcp_dnscrypt ||
 			ports->ftype == listen_type_udpancil_dnscrypt) {
 			cp->dnscrypt = 1;
-            cp->dnscrypt_buffer = sldns_buffer_new(bufsize);
-            if(!cp->dnscrypt_buffer) {
-                log_err("can't alloc dnscrypt_buffer");
-                comm_point_delete(cp);
-                listen_delete(front);
-                return NULL;
-            }
-            front->dnscrypt_udp_buff = cp->dnscrypt_buffer;
-        }
+			cp->dnscrypt_buffer = sldns_buffer_new(bufsize);
+			if(!cp->dnscrypt_buffer) {
+				log_err("can't alloc dnscrypt_buffer");
+				comm_point_delete(cp);
+				listen_delete(front);
+				return NULL;
+			}
+			front->dnscrypt_udp_buff = cp->dnscrypt_buffer;
+		}
 #endif
 		if(!listen_cp_insert(cp, front)) {
 			log_err("malloc failed");
@@ -1269,10 +1310,10 @@ listen_delete(struct listen_dnsport* front)
 		return;
 	listen_list_delete(front->cps);
 #ifdef USE_DNSCRYPT
-    if(front->dnscrypt_udp_buff &&
-       front->udp_buff != front->dnscrypt_udp_buff) {
-        sldns_buffer_free(front->dnscrypt_udp_buff);
-    }
+	if(front->dnscrypt_udp_buff &&
+		front->udp_buff != front->dnscrypt_udp_buff) {
+		sldns_buffer_free(front->dnscrypt_udp_buff);
+	}
 #endif
 	sldns_buffer_free(front->udp_buff);
 	free(front);
@@ -1315,8 +1356,8 @@ listening_ports_open(struct config_file* cfg, int* reuseport)
 				do_auto, cfg->do_udp, do_tcp, 
 				&hints, portbuf, &list,
 				cfg->so_rcvbuf, cfg->so_sndbuf,
-				cfg->ssl_port, reuseport,
-				cfg->ip_transparent,
+				cfg->ssl_port, cfg->tls_additional_port,
+				reuseport, cfg->ip_transparent,
 				cfg->tcp_mss, cfg->ip_freebind, cfg->use_systemd,
 				cfg->dnscrypt_port)) {
 				listening_ports_free(list);
@@ -1329,8 +1370,8 @@ listening_ports_open(struct config_file* cfg, int* reuseport)
 				do_auto, cfg->do_udp, do_tcp, 
 				&hints, portbuf, &list,
 				cfg->so_rcvbuf, cfg->so_sndbuf,
-				cfg->ssl_port, reuseport,
-				cfg->ip_transparent,
+				cfg->ssl_port, cfg->tls_additional_port,
+				reuseport, cfg->ip_transparent,
 				cfg->tcp_mss, cfg->ip_freebind, cfg->use_systemd,
 				cfg->dnscrypt_port)) {
 				listening_ports_free(list);
@@ -1345,8 +1386,8 @@ listening_ports_open(struct config_file* cfg, int* reuseport)
 			if(!ports_create_if(cfg->ifs[i], 0, cfg->do_udp, 
 				do_tcp, &hints, portbuf, &list, 
 				cfg->so_rcvbuf, cfg->so_sndbuf,
-				cfg->ssl_port, reuseport,
-				cfg->ip_transparent,
+				cfg->ssl_port, cfg->tls_additional_port,
+				reuseport, cfg->ip_transparent,
 				cfg->tcp_mss, cfg->ip_freebind, cfg->use_systemd,
 				cfg->dnscrypt_port)) {
 				listening_ports_free(list);
@@ -1359,8 +1400,8 @@ listening_ports_open(struct config_file* cfg, int* reuseport)
 			if(!ports_create_if(cfg->ifs[i], 0, cfg->do_udp, 
 				do_tcp, &hints, portbuf, &list, 
 				cfg->so_rcvbuf, cfg->so_sndbuf,
-				cfg->ssl_port, reuseport,
-				cfg->ip_transparent,
+				cfg->ssl_port, cfg->tls_additional_port,
+				reuseport, cfg->ip_transparent,
 				cfg->tcp_mss, cfg->ip_freebind, cfg->use_systemd,
 				cfg->dnscrypt_port)) {
 				listening_ports_free(list);

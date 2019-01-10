@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017, The Monero Project
+# Copyright (c) 2014-2018, The MoNerO Project
 #
 # All rights reserved.
 #
@@ -29,7 +29,7 @@
 set(crypto_sources
   aesb.c
   blake256.c
-  chacha8.c
+  chacha.c
   crypto-ops-data.c
   crypto-ops.c
   crypto.cpp
@@ -51,7 +51,7 @@ set(crypto_headers)
 
 set(crypto_private_headers
   blake256.h
-  chacha8.h
+  chacha.h
   crypto-ops.h
   crypto.h
   generic-ops.h
@@ -68,15 +68,17 @@ set(crypto_private_headers
   skein.h
   skein_port.h)
 
-monero_private_headers(cncrypto
+stellite_private_headers(cncrypto
   ${crypto_private_headers})
-monero_add_library(cncrypto
+stellite_add_library(cncrypto
   ${crypto_sources}
   ${crypto_headers}
   ${crypto_private_headers})
 target_link_libraries(cncrypto
   PUBLIC
+    epee
     ${Boost_SYSTEM_LIBRARY}
+    ${SODIUM_LIBRARY}
   PRIVATE
     ${EXTRA_LIBRARIES})
 

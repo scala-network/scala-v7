@@ -67,6 +67,13 @@ struct config_strlist;
 /** max number of query restarts, number of IPs to probe */
 #define VAL_MAX_RESTART_COUNT 5
 
+/** Root key sentinel is ta preamble */
+#define SENTINEL_IS		"root-key-sentinel-is-ta-"
+/** Root key sentinel is not ta preamble */
+#define SENTINEL_NOT		"root-key-sentinel-not-ta-"
+/** Root key sentinal keytag length */
+#define SENTINEL_KEYTAG_LEN	5
+
 /**
  * Global state for the validator. 
  */
@@ -92,19 +99,6 @@ struct val_env {
 	 * Bogus data will not be verified more often than this interval. 
 	 * seconds. */
 	uint32_t bogus_ttl;
-
-	/** If set, the validator should clean the additional section of
-	 * secure messages.
-	 */
-	int clean_additional;
-
-	/**
-	 * If set, the validator will not make messages bogus, instead
-	 * indeterminate is issued, so that no clients receive SERVFAIL.
-	 * This allows an operator to run validation 'shadow' without
-	 * hurting responses to clients.
-	 */
-	int permissive_mode;
 
 	/**
 	 * Number of entries in the NSEC3 maximum iteration count table.

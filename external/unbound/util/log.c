@@ -103,8 +103,12 @@ log_init(const char* filename, int use_syslog, const char* chrootdir)
 			use_syslog?"syslog":(filename&&filename[0]?filename:"stderr"));
 		lock_quick_lock(&log_lock);
 	}
-	if(logfile && logfile != stderr)
-		fclose(logfile);
+	if(logfile && logfile != stderr) {
+		FILE* cl = logfile;
+		logfile = NULL; /* set to NULL before it is closed, so that
+			other threads have a valid logfile or NULL */
+		fclose(cl);
+	}
 #ifdef HAVE_SYSLOG_H
 	if(logging_to_syslog) {
 		closelog();
@@ -185,6 +189,17 @@ void log_set_time(time_t* t)
 void log_set_time_asc(int use_asc)
 {
 	log_time_asc = use_asc;
+}
+
+void* log_get_lock(void)
+{
+	if(!key_created)
+		return NULL;
+#ifndef THREADS_DISABLED
+	return (void*)&log_lock;
+#else
+	return NULL;
+#endif
 }
 
 void

@@ -99,6 +99,16 @@
 #else
 #  define ELPP_OS_FREEBSD 0
 #endif
+#if (defined(__OpenBSD__))
+#  define ELPP_OS_OPENBSD 1
+#else
+#  define ELPP_OS_OPENBSD 0
+#endif
+#if (defined(__NetBSD__))
+#  define ELPP_OS_NETBSD 1
+#else
+#  define ELPP_OS_NETBSD 0
+#endif
 #if (defined(__sun))
 #  define ELPP_OS_SOLARIS 1
 #else
@@ -110,7 +120,7 @@
 #   define ELPP_OS_DRAGONFLY 0
 #endif
 // Unix
-#if ((ELPP_OS_LINUX || ELPP_OS_MAC || ELPP_OS_FREEBSD || ELPP_OS_SOLARIS || ELPP_OS_DRAGONFLY) && (!ELPP_OS_WINDOWS))
+#if ((ELPP_OS_LINUX || ELPP_OS_MAC || ELPP_OS_FREEBSD || ELPP_OS_SOLARIS || ELPP_OS_DRAGONFLY || ELPP_OS_OPENBSD || ELPP_OS_NETBSD ) && (!ELPP_OS_WINDOWS))
 #  define ELPP_OS_UNIX 1
 #else
 #  define ELPP_OS_UNIX 0
@@ -195,19 +205,20 @@ ELPP_INTERNAL_DEBUGGING_OUT_INFO << ELPP_INTERNAL_DEBUGGING_MSG(internalInfoStre
 #  define ELPP_INTERNAL_INFO(lvl, msg)
 #endif  // (defined(ELPP_DEBUG_INFO))
 #if (defined(ELPP_FEATURE_ALL)) || (defined(ELPP_FEATURE_CRASH_LOG))
-#  if (ELPP_COMPILER_GCC && !ELPP_MINGW)
+#  if (ELPP_COMPILER_GCC && !ELPP_MINGW && !ELPP_OS_OPENBSD && !ELPP_OS_NETBSD)
 #    define ELPP_STACKTRACE 1
 #  else
-#      define ELPP_STACKTRACE 0
-#      if ELPP_COMPILER_MSVC
-#         pragma message("Stack trace not available for this compiler")
-#      else
-#         warning "Stack trace not available for this compiler";
-#      endif  // ELPP_COMPILER_MSVC
 #    define ELPP_STACKTRACE 0
+#    ifdef EASYLOGGING_CC
+#      if ELPP_COMPILER_MSVC
+#        pragma message("Stack trace not available for this compiler")
+#      else
+#        warning "Stack trace not available for this compiler";
+#      endif  // ELPP_COMPILER_MSVC
+#    endif
 #  endif  // ELPP_COMPILER_GCC
 #else
-#    define ELPP_STACKTRACE 0
+#  define ELPP_STACKTRACE 0
 #endif  // (defined(ELPP_FEATURE_ALL)) || (defined(ELPP_FEATURE_CRASH_LOG))
 // Miscellaneous macros
 #define ELPP_UNUSED(x) (void)x
@@ -2479,6 +2490,7 @@ class VRegistry : base::NoCopy, public base::threading::ThreadSafe {
   inline void clearCategories(void) {
     base::threading::ScopedLock scopedLock(lock());
     m_categories.clear();
+    m_cached_allowed_categories.clear();
   }
 
   inline void clearModules(void) {
@@ -2487,6 +2499,8 @@ class VRegistry : base::NoCopy, public base::threading::ThreadSafe {
   }
 
   void setCategories(const char* categories, bool clear = true);
+
+  std::string getCategories();
 
   void setModules(const char* modules);
 
@@ -2518,6 +2532,8 @@ class VRegistry : base::NoCopy, public base::threading::ThreadSafe {
   base::type::EnumType* m_pFlags;
   std::map<std::string, base::type::VerboseLevel> m_modules;
   std::deque<std::pair<std::string, Level>> m_categories;
+  std::map<std::string, int> m_cached_allowed_categories;
+  std::string m_categoriesString;
   std::string m_filenameCommonPrefix;
 };
 }  // namespace base
@@ -2755,6 +2771,8 @@ class Storage : base::NoCopy, public base::threading::ThreadSafe {
     return it->second;
   }
 
+  static el::base::type::StoragePointer getELPP();
+
  private:
   base::RegisteredHitCounters* m_registeredHitCounters;
   base::RegisteredLoggers* m_registeredLoggers;
@@ -2787,7 +2805,7 @@ class Storage : base::NoCopy, public base::threading::ThreadSafe {
   }
 };
 extern ELPP_EXPORT base::type::StoragePointer elStorage;
-#define ELPP el::base::elStorage
+#define ELPP el::base::Storage::getELPP()
 class DefaultLogDispatchCallback : public LogDispatchCallback {
  protected:
   void handle(const LogDispatchData* data);
@@ -3953,6 +3971,8 @@ class Loggers : base::StaticClass {
   static void setVModules(const char* modules);
   /// @brief Sets categories as specified (on the fly)
   static void setCategories(const char* categories, bool clear = true);
+  /// @brief Gets current categories
+  static std::string getCategories();
   /// @brief Clears vmodules
   static void clearVModules(void);
   /// @brief Clears categories
@@ -4615,10 +4635,9 @@ el::base::debug::CrashHandler elCrashHandler(ELPP_USE_DEF_CRASH_HANDLER); \
 }
 
 #if ELPP_ASYNC_LOGGING
-#  define INITIALIZE_EASYLOGGINGPP ELPP_INIT_EASYLOGGINGPP(new el::base::Storage(el::LogBuilderPtr(new el::base::DefaultLogBuilder()),\
-new el::base::AsyncDispatchWorker()))
+#  define INITIALIZE_EASYLOGGINGPP ELPP_INIT_EASYLOGGINGPP(NULL)
 #else
-#  define INITIALIZE_EASYLOGGINGPP ELPP_INIT_EASYLOGGINGPP(new el::base::Storage(el::LogBuilderPtr(new el::base::DefaultLogBuilder())))
+#  define INITIALIZE_EASYLOGGINGPP ELPP_INIT_EASYLOGGINGPP(NULL)
 #endif  // ELPP_ASYNC_LOGGING
 #define INITIALIZE_NULL_EASYLOGGINGPP \
 namespace el {\

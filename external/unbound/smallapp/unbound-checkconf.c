@@ -4,22 +4,22 @@
  * Copyright (c) 2007, NLnet Labs. All rights reserved.
  *
  * This software is open source.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  * Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
- * 
+ *
  * Redistributions in binary form must reproduce the above copyright notice,
  * this list of conditions and the following disclaimer in the documentation
  * and/or other materials provided with the distribution.
- * 
+ *
  * Neither the name of the NLNET LABS nor the names of its contributors may
  * be used to endorse or promote products derived from this software without
  * specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -54,6 +54,7 @@
 #include "validator/validator.h"
 #include "services/localzone.h"
 #include "services/view.h"
+#include "services/authzone.h"
 #include "respip/respip.h"
 #include "sldns/sbuffer.h"
 #ifdef HAVE_GETOPT_H
@@ -70,6 +71,9 @@
 #endif
 #ifdef WITH_PYTHONMODULE
 #include "pythonmod/pythonmod.h"
+#endif
+#ifdef CLIENT_SUBNET
+#include "edns-subnet/subnet-whitelist.h"
 #endif
 
 /** Give checkconf usage, and exit (1). */
@@ -88,10 +92,10 @@ usage(void)
 	exit(1);
 }
 
-/** 
- * Print given option to stdout 
+/**
+ * Print given option to stdout
  * @param cfg: config
- * @param opt: option name without trailing :. 
+ * @param opt: option name without trailing :.
  *	This is different from config_set_option.
  * @param final: if final pathname with chroot applied has to be printed.
  */
@@ -103,6 +107,16 @@ print_option(struct config_file* cfg, const char* opt, int final)
 		if(!p) fatal_exit("out of memory");
 		printf("%s\n", p);
 		free(p);
+		return;
+	}
+	if(strcmp(opt, "auto-trust-anchor-file") == 0 && final) {
+		struct config_strlist* s = cfg->auto_trust_anchor_file_list;
+		for(; s; s=s->next) {
+			char *p = fname_after_chroot(s->str, cfg, 1);
+			if(!p) fatal_exit("out of memory");
+			printf("%s\n", p);
+			free(p);
+		}
 		return;
 	}
 	if(!config_get_option(cfg, opt, config_print_func, stdout))
@@ -156,9 +170,9 @@ view_and_respipchecks(struct config_file* cfg)
 		fatal_exit("Could not create respip set: out of memory");
 	if(!views_apply_cfg(views, cfg))
 		fatal_exit("Could not set up views");
-        if(!respip_global_apply_cfg(respip, cfg))
+	if(!respip_global_apply_cfg(respip, cfg))
 		fatal_exit("Could not setup respip set");
-        if(!respip_views_apply_cfg(views, cfg, &ignored))
+	if(!respip_views_apply_cfg(views, cfg, &ignored))
 		fatal_exit("Could not setup per-view respip sets");
 	views_delete(views);
 	respip_set_delete(respip);
@@ -178,7 +192,7 @@ warn_hosts(const char* typ, struct config_stub* list)
 				fprintf(stderr, "unbound-checkconf: warning:"
 				  " %s %s: \"%s\" is an IP%s address, "
 				  "and when looked up as a host name "
-				  "during use may not resolve.\n", 
+				  "during use may not resolve.\n",
 				  s->name, typ, h->str,
 				  addr_is_ip6(&a, alen)?"6":"4");
 			}
@@ -230,7 +244,7 @@ aclchecks(struct config_file* cfg)
 	socklen_t alen;
 	struct config_str2list* acl;
 	for(acl=cfg->acls; acl; acl = acl->next) {
-		if(!netblockstrtoaddr(acl->str, UNBOUND_DNS_PORT, &a, &alen, 
+		if(!netblockstrtoaddr(acl->str, UNBOUND_DNS_PORT, &a, &alen,
 			&d)) {
 			fatal_exit("cannot parse access control address %s %s",
 				acl->str, acl->str2);
@@ -240,7 +254,7 @@ aclchecks(struct config_file* cfg)
 
 /** true if fname is a file */
 static int
-is_file(const char* fname) 
+is_file(const char* fname)
 {
 	struct stat buf;
 	if(stat(fname, &buf) < 0) {
@@ -260,7 +274,7 @@ is_file(const char* fname)
 
 /** true if fname is a directory */
 static int
-is_dir(const char* fname) 
+is_dir(const char* fname)
 {
 	struct stat buf;
 	if(stat(fname, &buf) < 0) {
@@ -305,7 +319,7 @@ check_chroot_string(const char* desc, char** ss,
 				fatal_exit("%s: \"%s\" does not exist in "
 					"chrootdir %s", desc, str, chrootdir);
 			else
-				fatal_exit("%s: \"%s\" does not exist", 
+				fatal_exit("%s: \"%s\" does not exist",
 					desc, str);
 		}
 		/* put in a new full path for continued checking */
@@ -332,8 +346,8 @@ check_chroot_filelist_wild(const char* desc, struct config_strlist* list,
 	struct config_strlist* p;
 	for(p=list; p; p=p->next) {
 #ifdef HAVE_GLOB
-		if(strchr(p->str, '*') || strchr(p->str, '[') || 
-			strchr(p->str, '?') || strchr(p->str, '{') || 
+		if(strchr(p->str, '*') || strchr(p->str, '[') ||
+			strchr(p->str, '?') || strchr(p->str, '{') ||
 			strchr(p->str, '~')) {
 			char* s = p->str;
 			/* adjust whole pattern for chroot and check later */
@@ -344,6 +358,20 @@ check_chroot_filelist_wild(const char* desc, struct config_strlist* list,
 			check_chroot_string(desc, &p->str, chrootdir, cfg);
 	}
 }
+
+#ifdef CLIENT_SUBNET
+/** check ECS configuration */
+static void
+ecs_conf_checks(struct config_file* cfg)
+{
+	struct ecs_whitelist* whitelist = NULL;
+	if(!(whitelist = ecs_whitelist_create()))
+		fatal_exit("Could not create ednssubnet whitelist: out of memory");
+        if(!ecs_whitelist_apply_cfg(whitelist, cfg))
+		fatal_exit("Could not setup ednssubnet whitelist");
+	ecs_whitelist_delete(whitelist);
+}
+#endif /* CLIENT_SUBNET */
 
 /** check configuration for errors */
 static void
@@ -370,11 +398,11 @@ morechecks(struct config_file* cfg, const char* fname)
 #ifdef UB_ON_WINDOWS
 	w_config_adjust_directory(cfg);
 #endif
-	if(cfg->chrootdir && cfg->chrootdir[0] && 
+	if(cfg->chrootdir && cfg->chrootdir[0] &&
 		cfg->chrootdir[strlen(cfg->chrootdir)-1] == '/')
 		fatal_exit("chootdir %s has trailing slash '/' please remove.",
 			cfg->chrootdir);
-	if(cfg->chrootdir && cfg->chrootdir[0] && 
+	if(cfg->chrootdir && cfg->chrootdir[0] &&
 		!is_dir(cfg->chrootdir)) {
 		fatal_exit("bad chroot directory");
 	}
@@ -416,16 +444,23 @@ morechecks(struct config_file* cfg, const char* fname)
 		}
 	}
 
-	check_chroot_filelist("file with root-hints", 
+	check_chroot_filelist("file with root-hints",
 		cfg->root_hints, cfg->chrootdir, cfg);
-	check_chroot_filelist("trust-anchor-file", 
+	check_chroot_filelist("trust-anchor-file",
 		cfg->trust_anchor_file_list, cfg->chrootdir, cfg);
-	check_chroot_filelist("auto-trust-anchor-file", 
+	check_chroot_filelist("auto-trust-anchor-file",
 		cfg->auto_trust_anchor_file_list, cfg->chrootdir, cfg);
-	check_chroot_filelist_wild("trusted-keys-file", 
+	check_chroot_filelist_wild("trusted-keys-file",
 		cfg->trusted_keys_file_list, cfg->chrootdir, cfg);
-	check_chroot_string("dlv-anchor-file", &cfg->dlv_anchor_file, 
+	check_chroot_string("dlv-anchor-file", &cfg->dlv_anchor_file,
 		cfg->chrootdir, cfg);
+#ifdef USE_IPSECMOD
+	if(cfg->ipsecmod_enabled && strstr(cfg->module_conf, "ipsecmod")) {
+		/* only check hook if enabled */
+		check_chroot_string("ipsecmod-hook", &cfg->ipsecmod_hook,
+			cfg->chrootdir, cfg);
+	}
+#endif
 	/* remove chroot setting so that modules are not stripping pathnames*/
 	free(cfg->chrootdir);
 	cfg->chrootdir = NULL;
@@ -434,21 +469,21 @@ morechecks(struct config_file* cfg, const char* fname)
 	 * dns64, but it's not explicitly confirmed,  so the combination is
 	 * excluded below.   It's simply unknown yet for the combination of
 	 * respip and other modules. */
-	if(strcmp(cfg->module_conf, "iterator") != 0 
+	if(strcmp(cfg->module_conf, "iterator") != 0
 		&& strcmp(cfg->module_conf, "validator iterator") != 0
 		&& strcmp(cfg->module_conf, "dns64 validator iterator") != 0
 		&& strcmp(cfg->module_conf, "dns64 iterator") != 0
 		&& strcmp(cfg->module_conf, "respip iterator") != 0
 		&& strcmp(cfg->module_conf, "respip validator iterator") != 0
 #ifdef WITH_PYTHONMODULE
-		&& strcmp(cfg->module_conf, "python iterator") != 0 
-		&& strcmp(cfg->module_conf, "python validator iterator") != 0 
+		&& strcmp(cfg->module_conf, "python iterator") != 0
+		&& strcmp(cfg->module_conf, "python validator iterator") != 0
 		&& strcmp(cfg->module_conf, "validator python iterator") != 0
-		&& strcmp(cfg->module_conf, "dns64 python iterator") != 0 
-		&& strcmp(cfg->module_conf, "dns64 python validator iterator") != 0 
+		&& strcmp(cfg->module_conf, "dns64 python iterator") != 0
+		&& strcmp(cfg->module_conf, "dns64 python validator iterator") != 0
 		&& strcmp(cfg->module_conf, "dns64 validator python iterator") != 0
-		&& strcmp(cfg->module_conf, "python dns64 iterator") != 0 
-		&& strcmp(cfg->module_conf, "python dns64 validator iterator") != 0 
+		&& strcmp(cfg->module_conf, "python dns64 iterator") != 0
+		&& strcmp(cfg->module_conf, "python dns64 validator iterator") != 0
 #endif
 #ifdef USE_CACHEDB
 		&& strcmp(cfg->module_conf, "validator cachedb iterator") != 0
@@ -468,16 +503,30 @@ morechecks(struct config_file* cfg, const char* fname)
 		&& strcmp(cfg->module_conf, "validator python cachedb iterator") != 0
 #endif
 #ifdef CLIENT_SUBNET
-		&& strcmp(cfg->module_conf, "subnetcache iterator") != 0 
+		&& strcmp(cfg->module_conf, "subnetcache iterator") != 0
 		&& strcmp(cfg->module_conf, "subnetcache validator iterator") != 0
+		&& strcmp(cfg->module_conf, "dns64 subnetcache iterator") != 0
+		&& strcmp(cfg->module_conf, "dns64 subnetcache validator iterator") != 0
 #endif
 #if defined(WITH_PYTHONMODULE) && defined(CLIENT_SUBNET)
 		&& strcmp(cfg->module_conf, "python subnetcache iterator") != 0
-		&& strcmp(cfg->module_conf, "subnetcache python iterator") != 0 
+		&& strcmp(cfg->module_conf, "subnetcache python iterator") != 0
 		&& strcmp(cfg->module_conf, "subnetcache validator iterator") != 0
 		&& strcmp(cfg->module_conf, "python subnetcache validator iterator") != 0
 		&& strcmp(cfg->module_conf, "subnetcache python validator iterator") != 0
 		&& strcmp(cfg->module_conf, "subnetcache validator python iterator") != 0
+#endif
+#ifdef USE_IPSECMOD
+		&& strcmp(cfg->module_conf, "ipsecmod iterator") != 0
+		&& strcmp(cfg->module_conf, "ipsecmod validator iterator") != 0
+#endif
+#if defined(WITH_PYTHONMODULE) && defined(USE_IPSECMOD)
+		&& strcmp(cfg->module_conf, "python ipsecmod iterator") != 0
+		&& strcmp(cfg->module_conf, "ipsecmod python iterator") != 0
+		&& strcmp(cfg->module_conf, "ipsecmod validator iterator") != 0
+		&& strcmp(cfg->module_conf, "python ipsecmod validator iterator") != 0
+		&& strcmp(cfg->module_conf, "ipsecmod python validator iterator") != 0
+		&& strcmp(cfg->module_conf, "ipsecmod validator python iterator") != 0
 #endif
 		) {
 		fatal_exit("module conf '%s' is not known to work",
@@ -493,7 +542,8 @@ morechecks(struct config_file* cfg, const char* fname)
 #  endif
 	}
 #endif
-	if(cfg->remote_control_enable && cfg->remote_control_use_cert) {
+	if(cfg->remote_control_enable && options_remote_is_address(cfg)
+		&& cfg->control_use_cert) {
 		check_chroot_string("server-key-file", &cfg->server_key_file,
 			cfg->chrootdir, cfg);
 		check_chroot_string("server-cert-file", &cfg->server_cert_file,
@@ -508,6 +558,9 @@ morechecks(struct config_file* cfg, const char* fname)
 
 	localzonechecks(cfg);
 	view_and_respipchecks(cfg);
+#ifdef CLIENT_SUBNET
+	ecs_conf_checks(cfg);
+#endif
 }
 
 /** check forwards */
@@ -530,6 +583,17 @@ check_hints(struct config_file* cfg)
 		fatal_exit("Could not set root or stub hints");
 	}
 	hints_delete(hints);
+}
+
+/** check auth zones */
+static void
+check_auth(struct config_file* cfg)
+{
+	struct auth_zones* az = auth_zones_create();
+	if(!az || !auth_zones_apply_cfg(az, cfg, 0)) {
+		fatal_exit("Could not setup authority zones");
+	}
+	auth_zones_delete(az);
 }
 
 /** check config file */
@@ -566,6 +630,7 @@ checkconf(const char* cfgfile, const char* opt, int final)
 #endif
 	check_fwd(cfg);
 	check_hints(cfg);
+	check_auth(cfg);
 	printf("unbound-checkconf: no errors in %s\n", cfgfile);
 	config_delete(cfg);
 }

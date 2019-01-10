@@ -52,7 +52,6 @@
 #include "util/data/msgreply.h"
 #include "util/data/msgparse.h"
 #include "util/as112.h"
-#include "util/config_file.h"
 
 /* maximum RRs in an RRset, to cap possible 'endless' list RRs.
  * with 16 bytes for an A record, a 64K packet has about 4000 max */
@@ -187,7 +186,9 @@ lz_enter_zone_dname(struct local_zones* zones, uint8_t* nm, size_t len,
 	lock_rw_wrlock(&z->lock);
 	if(!rbtree_insert(&zones->ztree, &z->node)) {
 		struct local_zone* oldz;
-		log_warn("duplicate local-zone");
+		char str[256];
+		dname_str(nm, str);
+		log_warn("duplicate local-zone %s", str);
 		lock_rw_unlock(&z->lock);
 		/* save zone name locally before deallocation,
 		 * otherwise, nm is gone if we zone_delete now. */
@@ -258,7 +259,8 @@ rrstr_get_rr_content(const char* str, uint8_t** nm, uint16_t* type,
 
 /** return name and class of rr; parses string */
 static int
-get_rr_nameclass(const char* str, uint8_t** nm, uint16_t* dclass)
+get_rr_nameclass(const char* str, uint8_t** nm, uint16_t* dclass,
+	uint16_t* dtype)
 {
 	uint8_t rr[LDNS_RR_BUF_SIZE];
 	size_t len = sizeof(rr), dname_len = 0;
@@ -272,6 +274,7 @@ get_rr_nameclass(const char* str, uint8_t** nm, uint16_t* dclass)
 	}
 	*nm = memdup(rr, dname_len);
 	*dclass = sldns_wirerr_get_class(rr, len, dname_len);
+	*dtype = sldns_wirerr_get_type(rr, len, dname_len);
 	if(!*nm) {
 		log_err("out of memory");
 		return 0;
@@ -520,18 +523,18 @@ static int
 lz_enter_rr_str(struct local_zones* zones, const char* rr)
 {
 	uint8_t* rr_name;
-	uint16_t rr_class;
+	uint16_t rr_class, rr_type;
 	size_t len;
 	int labs;
 	struct local_zone* z;
 	int r;
-	if(!get_rr_nameclass(rr, &rr_name, &rr_class)) {
+	if(!get_rr_nameclass(rr, &rr_name, &rr_class, &rr_type)) {
 		log_err("bad rr %s", rr);
 		return 0;
 	}
 	labs = dname_count_size_labels(rr_name, &len);
 	lock_rw_rdlock(&zones->lock);
-	z = local_zones_lookup(zones, rr_name, len, labs, rr_class);
+	z = local_zones_lookup(zones, rr_name, len, labs, rr_class, rr_type);
 	if(!z) {
 		lock_rw_unlock(&zones->lock);
 		fatal_exit("internal error: no zone for rr %s", rr);
@@ -717,9 +720,9 @@ lz_nodefault(struct config_file* cfg, const char* name)
 	return 0;
 }
 
-/** enter AS112 default zone */
+/** enter (AS112) empty default zone */
 static int
-add_as112_default(struct local_zones* zones, struct config_file* cfg,
+add_empty_default(struct local_zones* zones, struct config_file* cfg,
         const char* name)
 {
 	struct local_zone* z;
@@ -744,11 +747,14 @@ add_as112_default(struct local_zones* zones, struct config_file* cfg,
 }
 
 /** enter default zones */
-static int
-lz_enter_defaults(struct local_zones* zones, struct config_file* cfg)
+int local_zone_enter_defaults(struct local_zones* zones, struct config_file* cfg)
 {
 	struct local_zone* z;
 	const char** zstr;
+
+	/* Do not add any default */
+	if(cfg->local_zones_disable_default)
+		return 1;
 
 	/* this list of zones is from RFC 6303 and RFC 7686 */
 
@@ -757,7 +763,7 @@ lz_enter_defaults(struct local_zones* zones, struct config_file* cfg)
 	/* localhost. zone */
 	if(!lz_exists(zones, "localhost.") &&
 		!lz_nodefault(cfg, "localhost.")) {
-		if(!(z=lz_enter_zone(zones, "localhost.", "static", 
+		if(!(z=lz_enter_zone(zones, "localhost.", "redirect", 
 			LDNS_RR_CLASS_IN)) ||
 		   !lz_enter_rr_into_zone(z,
 			"localhost. 10800 IN NS localhost.") ||
@@ -811,26 +817,24 @@ lz_enter_defaults(struct local_zones* zones, struct config_file* cfg)
 		lock_rw_unlock(&z->lock);
 	}
 	/* onion. zone (RFC 7686) */
-	if(!lz_exists(zones, "onion.") &&
-		!lz_nodefault(cfg, "onion.")) {
-		if(!(z=lz_enter_zone(zones, "onion.", "static", 
-			LDNS_RR_CLASS_IN)) ||
-		   !lz_enter_rr_into_zone(z,
-			"onion. 10800 IN NS localhost.") ||
-		   !lz_enter_rr_into_zone(z,
-			"onion. 10800 IN SOA localhost. nobody.invalid. "
-			"1 3600 1200 604800 10800")) {
-			log_err("out of memory adding default zone");
-			if(z) { lock_rw_unlock(&z->lock); }
-			return 0;
-		}
-		lock_rw_unlock(&z->lock);
+	if(!add_empty_default(zones, cfg, "onion.")) {
+		log_err("out of memory adding default zone");
+		return 0;
 	}
-
+	/* test. zone (RFC 7686) */
+	if(!add_empty_default(zones, cfg, "test.")) {
+		log_err("out of memory adding default zone");
+		return 0;
+	}
+	/* invalid. zone (RFC 7686) */
+	if(!add_empty_default(zones, cfg, "invalid.")) {
+		log_err("out of memory adding default zone");
+		return 0;
+	}
 	/* block AS112 zones, unless asked not to */
 	if(!cfg->unblock_lan_zones) {
 		for(zstr = as112_zones; *zstr; zstr++) {
-			if(!add_as112_default(zones, cfg, *zstr)) {
+			if(!add_empty_default(zones, cfg, *zstr)) {
 				log_err("out of memory adding default zone");
 				return 0;
 			}
@@ -908,16 +912,17 @@ lz_setup_implicit(struct local_zones* zones, struct config_file* cfg)
 	init_parents(zones); /* to enable local_zones_lookup() */
 	for(p = cfg->local_data; p; p = p->next) {
 		uint8_t* rr_name;
-		uint16_t rr_class;
+		uint16_t rr_class, rr_type;
 		size_t len;
 		int labs;
-		if(!get_rr_nameclass(p->str, &rr_name, &rr_class)) {
+		if(!get_rr_nameclass(p->str, &rr_name, &rr_class, &rr_type)) {
 			log_err("Bad local-data RR %s", p->str);
 			return 0;
 		}
 		labs = dname_count_size_labels(rr_name, &len);
 		lock_rw_rdlock(&zones->lock);
-		if(!local_zones_lookup(zones, rr_name, len, labs, rr_class)) {
+		if(!local_zones_lookup(zones, rr_name, len, labs, rr_class,
+			rr_type)) {
 			if(!have_name) {
 				dclass = rr_class;
 				nm = rr_name;
@@ -1019,7 +1024,7 @@ local_zones_apply_cfg(struct local_zones* zones, struct config_file* cfg)
 		return 0;
 	}
 	/* apply default zones+content (unless disabled, or overridden) */
-	if(!lz_enter_defaults(zones, cfg)) {
+	if(!local_zone_enter_defaults(zones, cfg)) {
 		return 0;
 	}
 	/* enter local zone overrides */
@@ -1048,21 +1053,26 @@ local_zones_apply_cfg(struct local_zones* zones, struct config_file* cfg)
 
 struct local_zone* 
 local_zones_lookup(struct local_zones* zones,
-        uint8_t* name, size_t len, int labs, uint16_t dclass)
+        uint8_t* name, size_t len, int labs, uint16_t dclass, uint16_t dtype)
 {
 	return local_zones_tags_lookup(zones, name, len, labs,
-		dclass, NULL, 0, 1);
+		dclass, dtype, NULL, 0, 1);
 }
 
 struct local_zone* 
 local_zones_tags_lookup(struct local_zones* zones,
-        uint8_t* name, size_t len, int labs, uint16_t dclass,
+        uint8_t* name, size_t len, int labs, uint16_t dclass, uint16_t dtype,
 	uint8_t* taglist, size_t taglen, int ignoretags)
 {
 	rbnode_type* res = NULL;
 	struct local_zone *result;
 	struct local_zone key;
 	int m;
+	/* for type DS use a zone higher when on a zonecut */
+	if(dtype == LDNS_RR_TYPE_DS && !dname_is_root(name)) {
+		dname_remove_label(&name, &len);
+		labs--;
+	}
 	key.node.key = &key;
 	key.dclass = dclass;
 	key.name = name;
@@ -1122,57 +1132,11 @@ void local_zones_print(struct local_zones* zones)
 	lock_rw_rdlock(&zones->lock);
 	log_info("number of auth zones %u", (unsigned)zones->ztree.count);
 	RBTREE_FOR(z, struct local_zone*, &zones->ztree) {
+		char buf[64];
 		lock_rw_rdlock(&z->lock);
-		switch(z->type) {
-		case local_zone_deny:
-			log_nametypeclass(0, "deny zone", 
-				z->name, 0, z->dclass);
-			break;
-		case local_zone_refuse:
-			log_nametypeclass(0, "refuse zone", 
-				z->name, 0, z->dclass);
-			break;
-		case local_zone_redirect:
-			log_nametypeclass(0, "redirect zone", 
-				z->name, 0, z->dclass);
-			break;
-		case local_zone_transparent:
-			log_nametypeclass(0, "transparent zone", 
-				z->name, 0, z->dclass);
-			break;
-		case local_zone_typetransparent:
-			log_nametypeclass(0, "typetransparent zone", 
-				z->name, 0, z->dclass);
-			break;
-		case local_zone_static:
-			log_nametypeclass(0, "static zone", 
-				z->name, 0, z->dclass);
-			break;
-		case local_zone_inform:
-			log_nametypeclass(0, "inform zone", 
-				z->name, 0, z->dclass);
-			break;
-		case local_zone_inform_deny:
-			log_nametypeclass(0, "inform_deny zone", 
-				z->name, 0, z->dclass);
-			break;
-		case local_zone_always_transparent:
-			log_nametypeclass(0, "always_transparent zone", 
-				z->name, 0, z->dclass);
-			break;
-		case local_zone_always_refuse:
-			log_nametypeclass(0, "always_refuse zone", 
-				z->name, 0, z->dclass);
-			break;
-		case local_zone_always_nxdomain:
-			log_nametypeclass(0, "always_nxdomain zone", 
-				z->name, 0, z->dclass);
-			break;
-		default:
-			log_nametypeclass(0, "badtyped zone", 
-				z->name, 0, z->dclass);
-			break;
-		}
+		snprintf(buf, sizeof(buf), "%s zone",
+			local_zone_type2str(z->type));
+		log_nametypeclass(0, buf, z->name, 0, z->dclass);
 		local_zone_out(z);
 		lock_rw_unlock(&z->lock);
 	}
@@ -1578,14 +1542,19 @@ local_zones_answer(struct local_zones* zones, struct module_env* env,
 		if(view->local_zones &&
 			(z = local_zones_lookup(view->local_zones,
 			qinfo->qname, qinfo->qname_len, labs,
-			qinfo->qclass))) {
-			verbose(VERB_ALGO, 
-				"using localzone from view: %s", 
-				view->name);
+			qinfo->qclass, qinfo->qtype))) {
+			if(z->type != local_zone_noview)
+				verbose(VERB_ALGO, 
+					"using localzone from view: %s", 
+					view->name);
 			lock_rw_rdlock(&z->lock);
 			lzt = z->type;
 		}
-		if(!z && !view->isfirst){
+		if(lzt == local_zone_noview) {
+			lock_rw_unlock(&z->lock);
+			z = NULL;
+		}
+		if(view->local_zones && !z && !view->isfirst){
 			lock_rw_unlock(&view->lock);
 			return 0;
 		}
@@ -1595,8 +1564,8 @@ local_zones_answer(struct local_zones* zones, struct module_env* env,
 		/* try global local_zones tree */
 		lock_rw_rdlock(&zones->lock);
 		if(!(z = local_zones_tags_lookup(zones, qinfo->qname,
-			qinfo->qname_len, labs, qinfo->qclass, taglist,
-			taglen, 0))) {
+			qinfo->qname_len, labs, qinfo->qclass, qinfo->qtype,
+			taglist, taglen, 0))) {
 			lock_rw_unlock(&zones->lock);
 			return 0;
 		}
@@ -1642,6 +1611,7 @@ const char* local_zone_type2str(enum localzone_type t)
 		case local_zone_always_transparent: return "always_transparent";
 		case local_zone_always_refuse: return "always_refuse";
 		case local_zone_always_nxdomain: return "always_nxdomain";
+		case local_zone_noview: return "noview";
 	}
 	return "badtyped"; 
 }
@@ -1670,6 +1640,10 @@ int local_zone_str2type(const char* type, enum localzone_type* t)
 		*t = local_zone_always_refuse;
 	else if(strcmp(type, "always_nxdomain") == 0)
 		*t = local_zone_always_nxdomain;
+	else if(strcmp(type, "noview") == 0)
+		*t = local_zone_noview;
+	else if(strcmp(type, "nodefault") == 0)
+		*t = local_zone_nodefault;
 	else return 0;
 	return 1;
 }
@@ -1749,19 +1723,19 @@ int
 local_zones_add_RR(struct local_zones* zones, const char* rr)
 {
 	uint8_t* rr_name;
-	uint16_t rr_class;
+	uint16_t rr_class, rr_type;
 	size_t len;
 	int labs;
 	struct local_zone* z;
 	int r;
-	if(!get_rr_nameclass(rr, &rr_name, &rr_class)) {
+	if(!get_rr_nameclass(rr, &rr_name, &rr_class, &rr_type)) {
 		return 0;
 	}
 	labs = dname_count_size_labels(rr_name, &len);
 	/* could first try readlock then get writelock if zone does not exist,
 	 * but we do not add enough RRs (from multiple threads) to optimize */
 	lock_rw_wrlock(&zones->lock);
-	z = local_zones_lookup(zones, rr_name, len, labs, rr_class);
+	z = local_zones_lookup(zones, rr_name, len, labs, rr_class, rr_type);
 	if(!z) {
 		z = local_zones_add_zone(zones, rr_name, len, labs, rr_class,
 			local_zone_transparent);
@@ -1813,14 +1787,47 @@ del_empty_term(struct local_zone* z, struct local_data* d,
 	}
 }
 
+/** find and remove type from list in domain struct */
+static void
+del_local_rrset(struct local_data* d, uint16_t dtype)
+{
+	struct local_rrset* prev=NULL, *p=d->rrsets;
+	while(p && ntohs(p->rrset->rk.type) != dtype) {
+		prev = p;
+		p = p->next;
+	}
+	if(!p) 
+		return; /* rrset type not found */
+	/* unlink it */
+	if(prev) prev->next = p->next;
+	else d->rrsets = p->next;
+	/* no memory recycling for zone deletions ... */
+}
+
 void local_zones_del_data(struct local_zones* zones, 
 	uint8_t* name, size_t len, int labs, uint16_t dclass)
 {
 	/* find zone */
 	struct local_zone* z;
 	struct local_data* d;
+
+	/* remove DS */
 	lock_rw_rdlock(&zones->lock);
-	z = local_zones_lookup(zones, name, len, labs, dclass);
+	z = local_zones_lookup(zones, name, len, labs, dclass, LDNS_RR_TYPE_DS);
+	if(z) {
+		lock_rw_wrlock(&z->lock);
+		d = lz_find_node(z, name, len, labs);
+		if(d) {
+			del_local_rrset(d, LDNS_RR_TYPE_DS);
+			del_empty_term(z, d, name, len, labs);
+		}
+		lock_rw_unlock(&z->lock);
+	}
+	lock_rw_unlock(&zones->lock);
+
+	/* remove other types */
+	lock_rw_rdlock(&zones->lock);
+	z = local_zones_lookup(zones, name, len, labs, dclass, 0);
 	if(!z) {
 		/* no such zone, we're done */
 		lock_rw_unlock(&zones->lock);
