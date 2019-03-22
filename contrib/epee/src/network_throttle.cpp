@@ -1,6 +1,6 @@
 /**
 @file
-@author rfree (current maintainer in stellite.cc project)
+@author rfree (current maintainer in torque.cc project)
 @brief interface for throttling of connection (count and rate-limit speed etc) 
 @details <PRE>
 

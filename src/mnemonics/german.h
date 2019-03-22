@@ -1,4 +1,4 @@
-// Word list created by Stellite contributor Shrikez
+// Word list created by Torque contributor Shrikez
 // 
 // Copyright (c) 2014-2018, The MoNerO Project
 // 

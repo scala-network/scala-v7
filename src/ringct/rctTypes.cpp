@@ -1,4 +1,4 @@
-// Copyright (c) 2016, Stellite Research Labs
+// Copyright (c) 2016, Torque Research Labs
 //
 // Author: Shen Noether <shen.noether@gmx.com>
 // 
@@ -91,7 +91,7 @@ namespace rct {
         printf("]");
         printf("\n");
     }
-    void dp(xtl_amount vali) {
+    void dp(xtc_amount vali) {
         printf("x: ");
         std::cout << vali;
         printf("\n\n");
@@ -116,33 +116,33 @@ namespace rct {
     //Various Conversions 
     
     //uint long long to 32 byte key
-    void d2h(key & amounth, const xtl_amount in) {
+    void d2h(key & amounth, const xtc_amount in) {
         sc_0(amounth.bytes);
-        xtl_amount val = in;
+        xtc_amount val = in;
         int i = 0;
         while (val != 0) {
             amounth[i] = (unsigned char)(val & 0xFF);
             i++;
-            val /= (xtl_amount)256;
+            val /= (xtc_amount)256;
         }
     }
     
     //uint long long to 32 byte key
-    key d2h(const xtl_amount in) {
+    key d2h(const xtc_amount in) {
         key amounth;
         sc_0(amounth.bytes);
-        xtl_amount val = in;
+        xtc_amount val = in;
         int i = 0;
         while (val != 0) {
             amounth[i] = (unsigned char)(val & 0xFF);
             i++;
-            val /= (xtl_amount)256;
+            val /= (xtc_amount)256;
         }
         return amounth;
     }
 
     //uint long long to int[64]
-    void d2b(bits  amountb, xtl_amount val) {
+    void d2b(bits  amountb, xtc_amount val) {
         int i = 0;
         while (val != 0) {
             amountb[i] = val & 1;
@@ -158,11 +158,11 @@ namespace rct {
     //32 byte key to uint long long
     // if the key holds a value > 2^64
     // then the value in the first 8 bytes is returned    
-    xtl_amount h2d(const key & test) {
-        xtl_amount vali = 0;
+    xtc_amount h2d(const key & test) {
+        xtc_amount vali = 0;
         int j = 0;
         for (j = 7; j >= 0; j--) {
-            vali = (xtl_amount)(vali * 256 + (unsigned char)test.bytes[j]);
+            vali = (xtc_amount)(vali * 256 + (unsigned char)test.bytes[j]);
         }
         return vali;
     }
@@ -202,11 +202,11 @@ namespace rct {
     }
     
     //int[64] to uint long long
-    xtl_amount b2d(bits amountb) {
-        xtl_amount vali = 0;
+    xtc_amount b2d(bits amountb) {
+        xtc_amount vali = 0;
         int j = 0;
         for (j = 63; j >= 0; j--) {
-            vali = (xtl_amount)(vali * 2 + amountb[j]);
+            vali = (xtc_amount)(vali * 2 + amountb[j]);
         }
         return vali;
     }

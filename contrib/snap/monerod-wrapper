@@ -2,7 +2,7 @@
 
 if [ ! -d "$SNAP_USER_DATA/etc" ]; then
   mkdir $SNAP_USER_DATA/etc/
-  cp -R $SNAP/etc/stellited.conf $SNAP_USER_DATA/etc/stellited.conf
+  cp -R $SNAP/etc/torqued.conf $SNAP_USER_DATA/etc/torqued.conf
 fi
 
-exec "$SNAP/bin/stellited" "$@"
+exec "$SNAP/bin/torqued" "$@"

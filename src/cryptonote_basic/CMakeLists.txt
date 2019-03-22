@@ -61,9 +61,9 @@ set(cryptonote_basic_private_headers
   tx_extra.h
   verification_context.h)
 
-stellite_private_headers(cryptonote_basic
+torque_private_headers(cryptonote_basic
   ${cryptonote_basic_private_headers})
-stellite_add_library(cryptonote_basic
+torque_add_library(cryptonote_basic
   ${cryptonote_basic_sources}
   ${cryptonote_basic_headers}
   ${cryptonote_basic_private_headers})

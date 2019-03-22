@@ -1,6 +1,6 @@
 # Portions Copyright (c) 2017-2018, The MoNerO Project
 # This file is based off of the https://code.google.com/archive/p/ios-cmake/
-# It has been altered for Stellite iOS development
+# It has been altered for Torque iOS development
 #
 #
 # Options:

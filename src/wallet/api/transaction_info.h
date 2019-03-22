@@ -32,7 +32,7 @@
 #include <string>
 #include <ctime>
 
-namespace Stellite {
+namespace Torque {
 
 class TransactionHistoryImpl;
 
@@ -84,4 +84,4 @@ private:
 
 } // namespace
 
-namespace Bitstellite = Stellite;
+namespace Bittorque = Torque;

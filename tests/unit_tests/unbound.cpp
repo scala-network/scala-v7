@@ -36,7 +36,7 @@ extern "C" int dnskey_algo_id_is_supported(int);
 
 TEST(unbound, supported_algorithms)
 {
-  // Stellite causes these to be tried, but we don't have access
+  // Torque causes these to be tried, but we don't have access
   // to this internal unbound header here, so we use raw numbers
   // LDNS_RSASHA1            = 5,
   // LDNS_RSASHA1_NSEC3      = 7,

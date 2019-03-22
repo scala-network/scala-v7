@@ -27,15 +27,15 @@
 # THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cmake_minimum_required (VERSION 2.6)
-project (stellite CXX)
+project (torque CXX)
 
 file(GLOB P2P *)
 source_group(p2p FILES ${P2P})
 
 #add_library(p2p ${P2P})
 
-#stellite_private_headers(p2p ${P2P})
-stellite_add_library(p2p ${P2P})
+#torque_private_headers(p2p ${P2P})
+torque_add_library(p2p ${P2P})
 target_link_libraries(p2p
   PUBLIC
     version

@@ -40,7 +40,7 @@
 #include <boost/thread/condition_variable.hpp>
 
 
-namespace Stellite {
+namespace Torque {
 class TransactionHistoryImpl;
 class PendingTransactionImpl;
 class UnsignedTransactionImpl;
@@ -254,7 +254,7 @@ private:
 
 } // namespace
 
-namespace Bitstellite = Stellite;
+namespace Bittorque = Torque;
 
 #endif
 

@@ -1,7 +1,7 @@
 #assumes you have gnu sed, osx sed might need slight syntax changeo
 #c.f. https://unix.stackexchange.com/questions/112023/how-can-i-replace-a-string-in-a-files
 
-#written by shen-noether stellite research labs
+#written by shen-noether torque research labs
 
 import os #for copying and sed etc.
 import glob #for copy files
@@ -120,10 +120,10 @@ ge_comments = textwrap.dedent("""\
     */
     """)
 
-xtl_comments = textwrap.dedent("""\
+xtc_comments = textwrap.dedent("""\
     /*
      *
-     * xtl specific code
+     * xtc specific code
      *
      *
     This code is from the original CryptoNote.
@@ -168,36 +168,36 @@ if a == "m":
     print(fe_comments)
     fe = glob.glob("fe*.c")
     for g in fe:
-        os.system("cp "+g+" "+g.replace("fe", "fe.stellite."))
-    qhasmToC("fe_pow22523.c", "pow22523.h", "fe.stellite._pow22523.c")
-    qhasmToC("fe_invert.c", "pow225521.h", "fe.stellite._invert.c")
-    os.system("rm fe.stellite._isnonzero.c") #since it's modified, it's in xtlSpecificOld
-    os.system("cat fe.stellite.*.c | grep -v '^#include' > fe.stellite.c")
+        os.system("cp "+g+" "+g.replace("fe", "fe.torque."))
+    qhasmToC("fe_pow22523.c", "pow22523.h", "fe.torque._pow22523.c")
+    qhasmToC("fe_invert.c", "pow225521.h", "fe.torque._invert.c")
+    os.system("rm fe.torque._isnonzero.c") #since it's modified, it's in xtcSpecificOld
+    os.system("cat fe.torque.*.c | grep -v '^#include' > fe.torque.c")
 
     #sc things
     print("\nmaking sc.c")
     print(sc_comments)
     #so you don't get multiple "loads"
-    os.system("tail -n +24 sc_reduce.c > sc.stellite._reduce.c") #also good on linux
-    os.system("tail -n +24 sc_muladd.c > sc.stellite._muladd.c")
-    os.system("tail -n +31 sc_sub.xtl.c > sc.stellite._sub.xtl.c") #careful with the tails if you change these files!
-    os.system("cat sc.stellite.*.c | grep -v '^#include' > sc.stellite.c")
+    os.system("tail -n +24 sc_reduce.c > sc.torque._reduce.c") #also good on linux
+    os.system("tail -n +24 sc_muladd.c > sc.torque._muladd.c")
+    os.system("tail -n +31 sc_sub.xtc.c > sc.torque._sub.xtc.c") #careful with the tails if you change these files!
+    os.system("cat sc.torque.*.c | grep -v '^#include' > sc.torque.c")
 
     #ge stuff
     print("making ge.c")
     ge = glob.glob("ge*.c")
     for g in ge:
-        os.system("cp "+g+" "+g.replace("ge", "ge.stellite."))
+        os.system("cp "+g+" "+g.replace("ge", "ge.torque."))
     print(ge_comments)
     #need to substitute the below lines for their .h files in the appropriate places
-    qhasmToC("ge_add.c", "ge_add.h", "ge.stellite._add.c")
-    qhasmToC("ge_madd.c", "ge_madd.h", "ge.stellite._madd.c")
-    qhasmToC("ge_sub.c", "ge_sub.h", "ge.stellite._sub.c")
-    qhasmToC("ge_msub.c", "ge_msub.h", "ge.stellite._msub.c")
-    qhasmToC("ge_p2_dbl.c", "ge_p2_dbl.h", "ge.stellite._p2_dbl.c")
-    qhasmToC("ge_frombytes.c", "d.h", "ge.stellite._frombytes.c")
-    qhasmToC("ge.stellite._frombytes.c", "sqrtm1.h", "ge.stellite._frombytes.c")
-    qhasmToC("ge_p3_to_cached.c", "d2.h", "ge.stellite._p3_to_cached.c")
+    qhasmToC("ge_add.c", "ge_add.h", "ge.torque._add.c")
+    qhasmToC("ge_madd.c", "ge_madd.h", "ge.torque._madd.c")
+    qhasmToC("ge_sub.c", "ge_sub.h", "ge.torque._sub.c")
+    qhasmToC("ge_msub.c", "ge_msub.h", "ge.torque._msub.c")
+    qhasmToC("ge_p2_dbl.c", "ge_p2_dbl.h", "ge.torque._p2_dbl.c")
+    qhasmToC("ge_frombytes.c", "d.h", "ge.torque._frombytes.c")
+    qhasmToC("ge.torque._frombytes.c", "sqrtm1.h", "ge.torque._frombytes.c")
+    qhasmToC("ge_p3_to_cached.c", "d2.h", "ge.torque._p3_to_cached.c")
 
 
 
@@ -205,11 +205,11 @@ if a == "m":
     #note, base2.h is a large file!
     #also in ge_scalarmult_base ge_precomp base needs base.h included
 
-    qhasmToC("ge_double_scalarmult.c", "base2.h", "ge.stellite._double_scalarmult.c")
-    qhasmToC("ge_scalarmult_base.c", "base.h", "ge.stellite._scalarmult_base.c")
-    #qhasmToC("ge.stellite._scalarmult_base.c", "base.h", "ge.stellite._scalarmult_base.c")
-    os.system("sed -i 's/ cmov/ ge_precomp_cmov/g' ge.stellite._scalarmult_base.c")
-    os.system("cat ge.stellite.*.c | grep -v '^#include' > ge.stellite.c")
+    qhasmToC("ge_double_scalarmult.c", "base2.h", "ge.torque._double_scalarmult.c")
+    qhasmToC("ge_scalarmult_base.c", "base.h", "ge.torque._scalarmult_base.c")
+    #qhasmToC("ge.torque._scalarmult_base.c", "base.h", "ge.torque._scalarmult_base.c")
+    os.system("sed -i 's/ cmov/ ge_precomp_cmov/g' ge.torque._scalarmult_base.c")
+    os.system("cat ge.torque.*.c | grep -v '^#include' > ge.torque.c")
 
 
     print("making crypto-ops.c")
@@ -217,30 +217,30 @@ if a == "m":
     #sqrtm1 things
 
     #comments
-    with open("fe.stellite.comments", "w") as text_file:
+    with open("fe.torque.comments", "w") as text_file:
             text_file.write(fe_comments)
-    with open("ge.stellite.comments", "w") as text_file:
+    with open("ge.torque.comments", "w") as text_file:
             text_file.write(ge_comments)
-    with open("sc.stellite.comments", "w") as text_file:
+    with open("sc.torque.comments", "w") as text_file:
             text_file.write(sc_comments)
-    with open("xtl.stellite.comments", "w") as text_file:
-            text_file.write(xtl_comments)
-    with open("xtl.stellite.predeclarations", "w") as text_file:
+    with open("xtc.torque.comments", "w") as text_file:
+            text_file.write(xtc_comments)
+    with open("xtc.torque.predeclarations", "w") as text_file:
             text_file.write(predeclarations)
 
 
     #license
-    with open("stellite.license", "w") as text_file:
+    with open("torque.license", "w") as text_file:
             text_file.write(license)
 
     #crypto-ops.c includes
-    with open("crypto-ops.stellite.includes", "w") as text_file:
+    with open("crypto-ops.torque.includes", "w") as text_file:
         text_file.write(crypto_ops_includes)
 
     #note you may have duplicates of load_3, load_4 and possibly some other functions ... 
-    os.system("cat stellite.license crypto-ops.stellite.includes xtl.stellite.predeclarations fe.stellite.comments fe.stellite.c sc.stellite.comments sc.stellite.c ge.stellite.comments ge.stellite.c xtl.stellite.comments xtlSpecificOld.c > crypto-ops.c")
+    os.system("cat torque.license crypto-ops.torque.includes xtc.torque.predeclarations fe.torque.comments fe.torque.c sc.torque.comments sc.torque.c ge.torque.comments ge.torque.c xtc.torque.comments xtcSpecificOld.c > crypto-ops.c")
 
-    #stellite specific header files
+    #torque specific header files
     #print("making crypto-ops-tmp.h")
     #os.system("cat fe.h ge.h sc.h |grep -v crypto_sign_ed25519 |grep -v fe.h > crypto-ops-tmp.h")
     #we'll just use the old header crypto-ops.h
@@ -252,10 +252,10 @@ if a == "m":
     os.system("sed -i 's/crypto_uint64/uint64_t/g' crypto-ops.c")
 
     #cleaning up 
-    os.system("rm *stellite*")
+    os.system("rm *torque*")
 
-    #stellite specific c files
+    #torque specific c files
 if a == "c":
     #turn the directory back into ref10
-    os.system("rm *stellite*")
+    os.system("rm *torque*")
     os.system("rm crypto-ops.c")

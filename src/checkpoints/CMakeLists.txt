@@ -44,9 +44,9 @@ set(checkpoints_headers)
 set(checkpoints_private_headers
   checkpoints.h)
 
-stellite_private_headers(checkpoints
+torque_private_headers(checkpoints
   ${checkpoints_private_headers})
-stellite_add_library(checkpoints
+torque_add_library(checkpoints
   ${checkpoints_sources}
   ${checkpoints_headers}
   ${checkpoints_private_headers})

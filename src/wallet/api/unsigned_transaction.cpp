@@ -42,7 +42,7 @@
 
 using namespace std;
 
-namespace Stellite {
+namespace Torque {
 
 UnsignedTransaction::~UnsignedTransaction() {}
 
@@ -317,5 +317,5 @@ uint64_t UnsignedTransactionImpl::minMixinCount() const
 
 } // namespace
 
-namespace Bitstellite = Stellite;
+namespace Bittorque = Torque;
 

@@ -1,5 +1,5 @@
 /// @file
-/// @author rfree (current maintainer in stellite.cc project)
+/// @author rfree (current maintainer in torque.cc project)
 /// @brief base for connection, contains e.g. the ratelimit hooks
 
 // Copyright (c) 2014-2018, The MoNerO Project
@@ -161,7 +161,7 @@ connection_basic::connection_basic(boost::asio::io_service& io_service, std::ato
 	try { boost::system::error_code e; remote_addr_str = socket_.remote_endpoint(e).address().to_string(); } catch(...){} ;
 
 	_note("Spawned connection p2p#"<<mI->m_peer_number<<" to " << remote_addr_str << " currently we have sockets count:" << m_ref_sock_count);
-	//boost::filesystem::create_directories("log/dr-stellite/net/");
+	//boost::filesystem::create_directories("log/dr-torque/net/");
 }
 
 connection_basic::~connection_basic() noexcept(false) {

@@ -35,7 +35,7 @@
 #include <vector>
 
 
-namespace Stellite {
+namespace Torque {
 
 class WalletImpl;
 class UnsignedTransactionImpl : public UnsignedTransaction
@@ -72,4 +72,4 @@ private:
 
 }
 
-namespace Bitstellite = Stellite;
+namespace Bittorque = Torque;

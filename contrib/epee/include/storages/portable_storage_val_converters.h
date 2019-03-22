@@ -134,9 +134,9 @@ POP_WARNINGS
       }
     };
 
-    // For MyStellite/OpenStellite backend compatibility
-    // MyStellite backend sends amount, fees and timestamp values as strings.
-    // Until MM backend is updated, this is needed for compatibility between OpenStellite and MyStellite. 
+    // For MyTorque/OpenTorque backend compatibility
+    // MyTorque backend sends amount, fees and timestamp values as strings.
+    // Until MM backend is updated, this is needed for compatibility between OpenTorque and MyTorque. 
     template<>
     struct convert_to_integral<std::string, uint64_t, false>
     {
@@ -146,7 +146,7 @@ POP_WARNINGS
         // String only contains digits
         if(std::all_of(from.begin(), from.end(), ::isdigit))
           to = boost::lexical_cast<uint64_t>(from);
-        // MyStellite ISO 8061 timestamp (2017-05-06T16:27:06Z)
+        // MyTorque ISO 8061 timestamp (2017-05-06T16:27:06Z)
         else if (boost::regex_match (from, boost::regex("\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\dZ")))
         {
           // Convert to unix timestamp

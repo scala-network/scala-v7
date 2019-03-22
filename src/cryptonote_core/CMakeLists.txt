@@ -47,9 +47,9 @@ else()
   set(Blocks "")
 endif()
 
-stellite_private_headers(cryptonote_core
+torque_private_headers(cryptonote_core
   ${cryptonote_core_private_headers})
-stellite_add_library(cryptonote_core
+torque_add_library(cryptonote_core
   ${cryptonote_core_sources}
   ${cryptonote_core_headers}
   ${cryptonote_core_private_headers})

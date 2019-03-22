@@ -79,9 +79,9 @@ set(common_private_headers
   updates.h
   aligned.h)
 
-stellite_private_headers(common
+torque_private_headers(common
   ${common_private_headers})
-stellite_add_library(common
+torque_add_library(common
   ${common_sources}
   ${common_headers}
   ${common_private_headers}
@@ -101,5 +101,5 @@ target_link_libraries(common
     ${OPENSSL_LIBRARIES}
     ${EXTRA_LIBRARIES})
 
-#stellite_install_headers(common
+#torque_install_headers(common
 #  ${common_headers})

@@ -109,12 +109,12 @@ int main(int argc, char* argv[])
   SL(tools::wallet2::unsigned_tx_set);
   SL(tools::wallet2::signed_tx_set);
 
-  SL(Stellite::WalletImpl);
-  SL(Stellite::AddressBookRow);
-  SL(Stellite::TransactionInfoImpl);
-  SL(Stellite::TransactionHistoryImpl);
-  SL(Stellite::PendingTransactionImpl);
-  SL(Stellite::UnsignedTransactionImpl);
+  SL(Torque::WalletImpl);
+  SL(Torque::AddressBookRow);
+  SL(Torque::TransactionInfoImpl);
+  SL(Torque::TransactionHistoryImpl);
+  SL(Torque::PendingTransactionImpl);
+  SL(Torque::UnsignedTransactionImpl);
 
   return 0;
 }

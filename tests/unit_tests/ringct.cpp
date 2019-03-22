@@ -152,7 +152,7 @@ TEST(ringct, range_proofs)
         tie(sctmp, pctmp) = ctskpkGen(7000);
         sc.push_back(sctmp);
         pc.push_back(pctmp);
-        vector<xtl_amount >amounts;
+        vector<xtc_amount >amounts;
         rct::keyV amount_keys;
         key mask;
 
@@ -213,7 +213,7 @@ TEST(ringct, range_proofs_with_fee)
         tie(sctmp, pctmp) = ctskpkGen(7000);
         sc.push_back(sctmp);
         pc.push_back(pctmp);
-        vector<xtl_amount >amounts;
+        vector<xtc_amount >amounts;
         keyV amount_keys;
         key mask;
 
@@ -267,9 +267,9 @@ TEST(ringct, simple)
         ctkeyV sc, pc;
         ctkey sctmp, pctmp;
         //this vector corresponds to output amounts
-        vector<xtl_amount>outamounts;
+        vector<xtc_amount>outamounts;
        //this vector corresponds to input amounts
-        vector<xtl_amount>inamounts;
+        vector<xtc_amount>inamounts;
         //this keyV corresponds to destination pubkeys
         keyV destinations;
         keyV amount_keys;
@@ -309,7 +309,7 @@ TEST(ringct, simple)
         key message = skGen(); //real message later (hash of txn..)
 
         //compute sig with mixin 2
-        xtl_amount txnfee = 1;
+        xtc_amount txnfee = 1;
 
         rctSig s = genRctSimple(message, sc, pc, destinations,inamounts, outamounts, amount_keys, NULL, NULL, txnfee, 2, hw::get_device("default"));
 
@@ -324,7 +324,7 @@ static rct::rctSig make_sample_rct_sig(int n_inputs, const uint64_t input_amount
 {
     ctkeyV sc, pc;
     ctkey sctmp, pctmp;
-    vector<xtl_amount >amounts;
+    vector<xtc_amount >amounts;
     keyV destinations;
     keyV amount_keys;
     key Sk, Pk;
@@ -352,7 +352,7 @@ static rct::rctSig make_sample_simple_rct_sig(int n_inputs, const uint64_t input
 {
     ctkeyV sc, pc;
     ctkey sctmp, pctmp;
-    vector<xtl_amount> inamounts, outamounts;
+    vector<xtc_amount> inamounts, outamounts;
     keyV destinations;
     keyV amount_keys;
     key Sk, Pk;
@@ -822,7 +822,7 @@ TEST(ringct, HPow2)
   }
 }
 
-static const xtl_amount test_amounts[]={0, 1, 2, 3, 4, 5, 10000, 10000000000000000000ull, 10203040506070809000ull, 123456789123456789};
+static const xtc_amount test_amounts[]={0, 1, 2, 3, 4, 5, 10000, 10000000000000000000ull, 10203040506070809000ull, 123456789123456789};
 
 TEST(ringct, ecdh_roundtrip)
 {

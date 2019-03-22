@@ -1,31 +1,31 @@
-name: stellite
+name: torque
 version: 0.11.1.0-1
-summary: "Stellite: the secure, private, untraceable cryptocurrency https://getstellite.org"
+summary: "Torque: the secure, private, untraceable cryptocurrency https://gettorque.org"
 description: |
-    Stellite is a private, secure, untraceable, decentralised digital currency.
+    Torque is a private, secure, untraceable, decentralised digital currency.
     You are your bank, you control your funds, and nobody can trace your transfers
     unless you allow them to do so.
 grade: devel
 confinement: strict
 
 apps:
-    stellited:
+    torqued:
         daemon: forking
         command: |
-          stellited-wrapper --detach --data-dir ${SNAP_COMMON} --config-file ${SNAP_USER_DATA}/etc/stellited.conf
+          torqued-wrapper --detach --data-dir ${SNAP_COMMON} --config-file ${SNAP_USER_DATA}/etc/torqued.conf
         plugs:
             - network
             - network-bind
-    stellite-wallet-rpc:
+    torque-wallet-rpc:
         command: |
-          stellite-wallet-rpc --log-file ${SNAP_USER_DATA}
+          torque-wallet-rpc --log-file ${SNAP_USER_DATA}
         plugs:
             - home
             - network
             - network-bind
-    stellite-wallet-cli:
+    torque-wallet-cli:
         command: |
-          stellite-wallet-cli --log-file ${SNAP_USER_DATA}
+          torque-wallet-cli --log-file ${SNAP_USER_DATA}
         plugs:
             - home
             - network
@@ -71,8 +71,8 @@ parts:
         plugin: dump
         source: .
         organize:
-            contrib/snap/stellited.conf: etc/stellited.conf
-            contrib/snap/stellited-wrapper: bin/stellited-wrapper
+            contrib/snap/torqued.conf: etc/torqued.conf
+            contrib/snap/torqued-wrapper: bin/torqued-wrapper
         prime:
             - etc
             - bin

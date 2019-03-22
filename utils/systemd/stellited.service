@@ -1,33 +1,33 @@
 [Unit]
-Description=Stellite Full Node
+Description=Torque Full Node
 After=network.target
 
 [Service]
-User=stellite
-Group=stellite
+User=torque
+Group=torque
 WorkingDirectory=~
-RuntimeDirectory=stellite
+RuntimeDirectory=torque
 
 # Clearnet config
 #
 Type=forking
-PIDFile=/run/stellite/stellited.pid
-ExecStart=/usr/bin/stellited --config-file /etc/stellited.conf \
-    --detach --pidfile /run/stellite/stellited.pid
+PIDFile=/run/torque/torqued.pid
+ExecStart=/usr/bin/torqued --config-file /etc/torqued.conf \
+    --detach --pidfile /run/torque/torqued.pid
 
 # Tor config
 #
 ## We have to use simple, not forking, because we cannot pass --detach
 ## because stderr/stdout is not available when detached, but torsocks
 ## attempts to write to it, and fails with 'invalid argument', causing
-## stellited to fail.
+## torqued to fail.
 #Type=simple
 #Environment=DNS_PUBLIC=tcp
 ## The following is needed only when accessing wallet from a different
 ## host in the LAN, VPN, etc, the RPC must bind to 0.0.0.0, but
 ## by default torsocks only allows binding to localhost.
 #Environment=TORSOCKS_ALLOW_INBOUND=1
-#ExecStart=/usr/bin/torsocks /usr/bin/stellited --config-file /etc/stellited.conf \
+#ExecStart=/usr/bin/torsocks /usr/bin/torqued --config-file /etc/torqued.conf \
 #    --non-interactive
 
 Restart=always

@@ -150,7 +150,7 @@ namespace cryptonote
   };
   static const command_line::arg_descriptor<std::string> arg_check_updates = {
     "check-updates"
-  , "Check for new versions of stellite: [disabled|notify|download|update]"
+  , "Check for new versions of torque: [disabled|notify|download|update]"
   , "notify"
   };
   static const command_line::arg_descriptor<bool> arg_fluffy_blocks  = {
@@ -427,8 +427,8 @@ namespace cryptonote
       if (boost::filesystem::exists(old_files / "blockchain.bin"))
       {
         MWARNING("Found old-style blockchain.bin in " << old_files.string());
-        MWARNING("Stellite now uses a new format. You can either remove blockchain.bin to start syncing");
-        MWARNING("the blockchain anew, or use stellite-blockchain-export and stellite-blockchain-import to");
+        MWARNING("Torque now uses a new format. You can either remove blockchain.bin to start syncing");
+        MWARNING("the blockchain anew, or use torque-blockchain-export and torque-blockchain-import to");
         MWARNING("convert your existing blockchain.bin to the new format. See README.md for instructions.");
         return false;
       }
@@ -1479,10 +1479,10 @@ if (!results[i].res)
     {
       std::string main_message;
       if (m_offline)
-        main_message = "The daemon is running offline and will not attempt to sync to the Stellite network.";
+        main_message = "The daemon is running offline and will not attempt to sync to the Torque network.";
       else
         main_message = "The daemon will start synchronizing with the network. This may take a long time to complete.";
-      MGINFO_YELLOW(ENDL << "**********************************************************************" << ENDL
+        MGINFO_YELLOW(ENDL << "**********************************************************************" << ENDL
         << main_message << ENDL
         << ENDL
         << "You can set the level of process detailization through \"set_log <level|categories>\" command," << ENDL
@@ -1491,6 +1491,7 @@ if (!results[i].res)
         << "Use the \"help\" command to see the list of available commands." << ENDL
         << "Use \"help <command>\" to see a command's documentation." << ENDL
         << "**********************************************************************" << ENDL);
+
       m_starter_message_showed = true;
     }
 
@@ -1547,7 +1548,7 @@ if (!results[i].res)
   //-----------------------------------------------------------------------------------------------
   bool core::check_updates()
   {
-    static const char software[] = "stellite";
+    static const char software[] = "torque";
 #ifdef BUILD_TAG
     static const char buildtag[] = BOOST_PP_STRINGIZE(BUILD_TAG);
     static const char subdir[] = "cli"; // because it can never be simple
