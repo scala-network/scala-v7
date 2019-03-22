@@ -34,9 +34,9 @@ set(serialization_headers)
 set(serialization_private_headers
   json_object.h)
 
-stellite_private_headers(serialization
+torque_private_headers(serialization
   ${serialization_private_headers})
-stellite_add_library(serialization
+torque_add_library(serialization
   ${serialization_sources}
   ${serialization_headers}
   ${serialization_private_headers})

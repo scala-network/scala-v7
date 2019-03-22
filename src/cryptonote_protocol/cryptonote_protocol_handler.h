@@ -1,5 +1,5 @@
 /// @file
-/// @author rfree (current maintainer/user in stellite.cc project - most of code is from CryptoNote)
+/// @author rfree (current maintainer/user in torque.cc project - most of code is from CryptoNote)
 /// @brief This is the original cryptonote protocol network-events handler, modified by us
 
 // Copyright (c) 2014-2018, The MoNerO Project

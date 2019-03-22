@@ -33,7 +33,7 @@
 #include "net/http_client.h"
 #include <string>
 
-namespace Stellite {
+namespace Torque {
 
 class WalletManagerImpl : public WalletManager
 {
@@ -101,4 +101,4 @@ private:
 
 } // namespace
 
-namespace Bitstellite = Stellite;
+namespace Bittorque = Torque;

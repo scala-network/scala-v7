@@ -49,9 +49,9 @@ set(mnemonics_private_headers
   esperanto.h
   lojban.h)
 
-stellite_private_headers(mnemonics
+torque_private_headers(mnemonics
   ${mnemonics_private_headers})
-stellite_add_library(mnemonics
+torque_add_library(mnemonics
   ${mnemonics_sources}
   ${mnemonics_headers}
   ${mnemonics_private_headers})

@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
-    <name>Stellite::AddressBookImpl</name>
+    <name>Torque::AddressBookImpl</name>
     <message>
         <location filename="../src/wallet/api/address_book.cpp" line="53"/>
         <source>Invalid destination address</source>
@@ -25,7 +25,7 @@
     </message>
 </context>
 <context>
-    <name>Stellite::PendingTransactionImpl</name>
+    <name>Torque::PendingTransactionImpl</name>
     <message>
         <location filename="../src/wallet/api/pending_transaction.cpp" line="90"/>
         <source>Attempting to save transaction to file, but specified file(s) exist. Exiting to not risk overwriting. File:</source>
@@ -68,7 +68,7 @@
     </message>
 </context>
 <context>
-    <name>Stellite::UnsignedTransactionImpl</name>
+    <name>Torque::UnsignedTransactionImpl</name>
     <message>
         <location filename="../src/wallet/api/unsigned_transaction.cpp" line="75"/>
         <source>This is a watch only wallet</source>
@@ -122,7 +122,7 @@
     </message>
 </context>
 <context>
-    <name>Stellite::WalletImpl</name>
+    <name>Torque::WalletImpl</name>
     <message>
         <location filename="../src/wallet/api/wallet.cpp" line="1111"/>
         <source>payment id has invalid format, expected 16 or 64 character hex string: </source>
@@ -1147,8 +1147,8 @@ Denna transaktion låses upp vid block %llu, om ungefär %s dagar (förutsatt en
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="679"/>
-        <source>Current fee is %s stellite per kB</source>
-        <translation>Aktuell avgift är %s stellite per kB</translation>
+        <source>Current fee is %s torque per kB</source>
+        <translation>Aktuell avgift är %s torque per kB</translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="695"/>
@@ -1559,8 +1559,8 @@ Denna transaktion låses upp vid block %llu, om ungefär %s dagar (förutsatt en
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="1622"/>
-        <source>Donate &lt;amount&gt; to the development team (donate.getstellite.org).</source>
-        <translation>Donera &lt;belopp&gt; till utvecklingsteamet (donate.getstellite.org).</translation>
+        <source>Donate &lt;amount&gt; to the development team (donate.gettorque.org).</source>
+        <translation>Donera &lt;belopp&gt; till utvecklingsteamet (donate.gettorque.org).</translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="1625"/>
@@ -1702,8 +1702,8 @@ Om argumentet &quot;tag_description&quot; anges, så tilldelas taggen &lt;taggna
    Set the fee to default/unimportant/normal/elevated/priority.
  confirm-missing-payment-id &lt;1|0>
  ask-password &lt;1|0>
- unit &lt;stellite|millinero|micronero|nanonero|piconero>
-   Set the default stellite (sub-)unit.
+ unit &lt;torque|millinero|micronero|nanonero|piconero>
+   Set the default torque (sub-)unit.
  min-outputs-count [n]
    Try to keep at least that many outputs of value at least min-outputs-value.
  min-outputs-value [n]
@@ -1737,8 +1737,8 @@ Om argumentet &quot;tag_description&quot; anges, så tilldelas taggen &lt;taggna
    Sätt avgiften till default/unimportant/normal/elevated/priority.
  confirm-missing-payment-id &lt;1|0>
  ask-password &lt;1|0>
- unit &lt;stellite|millinero|micronero|nanonero|piconero>
-   Ange standardvärde för stelliteenhet.
+ unit &lt;torque|millinero|micronero|nanonero|piconero>
+   Ange standardvärde för torqueenhet.
  min-outputs-count [n]
    Försök att behålla åtminstone så många utgångar med åtminstone värdet min-outputs-value.
  min-outputs-value [n]
@@ -2205,7 +2205,7 @@ Annars bevisar du reserven för det minsta möjliga belopp över &lt;belopp&gt; 
 To start synchronizing with the daemon, use the &quot;refresh&quot; command.
 Use the &quot;help&quot; command to see the list of available commands.
 Use &quot;help &lt;command>&quot; to see a command&apos;s documentation.
-Always use the &quot;exit&quot; command when closing stellite-wallet-cli to save 
+Always use the &quot;exit&quot; command when closing torque-wallet-cli to save 
 your current session&apos;s state. Otherwise, you might need to synchronize 
 your wallet again (your wallet keys are NOT at risk in any case).
 </source>
@@ -2213,7 +2213,7 @@ your wallet again (your wallet keys are NOT at risk in any case).
 Använd kommandot &quot;refresh&quot; för att starta synkronisering med daemonen.
 Använd kommandot &quot;help&quot; för att visa en lista över tillgängliga kommandon.
 Använd &quot;help &lt;kommando>&quot; för att visa dokumentation för kommandot.
-Använd alltid kommandot &quot;exit&quot; när du stänger stellite-wallet-cli så att ditt aktuella sessionstillstånd sparas. Annars kan du bli tvungen att synkronisera
+Använd alltid kommandot &quot;exit&quot; när du stänger torque-wallet-cli så att ditt aktuella sessionstillstånd sparas. Annars kan du bli tvungen att synkronisera
 din plånbok igen (din plånboks nycklar är dock INTE hotade i vilket fall som helst).
 </translation>
     </message>
@@ -2609,8 +2609,8 @@ Varning: Några ingångsnycklar som spenderas kommer från </translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="1923"/>
-        <source>stellite, millinero, micronero, nanonero, piconero</source>
-        <translation>stellite, millinero, micronero, nanonero, piconero</translation>
+        <source>torque, millinero, micronero, nanonero, piconero</source>
+        <translation>torque, millinero, micronero, nanonero, piconero</translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="1975"/>
@@ -3759,8 +3759,8 @@ Utgångar per *: </translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="129"/>
-        <source>The newly created transaction will not be relayed to the stellite network</source>
-        <translation>Den nyss skapade transaktionen kommer inte att skickas vidare till stellite-nätverket</translation>
+        <source>The newly created transaction will not be relayed to the torque network</source>
+        <translation>Den nyss skapade transaktionen kommer inte att skickas vidare till torque-nätverket</translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="171"/>
@@ -3779,9 +3779,9 @@ Utgångar per *: </translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="6787"/>
-        <source>This is the command line stellite wallet. It needs to connect to a stellite
+        <source>This is the command line torque wallet. It needs to connect to a torque
 daemon to work correctly.</source>
-        <translation>Detta är kommandoradsplånboken för Stellite. Den måste ansluta till en Stellite-
+        <translation>Detta är kommandoradsplånboken för Torque. Den måste ansluta till en Torque-
 daemon för att fungera korrekt.</translation>
     </message>
     <message>
@@ -4023,9 +4023,9 @@ daemon för att fungera korrekt.</translation>
     </message>
     <message>
         <location filename="../src/wallet/wallet_rpc_server.cpp" line="2870"/>
-        <source>This is the RPC stellite wallet. It needs to connect to a stellite
+        <source>This is the RPC torque wallet. It needs to connect to a torque
 daemon to work correctly.</source>
-        <translation>Detta är RPC-plånboken för stellite. Den måste ansluta till en Stellite-
+        <translation>Detta är RPC-plånboken för torque. Den måste ansluta till en Torque-
 daemon för att fungera korrekt.</translation>
     </message>
     <message>
@@ -4132,9 +4132,9 @@ daemon för att fungera korrekt.</translation>
     </message>
     <message>
         <location filename="../src/wallet/wallet_args.cpp" line="138"/>
-        <source>This is the command line stellite wallet. It needs to connect to a stellite
+        <source>This is the command line torque wallet. It needs to connect to a torque
 daemon to work correctly.</source>
-        <translation>Detta är kommandoradsplånboken för Stellite. Den måste ansluta till en Stellite-
+        <translation>Detta är kommandoradsplånboken för Torque. Den måste ansluta till en Torque-
 daemon för att fungera korrekt.</translation>
     </message>
     <message>

@@ -1,4 +1,4 @@
 #!/bin/bash
 
-rlwrap stellite-wallet-cli --wallet-file wallet_03.bin --password "" --testnet --trusted-daemon --daemon-address localhost:38081  --log-file wallet_03.log
+rlwrap torque-wallet-cli --wallet-file wallet_03.bin --password "" --testnet --trusted-daemon --daemon-address localhost:38081  --log-file wallet_03.log
 

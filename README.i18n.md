@@ -1,9 +1,9 @@
-Stellite daemon internationalization
+Torque daemon internationalization
 ==================================
 
-The Stellite command line tools can be translated in various languages. If you wish to contribute and need help/support, contact the [Stellite Localization Workgroup on Taiga](https://taiga.getstellite.org/project/erciccione-stellite-localization/) or come chat on `#stellite-translations` (Freenode/IRC, riot/matrix, MatterMost)
+The Torque command line tools can be translated in various languages. If you wish to contribute and need help/support, contact the [Torque Localization Workgroup on Taiga](https://taiga.gettorque.org/project/erciccione-torque-localization/) or come chat on `#torque-translations` (Freenode/IRC, riot/matrix, MatterMost)
 
-In order to use the same translation workflow as the [Stellite Core GUI](https://github.com/stellite-project/stellite-core), they use Qt Linguist translation files.  However, to avoid the dependencies on Qt this normally implies, they use a custom loader to read those files at runtime.
+In order to use the same translation workflow as the [Torque Core GUI](https://github.com/torque-project/torque-core), they use Qt Linguist translation files.  However, to avoid the dependencies on Qt this normally implies, they use a custom loader to read those files at runtime.
 
 ### Tools for translators
 
@@ -19,11 +19,11 @@ To update ts files after changing source code:
 
 To add a new language, eg Spanish (ISO code es):
 
-    cp translations/stellite.ts translations/stellite_es.ts
+    cp translations/torque.ts translations/torque_es.ts
 
 To edit translations for Spanish:
 
-    linguist translations/stellite_es.ts
+    linguist translations/torque_es.ts
 
 To build translations after modifying them:
 
@@ -31,7 +31,7 @@ To build translations after modifying them:
 
 To test a translation:
 
-    LANG=es ./build/release/bin/stellite-wallet-cli
+    LANG=es ./build/release/bin/torque-wallet-cli
 
 To add new translatable strings in the source code:
 

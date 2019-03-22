@@ -1,4 +1,4 @@
-// Copyright (c) 2016, Stellite Research Labs
+// Copyright (c) 2016, Torque Research Labs
 //
 // Author: Shen Noether <shen.noether@gmx.com>
 //
@@ -116,13 +116,13 @@ namespace rct {
     }
 
     //generates C =aG + bH from b, a is given..
-    void genC(key & C, const key & a, xtl_amount amount) {
+    void genC(key & C, const key & a, xtc_amount amount) {
         key bH = scalarmultH(d2h(amount));
         addKeys1(C, a, bH);
     }
 
     //generates a <secret , public> / Pedersen commitment to the amount
-    tuple<ctkey, ctkey> ctskpkGen(xtl_amount amount) {
+    tuple<ctkey, ctkey> ctskpkGen(xtc_amount amount) {
         ctkey sk, pk;
         skpkGen(sk.dest, pk.dest);
         skpkGen(sk.mask, pk.mask);
@@ -142,13 +142,13 @@ namespace rct {
         return make_tuple(sk, pk);
     }
     
-    key zeroCommit(xtl_amount amount) {
+    key zeroCommit(xtc_amount amount) {
         key am = d2h(amount);
         key bH = scalarmultH(am);
         return addKeys(G, bH);
     }
 
-    key commit(xtl_amount amount, const key &mask) {
+    key commit(xtc_amount amount, const key &mask) {
         key c = scalarmultBase(mask);
         key am = d2h(amount);
         key bH = scalarmultH(am);
@@ -157,7 +157,7 @@ namespace rct {
     }
 
     //generates a random uint long long (for testing)
-    xtl_amount randXmrAmount(xtl_amount upperlimit) {
+    xtc_amount randXmrAmount(xtc_amount upperlimit) {
         return h2d(skGen()) % (upperlimit);
     }
 

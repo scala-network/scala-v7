@@ -1,5 +1,5 @@
 /// @file
-/// @author rfree (current maintainer in stellite.cc project)
+/// @author rfree (current maintainer in torque.cc project)
 /// @brief This is the place to implement our handlers for protocol network actions, e.g. for ratelimit for download-requests
 
 // Copyright (c) 2014-2018, The MoNerO Project

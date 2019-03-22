@@ -58,9 +58,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_definitions(-DDEBUG_TMPDIR_LOG=1)
 endif()
 
-stellite_private_headers(daemonizer
+torque_private_headers(daemonizer
   ${daemonizer_private_headers})
-stellite_add_library(daemonizer
+torque_add_library(daemonizer
   ${daemonizer_sources}
   ${daemonizer_headers}
   ${daemonizer_private_headers})

@@ -34,10 +34,10 @@ set(multisig_headers)
 set(multisig_private_headers
   multisig.h)
 
-stellite_private_headers(multisig
+torque_private_headers(multisig
   ${multisig_private_headers})
 
-stellite_add_library(multisig
+torque_add_library(multisig
   ${multisig_sources}
   ${multisig_headers}
   ${multisig_private_headers})

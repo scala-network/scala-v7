@@ -43,7 +43,7 @@
 
 using namespace std;
 
-namespace Stellite {
+namespace Torque {
 
 PendingTransaction::~PendingTransaction() {}
 
@@ -247,5 +247,5 @@ std::vector<std::string> PendingTransactionImpl::signersKeys() const {
 
 }
 
-namespace Bitstellite = Stellite;
+namespace Bittorque = Torque;
 

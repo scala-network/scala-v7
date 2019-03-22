@@ -34,7 +34,7 @@
 
 #include <vector>
 
-namespace Stellite {
+namespace Torque {
   
 Subaddress::~Subaddress() {}
   

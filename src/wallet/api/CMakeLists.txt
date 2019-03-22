@@ -57,9 +57,9 @@ set(wallet_api_private_headers
   subaddress_account.h
   unsigned_transaction.h)
 
-stellite_private_headers(wallet_api
+torque_private_headers(wallet_api
   ${wallet_api_private_headers})
-stellite_add_library(wallet_api
+torque_add_library(wallet_api
   ${wallet_api_sources}
   ${wallet_api_headers}
   ${wallet_api_private_headers})

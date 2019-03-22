@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fr_FR">
 <context>
-    <name>Stellite::AddressBookImpl</name>
+    <name>Torque::AddressBookImpl</name>
     <message>
         <location filename="../src/wallet/api/address_book.cpp" line="53"/>
         <source>Invalid destination address</source>
@@ -25,7 +25,7 @@
     </message>
 </context>
 <context>
-    <name>Stellite::PendingTransactionImpl</name>
+    <name>Torque::PendingTransactionImpl</name>
     <message>
         <location filename="../src/wallet/api/pending_transaction.cpp" line="91"/>
         <source>Attempting to save transaction to file, but specified file(s) exist. Exiting to not risk overwriting. File:</source>
@@ -78,7 +78,7 @@
     </message>
 </context>
 <context>
-    <name>Stellite::UnsignedTransactionImpl</name>
+    <name>Torque::UnsignedTransactionImpl</name>
     <message>
         <location filename="../src/wallet/api/unsigned_transaction.cpp" line="75"/>
         <source>This is a watch only wallet</source>
@@ -132,7 +132,7 @@
     </message>
 </context>
 <context>
-    <name>Stellite::WalletImpl</name>
+    <name>Torque::WalletImpl</name>
     <message>
         <location filename="../src/wallet/api/wallet.cpp" line="1354"/>
         <source>payment id has invalid format, expected 16 or 64 character hex string: </source>
@@ -1586,8 +1586,8 @@ Cette transaction sera déverrouillée au bloc %llu, dans approximativement %s j
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="2283"/>
-        <source>Donate &lt;amount&gt; to the development team (donate.getstellite.org).</source>
-        <translation>Donner &lt;montant&gt; à l&apos;équipe de développement (donate.getstellite.org).</translation>
+        <source>Donate &lt;amount&gt; to the development team (donate.gettorque.org).</source>
+        <translation>Donner &lt;montant&gt; à l&apos;équipe de développement (donate.gettorque.org).</translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="2290"/>
@@ -2124,7 +2124,7 @@ Sinon, vous prouvez le plus petit solde supérieur à &lt;montant&gt; dans votre
 To start synchronizing with the daemon, use the &quot;refresh&quot; command.
 Use the &quot;help&quot; command to see the list of available commands.
 Use &quot;help &lt;command&gt;&quot; to see a command&apos;s documentation.
-Always use the &quot;exit&quot; command when closing stellite-wallet-cli to save 
+Always use the &quot;exit&quot; command when closing torque-wallet-cli to save 
 your current session&apos;s state. Otherwise, you might need to synchronize 
 your wallet again (your wallet keys are NOT at risk in any case).
 </source>
@@ -2132,7 +2132,7 @@ your wallet again (your wallet keys are NOT at risk in any case).
 Pour commencer la synchronisation avec le démon, utilisez la commande &quot;refresh&quot;.
 Utilisez la commande &quot;help&quot; pour voir la liste des commandes disponibles.
 Utilisez &quot;help &lt;commande&gt;&quot; pour voir la documentation d&apos;une commande.
-Utilisez toujours la commande &quot;exit&quot; pour fermer stellite-wallet-cli pour sauvegarder 
+Utilisez toujours la commande &quot;exit&quot; pour fermer torque-wallet-cli pour sauvegarder 
 l&apos;état de votre session. Sinon, vous pourriez avoir besoin de synchroniser 
 votre portefeuille à nouveau (mais les clés de votre portefeuille ne risquent rien).
 </translation>
@@ -2869,8 +2869,8 @@ Attention&#xa0;: Certaines clés d&apos;entrées étant dépensées sont issues 
    Set the fee to default/unimportant/normal/elevated/priority.
  confirm-missing-payment-id &lt;1|0&gt;
  ask-password &lt;0|1|2   (or never|action|decrypt)&gt;
- unit &lt;stellite|millinero|micronero|nanonero|piconero&gt;
-   Set the default stellite (sub-)unit.
+ unit &lt;torque|millinero|micronero|nanonero|piconero&gt;
+   Set the default torque (sub-)unit.
  min-outputs-count [n]
    Try to keep at least that many outputs of value at least min-outputs-value.
  min-outputs-value [n]
@@ -2886,12 +2886,12 @@ Attention&#xa0;: Certaines clés d&apos;entrées étant dépensées sont issues 
  auto-low-priority &lt;1|0&gt;
    Whether to automatically use the low priority fee level when it&apos;s safe to do so.
  segregate-pre-fork-outputs &lt;1|0&gt;
-   Set this if you intend to spend outputs on both Stellite AND a key reusing fork.
+   Set this if you intend to spend outputs on both Torque AND a key reusing fork.
  key-reuse-mitigation2 &lt;1|0&gt;
-   Set this if you are not sure whether you will spend on a key reusing Stellite fork later.
+   Set this if you are not sure whether you will spend on a key reusing Torque fork later.
 subaddress-lookahead &lt;major&gt;:&lt;minor&gt;
    Set the lookahead sizes for the subaddress hash table.
-   Set this if you are not sure whether you will spend on a key reusing Stellite fork later.
+   Set this if you are not sure whether you will spend on a key reusing Torque fork later.
  segregation-height &lt;n&gt;
    Set to the height of a key reusing fork you want to use, 0 to use default.</source>
         <translation>Options disponibles :
@@ -2913,8 +2913,8 @@ subaddress-lookahead &lt;major&gt;:&lt;minor&gt;
    Utiliser les frais pour la priorité par défaut/peu importante/normale/élevée/prioritaire.
  confirm-missing-payment-id &lt;1|0&gt;
  ask-password &lt;0|1|2 (ou never|action|decrypt)&gt;
- unit &lt;stellite|millinero|micronero|nanonero|piconero&gt;
-   Définir la (sous-)unité stellite par défaut.
+ unit &lt;torque|millinero|micronero|nanonero|piconero&gt;
+   Définir la (sous-)unité torque par défaut.
  min-outputs-count [n]
    Essayer de garder au moins ce nombre de sorties d&apos;une valeur d&apos;au moins min-outputs-value.
  min-outputs-value [n]
@@ -2930,7 +2930,7 @@ subaddress-lookahead &lt;major&gt;:&lt;minor&gt;
  auto-low-priority &lt;1|0&gt;
    Utilisation automatique du niveau de frais pour la priorité basse, lorsqu&apos;il est sûr de le faire.
  segregate-pre-fork-outputs &lt;1|0&gt;
-   Activez ceci si vous prévoyez de dépenser des sorties à la fois avec Stellite ET un fork réutilisant les clés.
+   Activez ceci si vous prévoyez de dépenser des sorties à la fois avec Torque ET un fork réutilisant les clés.
  key-reuse-mitigation2 &lt;1|0&gt;
    Activez ceci si vous n&apos;êtes pas sûr de ne jamais utiliser un fork réutilisant les clés.
  subaddress-lookahead &lt;majeur&gt;:&lt;mineur&gt;
@@ -3055,8 +3055,8 @@ subaddress-lookahead &lt;major&gt;:&lt;minor&gt;
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="2650"/>
-        <source>stellite, millinero, micronero, nanonero, piconero</source>
-        <translation>stellite, millinero, micronero, nanonero, piconero</translation>
+        <source>torque, millinero, micronero, nanonero, piconero</source>
+        <translation>torque, millinero, micronero, nanonero, piconero</translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="2661"/>
@@ -3527,8 +3527,8 @@ subaddress-lookahead &lt;major&gt;:&lt;minor&gt;
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="5799"/>
-        <source>Donating %s %s to The MoNerO Project (donate.getstellite.org or %s).</source>
-        <translation>Don de %s %s à The MoNerO Project (donate.getstellite.org ou %s).</translation>
+        <source>Donating %s %s to The MoNerO Project (donate.gettorque.org or %s).</source>
+        <translation>Don de %s %s à The MoNerO Project (donate.gettorque.org ou %s).</translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="5971"/>
@@ -4511,8 +4511,8 @@ Sorties par *&#xa0;: </translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="333"/>
-        <source> Stellite Address = </source>
-        <translation> Adresse Stellite = </translation>
+        <source> Torque Address = </source>
+        <translation> Adresse Torque = </translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="335"/>
@@ -4672,12 +4672,12 @@ Sorties par *&#xa0;: </translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="8074"/>
-        <source>This is the command line stellite wallet. It needs to connect to a stellite
+        <source>This is the command line torque wallet. It needs to connect to a torque
 daemon to work correctly.
-WARNING: Do not reuse your Stellite keys on another fork, UNLESS this fork has key reuse mitigations built in. Doing so will harm your privacy.</source>
-        <translation>Ceci est le portefeuille stellite en ligne de commande.
-Il a besoin de se connecter à un démon stellite pour fonctionner correctement.
-ATTENTION : Ne réutilisez pas vos clés Stellite avec un autre fork, À MOINS QUE ce fork inclue des mitigations contre la réutilisation des clés. Faire ceci nuira à votre confidentialité.</translation>
+WARNING: Do not reuse your Torque keys on another fork, UNLESS this fork has key reuse mitigations built in. Doing so will harm your privacy.</source>
+        <translation>Ceci est le portefeuille torque en ligne de commande.
+Il a besoin de se connecter à un démon torque pour fonctionner correctement.
+ATTENTION : Ne réutilisez pas vos clés Torque avec un autre fork, À MOINS QUE ce fork inclue des mitigations contre la réutilisation des clés. Faire ceci nuira à votre confidentialité.</translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="8099"/>
@@ -4696,8 +4696,8 @@ ATTENTION : Ne réutilisez pas vos clés Stellite avec un autre fork, À MOINS Q
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="133"/>
-        <source>The newly created transaction will not be relayed to the stellite network</source>
-        <translation>La transaction nouvellement créée ne sera pas transmise au réseau stellite</translation>
+        <source>The newly created transaction will not be relayed to the torque network</source>
+        <translation>La transaction nouvellement créée ne sera pas transmise au réseau torque</translation>
     </message>
     <message>
         <location filename="../src/simplewallet/simplewallet.cpp" line="134"/>
@@ -4944,13 +4944,13 @@ ATTENTION : Ne réutilisez pas vos clés Stellite avec un autre fork, À MOINS Q
     </message>
     <message>
         <location filename="../src/wallet/wallet2.cpp" line="1271"/>
-        <source>Password is needed to compute key image for incoming stellite</source>
-        <translation>Le mot de passe est requis pour calculer l&apos;image de clé pour les stellites entrants</translation>
+        <source>Password is needed to compute key image for incoming torque</source>
+        <translation>Le mot de passe est requis pour calculer l&apos;image de clé pour les torques entrants</translation>
     </message>
     <message>
         <location filename="../src/wallet/wallet2.cpp" line="1272"/>
-        <source>Invalid password: password is needed to compute key image for incoming stellite</source>
-        <translation>Mot de passe invalide : le mot de passe est requis pour calculer l&apos;image de clé pour les stellites entrants</translation>
+        <source>Invalid password: password is needed to compute key image for incoming torque</source>
+        <translation>Mot de passe invalide : le mot de passe est requis pour calculer l&apos;image de clé pour les torques entrants</translation>
     </message>
     <message>
         <location filename="../src/wallet/wallet2.cpp" line="3496"/>
@@ -5029,10 +5029,10 @@ ATTENTION : Ne réutilisez pas vos clés Stellite avec un autre fork, À MOINS Q
     </message>
     <message>
         <location filename="../src/wallet/wallet_rpc_server.cpp" line="3495"/>
-        <source>This is the RPC stellite wallet. It needs to connect to a stellite
+        <source>This is the RPC torque wallet. It needs to connect to a torque
 daemon to work correctly.</source>
-        <translation>Ceci est le portefeuille stellite par RPC. Il a besoin de se
-connecter à un démon stellite pour fonctionner correctement.</translation>
+        <translation>Ceci est le portefeuille torque par RPC. Il a besoin de se
+connecter à un démon torque pour fonctionner correctement.</translation>
     </message>
     <message>
         <location filename="../src/wallet/wallet_rpc_server.cpp" line="3336"/>
@@ -5143,10 +5143,10 @@ connecter à un démon stellite pour fonctionner correctement.</translation>
     </message>
     <message>
         <location filename="../src/wallet/wallet_args.cpp" line="144"/>
-        <source>This is the command line stellite wallet. It needs to connect to a stellite
+        <source>This is the command line torque wallet. It needs to connect to a torque
 daemon to work correctly.</source>
-        <translation>Ceci est le portefeuille stellite en ligne de commande. Il a besoin de se
-connecter à un démon stellite pour fonctionner correctement.</translation>
+        <translation>Ceci est le portefeuille torque en ligne de commande. Il a besoin de se
+connecter à un démon torque pour fonctionner correctement.</translation>
     </message>
     <message>
         <location filename="../src/wallet/wallet_args.cpp" line="169"/>

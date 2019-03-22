@@ -35,7 +35,7 @@
 
 using namespace std;
 
-namespace Stellite {
+namespace Torque {
 namespace Utils {
 
 bool isAddressLocal(const std::string &address)
@@ -61,4 +61,4 @@ void onStartup()
 
 } // namespace
 
-namespace Bitstellite = Stellite;
+namespace Bittorque = Torque;

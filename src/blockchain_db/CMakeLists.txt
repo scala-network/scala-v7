@@ -53,9 +53,9 @@ if (BERKELEY_DB)
   )
 endif()
 
-stellite_private_headers(blockchain_db
+torque_private_headers(blockchain_db
   ${crypto_private_headers})
-stellite_add_library(blockchain_db
+torque_add_library(blockchain_db
   ${blockchain_db_sources}
   ${blockchain_db_headers}
   ${blockchain_db_private_headers})

@@ -33,7 +33,7 @@
 
 using namespace std;
 
-namespace Stellite {
+namespace Torque {
 
 TransactionInfo::~TransactionInfo() {}
 
@@ -140,4 +140,4 @@ uint64_t TransactionInfoImpl::unlockTime() const
 
 } // namespace
 
-namespace Bitstellite = Stellite;
+namespace Bittorque = Torque;

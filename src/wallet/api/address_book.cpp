@@ -37,7 +37,7 @@
 
 #include <vector>
 
-namespace Stellite {
+namespace Torque {
   
 AddressBook::~AddressBook() {}
   
@@ -178,4 +178,4 @@ AddressBookImpl::~AddressBookImpl()
 
 } // namespace
 
-namespace Bitstellite = Stellite;
+namespace Bittorque = Torque;

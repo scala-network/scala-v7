@@ -68,9 +68,9 @@ set(crypto_private_headers
   skein.h
   skein_port.h)
 
-stellite_private_headers(cncrypto
+torque_private_headers(cncrypto
   ${crypto_private_headers})
-stellite_add_library(cncrypto
+torque_add_library(cncrypto
   ${crypto_sources}
   ${crypto_headers}
   ${crypto_private_headers})
