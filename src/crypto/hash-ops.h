@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018, The MoNerO Project
+// Copyright (c) 2014-2019, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -37,7 +37,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "common/int-util.h"
+#include "int-util.h"
 #include "warnings.h"
 
 static inline void *padd(void *p, size_t i) {
@@ -88,3 +88,13 @@ void hash_extra_skein(const void *data, size_t length, char *hash);
 
 void tree_hash(const char (*hashes)[HASH_SIZE], size_t count, char *root_hash);
 
+#define DX_BLOCK_VERSION 10
+void dx_slow_hash_allocate_state(void);
+void dx_slow_hash_free_state(void);
+uint64_t dx_seedheight(const uint64_t height);
+void dx_seedheights(const uint64_t height, uint64_t *seed_height, uint64_t *next_height);
+bool dx_needhash(const uint64_t height, uint64_t *seedheight);
+void dx_seedhash(const uint64_t seedheight, const char *hash, const int miners);
+void dx_slow_hash(const void *data, size_t length, char *hash, const int miners);
+void dx_alt_slowhash(const uint64_t mainheight, const uint64_t seedheight, const char *seedhash, const void *data, size_t length, char *hash);
+void dx_reorg(const uint64_t split_height);

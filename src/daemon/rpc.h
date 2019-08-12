@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018, The MoNerO Project
+// Copyright (c) 2014-2019, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -32,8 +32,8 @@
 
 #include "rpc/core_rpc_server.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "daemon"
+#undef SCALA_DEFAULT_LOG_CATEGORY
+#define SCALA_DEFAULT_LOG_CATEGORY "daemon"
 
 namespace daemonize
 {
@@ -54,7 +54,6 @@ public:
     , t_core & core
     , t_p2p & p2p
     , const bool restricted
-    , const cryptonote::network_type nettype
     , const std::string & port
     , const std::string & description
     )
@@ -62,7 +61,7 @@ public:
   {
     MGINFO("Initializing " << m_description << " RPC server...");
 
-    if (!m_server.init(vm, restricted, nettype, port))
+    if (!m_server.init(vm, restricted, port))
     {
       throw std::runtime_error("Failed to initialize " + m_description + " RPC server.");
     }

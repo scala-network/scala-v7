@@ -32,6 +32,9 @@
 #include "enableable.h"
 #include "keyvalue_serialization_overloads.h"
 
+#undef SCALA_DEFAULT_LOG_CATEGORY
+#define SCALA_DEFAULT_LOG_CATEGORY "serialization"
+
 namespace epee
 {
   /************************************************************************/

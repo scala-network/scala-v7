@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2018, The MoNerO Project
+# Copyright (c) 2014-2019, The Monero Project
 #
 # All rights reserved.
 #
@@ -44,9 +44,9 @@ set(checkpoints_headers)
 set(checkpoints_private_headers
   checkpoints.h)
 
-torque_private_headers(checkpoints
+scala_private_headers(checkpoints
   ${checkpoints_private_headers})
-torque_add_library(checkpoints
+scala_add_library(checkpoints
   ${checkpoints_sources}
   ${checkpoints_headers}
   ${checkpoints_private_headers})

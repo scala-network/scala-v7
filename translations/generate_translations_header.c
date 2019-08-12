@@ -1,5 +1,5 @@
 // Copyright (c) 2013, Sergey Lyubka
-// Copyright (c) 2017-2018, The MoNerO Project
+// Copyright (c) 2017-2019, The Monero Project
 // All rights reserved.
 // Released under the MIT license.
 
@@ -11,13 +11,13 @@
 //      cc -o generate-translations-header generate-translations-header.c
 //
 //   2. Convert list of files into single header:
-//      ./generate-translations-header torque_fr.qm torque_it.qm > translations_files.h
+//      ./generate-translations-header scala_fr.qm scala_it.qm > translations_files.h
 //
 //   3. In your application code, include translations_files.h, then you can
 //      access the files using this function:
 //      static bool find_embedded_file(const std::string &file_name, std::string &data);
 //      std::string data;
-//      find_embedded_file("torque_fr.qm", data);
+//      find_embedded_file("scala_fr.qm", data);
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,6 +48,7 @@ int main(int argc, char *argv[]) {
 
   for (i = 1; i < argc; i++) {
     if ((fp = fopen(argv[i], "rb")) == NULL) {
+      fclose(foutput);
       exit(EXIT_FAILURE);
     } else {
       fprintf(foutput, "static const std::string translation_file_name_%d = \"%s\";\n", i, argv[i]);

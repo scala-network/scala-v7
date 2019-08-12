@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2018, The MoNerO Project
+# Copyright (c) 2014-2019, The Monero Project
 #
 # All rights reserved.
 #
@@ -58,9 +58,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_definitions(-DDEBUG_TMPDIR_LOG=1)
 endif()
 
-torque_private_headers(daemonizer
+scala_private_headers(daemonizer
   ${daemonizer_private_headers})
-torque_add_library(daemonizer
+scala_add_library(daemonizer
   ${daemonizer_sources}
   ${daemonizer_headers}
   ${daemonizer_private_headers})

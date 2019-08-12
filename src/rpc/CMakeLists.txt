@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2018, The MoNerO Project
+# Copyright (c) 2014-2019, The Monero Project
 #
 # All rights reserved.
 #
@@ -31,6 +31,7 @@ set(rpc_base_sources
 
 set(rpc_sources
   core_rpc_server.cpp
+  rpc_handler.cpp
   instanciations)
 
 set(daemon_messages_sources
@@ -45,7 +46,8 @@ set(daemon_rpc_server_sources
 set(rpc_base_headers
   rpc_args.h)
 
-set(rpc_headers)
+set(rpc_headers
+  rpc_handler.cpp)
 
 set(daemon_rpc_server_headers)
 
@@ -63,33 +65,32 @@ set(daemon_rpc_server_private_headers
   message.h
   daemon_messages.h
   daemon_handler.h
-  rpc_handler.h
   zmq_server.h)
 
 
-torque_private_headers(rpc
+scala_private_headers(rpc
   ${rpc_private_headers})
 
-torque_private_headers(daemon_rpc_server
+scala_private_headers(daemon_rpc_server
   ${daemon_rpc_server_private_headers})
 
 
-torque_add_library(rpc_base
+scala_add_library(rpc_base
   ${rpc_base_sources}
   ${rpc_base_headers}
   ${rpc_base_private_headers})
 
-torque_add_library(rpc
+scala_add_library(rpc
   ${rpc_sources}
   ${rpc_headers}
   ${rpc_private_headers})
 
-torque_add_library(daemon_messages
+scala_add_library(daemon_messages
   ${daemon_messages_sources}
   ${daemon_messages_headers}
   ${daemon_messages_private_headers})
 
-torque_add_library(daemon_rpc_server
+scala_add_library(daemon_rpc_server
   ${daemon_rpc_server_sources}
   ${daemon_rpc_server_headers}
   ${daemon_rpc_server_private_headers})
@@ -111,6 +112,8 @@ target_link_libraries(rpc
     common
     cryptonote_core
     cryptonote_protocol
+    net
+    version
     ${Boost_REGEX_LIBRARY}
     ${Boost_THREAD_LIBRARY}
   PRIVATE
@@ -120,6 +123,7 @@ target_link_libraries(daemon_messages
   LINK_PRIVATE
     cryptonote_core
     cryptonote_protocol
+    version
     serialization
     ${EXTRA_LIBRARIES})
 
@@ -128,6 +132,7 @@ target_link_libraries(daemon_rpc_server
     rpc
     cryptonote_core
     cryptonote_protocol
+    version
     daemon_messages
     serialization
     ${Boost_CHRONO_LIBRARY}

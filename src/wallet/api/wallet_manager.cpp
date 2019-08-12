@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018, The MoNerO Project
+// Copyright (c) 2014-2019, The Monero Project
 //
 // All rights reserved.
 //
@@ -40,14 +40,14 @@
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "WalletAPI"
+#undef SCALA_DEFAULT_LOG_CATEGORY
+#define SCALA_DEFAULT_LOG_CATEGORY "WalletAPI"
 
 namespace epee {
     unsigned int g_test_dbg_lock_sleep = 0;
 }
 
-namespace Torque {
+namespace Scala {
 
 Wallet *WalletManagerImpl::createWallet(const std::string &path, const std::string &password,
                                     const std::string &language, NetworkType nettype, uint64_t kdf_rounds)
@@ -57,9 +57,14 @@ Wallet *WalletManagerImpl::createWallet(const std::string &path, const std::stri
     return wallet;
 }
 
-Wallet *WalletManagerImpl::openWallet(const std::string &path, const std::string &password, NetworkType nettype, uint64_t kdf_rounds)
+Wallet *WalletManagerImpl::openWallet(const std::string &path, const std::string &password, NetworkType nettype, uint64_t kdf_rounds, WalletListener * listener)
 {
     WalletImpl * wallet = new WalletImpl(nettype, kdf_rounds);
+    wallet->setListener(listener);
+    if (listener){
+        listener->onSetWallet(wallet);
+    }
+
     wallet->open(path, password);
     //Refresh addressBook
     wallet->addressBook()->refresh(); 
@@ -122,11 +127,19 @@ Wallet *WalletManagerImpl::createWalletFromDevice(const std::string &path,
                                                   const std::string &deviceName,
                                                   uint64_t restoreHeight,
                                                   const std::string &subaddressLookahead,
-                                                  uint64_t kdf_rounds)
+                                                  uint64_t kdf_rounds,
+                                                  WalletListener * listener)
 {
     WalletImpl * wallet = new WalletImpl(nettype, kdf_rounds);
+    wallet->setListener(listener);
+    if (listener){
+        listener->onSetWallet(wallet);
+    }
+
     if(restoreHeight > 0){
         wallet->setRefreshFromBlockHeight(restoreHeight);
+    } else {
+        wallet->setRefreshFromBlockHeight(wallet->estimateBlockChainHeight());
     }
     auto lookahead = tools::parse_subaddress_lookahead(subaddressLookahead);
     if (lookahead)
@@ -214,9 +227,6 @@ std::string WalletManagerImpl::errorString() const
 
 void WalletManagerImpl::setDaemonAddress(const std::string &address)
 {
-    m_daemonAddress = address;
-    if(m_http_client.is_connected())
-        m_http_client.disconnect();
     m_http_client.set_server(address, boost::none);
 }
 
@@ -346,7 +356,7 @@ std::tuple<bool, std::string, std::string, std::string, std::string> WalletManag
     if (!tools::check_updates(software, buildtag, version, hash))
       return std::make_tuple(false, "", "", "", "");
 
-    if (tools::vercmp(version.c_str(), MONERO_VERSION) > 0)
+    if (tools::vercmp(version.c_str(), SCALA_VERSION) > 0)
     {
       std::string user_url = tools::get_update_url(software, subdir, buildtag, version, true);
       std::string auto_url = tools::get_update_url(software, subdir, buildtag, version, false);
@@ -384,4 +394,4 @@ void WalletManagerFactory::setLogCategories(const std::string &categories)
 
 }
 
-namespace Bittorque = Torque;
+namespace Bitscala = Scala;

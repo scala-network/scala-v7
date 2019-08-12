@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018, The MoNerO Project
+// Copyright (c) 2017-2019, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -31,9 +31,10 @@
 
 
 #include "device_default.hpp"
-#include "common/int-util.h"
+#include "int-util.h"
 #include "cryptonote_basic/account.h"
 #include "cryptonote_basic/subaddress_index.h"
+#include "cryptonote_core/cryptonote_tx_utils.h"
 #include "ringct/rctOps.h"
 
 #define ENCRYPTED_PAYMENT_ID_TAIL 0x8d
@@ -69,21 +70,21 @@ namespace hw {
         }
         
         bool device_default::init(void) {
-            dfns();
+            return true;
         }
         bool device_default::release() {
-            dfns();
+            return true;
         }
 
         bool device_default::connect(void) {
-            dfns();
+            return true;
         }
         bool device_default::disconnect() {
-            dfns();
+            return true;
         }
 
         bool  device_default::set_mode(device_mode mode) {
-            return true;
+            return device::set_mode(mode);
         }
 
         /* ======================================================================= */
@@ -271,6 +272,11 @@ namespace hw {
         /* ======================================================================= */
         /*                               TRANSACTION                               */
         /* ======================================================================= */
+        void device_default::generate_tx_proof(const crypto::hash &prefix_hash, 
+                                               const crypto::public_key &R, const crypto::public_key &A, const boost::optional<crypto::public_key> &B, const crypto::public_key &D, const crypto::secret_key &r, 
+                                               crypto::signature &sig) {
+            crypto::generate_tx_proof(prefix_hash, R, A, B, D, r, sig);
+        }
 
         bool device_default::open_tx(crypto::secret_key &tx_key) {
             cryptonote::keypair txkey = cryptonote::keypair::generate(*this);
@@ -278,10 +284,55 @@ namespace hw {
             return true;
         }
 
+        bool device_default::generate_output_ephemeral_keys(const size_t tx_version,
+                                                            const cryptonote::account_keys &sender_account_keys, const crypto::public_key &txkey_pub,  const crypto::secret_key &tx_key,
+                                                            const cryptonote::tx_destination_entry &dst_entr, const boost::optional<cryptonote::account_public_address> &change_addr, const size_t output_index,
+                                                            const bool &need_additional_txkeys, const std::vector<crypto::secret_key> &additional_tx_keys,
+                                                            std::vector<crypto::public_key> &additional_tx_public_keys,
+                                                            std::vector<rct::key> &amount_keys,  crypto::public_key &out_eph_public_key) {
 
-        bool device_default::add_output_key_mapping(const crypto::public_key &Aout, const crypto::public_key &Bout, const bool is_subaddress, const size_t real_output_index,
-                                                  const rct::key &amount_key,  const crypto::public_key &out_eph_public_key)  {
-            return true;
+            crypto::key_derivation derivation;
+
+            // make additional tx pubkey if necessary
+            cryptonote::keypair additional_txkey;
+            if (need_additional_txkeys)
+            {
+                additional_txkey.sec = additional_tx_keys[output_index];
+                if (dst_entr.is_subaddress)
+                    additional_txkey.pub = rct::rct2pk(rct::scalarmultKey(rct::pk2rct(dst_entr.addr.m_spend_public_key), rct::sk2rct(additional_txkey.sec)));
+                else
+                    additional_txkey.pub = rct::rct2pk(rct::scalarmultBase(rct::sk2rct(additional_txkey.sec)));
+            }
+
+            bool r;
+            if (change_addr && dst_entr.addr == *change_addr)
+            {
+            // sending change to yourself; derivation = a*R
+                r = generate_key_derivation(txkey_pub, sender_account_keys.m_view_secret_key, derivation);
+                CHECK_AND_ASSERT_MES(r, false, "at creation outs: failed to generate_key_derivation(" << txkey_pub << ", " << sender_account_keys.m_view_secret_key << ")");
+            }
+            else
+            {
+            // sending to the recipient; derivation = r*A (or s*C in the subaddress scheme)
+                r = generate_key_derivation(dst_entr.addr.m_view_public_key, dst_entr.is_subaddress && need_additional_txkeys ? additional_txkey.sec : tx_key, derivation);
+                CHECK_AND_ASSERT_MES(r, false, "at creation outs: failed to generate_key_derivation(" << dst_entr.addr.m_view_public_key << ", " << (dst_entr.is_subaddress && need_additional_txkeys ? additional_txkey.sec : tx_key) << ")");
+            }
+
+            if (need_additional_txkeys)
+            {
+                additional_tx_public_keys.push_back(additional_txkey.pub);
+            }
+
+            if (tx_version > 1)
+            {
+                crypto::secret_key scalar1;
+                derivation_to_scalar(derivation, output_index, scalar1);
+                amount_keys.push_back(rct::sk2rct(scalar1));
+            }
+            r = derive_public_key(derivation, output_index, dst_entr.addr.m_spend_public_key, out_eph_public_key);
+            CHECK_AND_ASSERT_MES(r, false, "at creation outs: failed to derive_public_key(" << derivation << ", " << output_index << ", "<< dst_entr.addr.m_spend_public_key << ")");
+
+            return r;
         }
 
         bool  device_default::encrypt_payment_id(crypto::hash8 &payment_id, const crypto::public_key &public_key, const crypto::secret_key &secret_key) {
@@ -302,13 +353,17 @@ namespace hw {
             return true;
         }
 
-        bool  device_default::ecdhEncode(rct::ecdhTuple & unmasked, const rct::key & sharedSec) {
-            rct::ecdhEncode(unmasked, sharedSec);
+        rct::key device_default::genCommitmentMask(const rct::key &amount_key) {
+            return rct::genCommitmentMask(amount_key);
+        }
+
+        bool  device_default::ecdhEncode(rct::ecdhTuple & unmasked, const rct::key & sharedSec, bool short_amount) {
+            rct::ecdhEncode(unmasked, sharedSec, short_amount);
             return true;
         }
 
-        bool  device_default::ecdhDecode(rct::ecdhTuple & masked, const rct::key & sharedSec) {
-            rct::ecdhDecode(masked, sharedSec);
+        bool  device_default::ecdhDecode(rct::ecdhTuple & masked, const rct::key & sharedSec, bool short_amount) {
+            rct::ecdhDecode(masked, sharedSec, short_amount);
             return true;
         }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018, The MoNerO Project
+// Copyright (c) 2014-2019, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -31,7 +31,6 @@
 #include "password.h"
 
 #include <iostream>
-#include <memory.h>
 #include <stdio.h>
 
 #if defined(_WIN32)
@@ -41,8 +40,6 @@
 #include <termios.h>
 #include <unistd.h>
 #endif
-
-#include "memwipe.h"
 
 #define EOT 0x4
 
@@ -78,7 +75,7 @@ namespace
       {
         break;
       }
-      else if (ucs2_ch == L'\n' || ucs2_ch == L'\r')
+      else if (ucs2_ch == L'\r')
       {
         std::cout << std::endl;
         break;
@@ -158,6 +155,13 @@ namespace
         if (!aPass.empty())
         {
           aPass.pop_back();
+          if (!hide_input)
+            std::cout << "\b\b\b   \b\b\b" << std::flush;
+        }
+        else
+        {
+          if (!hide_input)
+            std::cout << "\b\b  \b\b" << std::flush;
         }
       }
       else

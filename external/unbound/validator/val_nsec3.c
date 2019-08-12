@@ -220,7 +220,7 @@ int nsec3_get_params(struct ub_packed_rrset_key* rrset, int r,
 
 int
 nsec3_get_nextowner(struct ub_packed_rrset_key* rrset, int r,
-	uint8_t** next, size_t* nextcen)
+	uint8_t** next, size_t* nextlen)
 {
 	size_t saltlen;
         struct packed_rrset_data* d = (struct packed_rrset_data*)
@@ -228,19 +228,19 @@ nsec3_get_nextowner(struct ub_packed_rrset_key* rrset, int r,
 	log_assert(d && r < (int)d->count);
 	if(d->rr_len[r] < 2+5) {
 		*next = 0;
-		*nextcen = 0;
+		*nextlen = 0;
 		return 0; /* malformed */
 	}
 	saltlen = (size_t)d->rr_data[r][2+4];
 	if(d->rr_len[r] < 2+5+saltlen+1) {
 		*next = 0;
-		*nextcen = 0;
+		*nextlen = 0;
 		return 0; /* malformed */
 	}
-	*nextcen = (size_t)d->rr_data[r][2+5+saltlen];
-	if(d->rr_len[r] < 2+5+saltlen+1+*nextcen) {
+	*nextlen = (size_t)d->rr_data[r][2+5+saltlen];
+	if(d->rr_len[r] < 2+5+saltlen+1+*nextlen) {
 		*next = 0;
-		*nextcen = 0;
+		*nextlen = 0;
 		return 0; /* malformed */
 	}
 	*next = d->rr_data[r]+2+5+saltlen+1;
@@ -766,15 +766,15 @@ nsec3_covers(uint8_t* zone, struct nsec3_cached_hash* hash,
 	struct ub_packed_rrset_key* rrset, int rr, sldns_buffer* buf)
 {
 	uint8_t* next, *owner;
-	size_t nextcen;
+	size_t nextlen;
 	int len;
-	if(!nsec3_get_nextowner(rrset, rr, &next, &nextcen))
+	if(!nsec3_get_nextowner(rrset, rr, &next, &nextlen))
 		return 0; /* malformed RR proves nothing */
 
 	/* check the owner name is a hashed value . apex
 	 * base32 encoded values must have equal length. 
 	 * hash_value and next hash value must have equal length. */
-	if(nextcen != hash->hash_len || hash->hash_len==0||hash->b32_len==0|| 
+	if(nextlen != hash->hash_len || hash->hash_len==0||hash->b32_len==0|| 
 		(size_t)*rrset->rk.dname != hash->b32_len ||
 		query_dname_compare(rrset->rk.dname+1+
 			(size_t)*rrset->rk.dname, zone) != 0)
@@ -783,7 +783,7 @@ nsec3_covers(uint8_t* zone, struct nsec3_cached_hash* hash,
 	/* This is the "normal case: owner < next and owner < hash < next */
 	if(label_compare_lower(rrset->rk.dname+1, hash->b32, 
 		hash->b32_len) < 0 && 
-		memcmp(hash->hash, next, nextcen) < 0)
+		memcmp(hash->hash, next, nextlen) < 0)
 		return 1;
 
 	/* convert owner name from text to binary */
@@ -793,16 +793,16 @@ nsec3_covers(uint8_t* zone, struct nsec3_cached_hash* hash,
 		hash->b32_len, owner, sldns_buffer_limit(buf));
 	if(len<1)
 		return 0; /* bad owner name in some way */
-	if((size_t)len != hash->hash_len || (size_t)len != nextcen)
+	if((size_t)len != hash->hash_len || (size_t)len != nextlen)
 		return 0; /* wrong length */
 
 	/* this is the end of zone case: next <= owner && 
 	 * 	(hash > owner || hash < next) 
 	 * this also covers the only-apex case of next==owner.
 	 */
-	if(memcmp(next, owner, nextcen) <= 0 &&
-		( memcmp(hash->hash, owner, nextcen) > 0 ||
-		  memcmp(hash->hash, next, nextcen) < 0)) {
+	if(memcmp(next, owner, nextlen) <= 0 &&
+		( memcmp(hash->hash, owner, nextlen) > 0 ||
+		  memcmp(hash->hash, next, nextlen) < 0)) {
 		return 1;
 	}
 	return 0;

@@ -1,4 +1,4 @@
-// Copyright (c) 2018, The MoNerO Project
+// Copyright (c) 2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -39,7 +39,7 @@ class Notify
 public:
   Notify(const char *spec);
 
-  int notify(const char *parameter);
+  int notify(const char *tag, const char *s, ...);
 
 private:
   std::string filename;

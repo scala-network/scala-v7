@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2018, The MoNerO Project
+// Copyright (c) 2016-2019, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -36,7 +36,7 @@ extern "C" int dnskey_algo_id_is_supported(int);
 
 TEST(unbound, supported_algorithms)
 {
-  // Torque causes these to be tried, but we don't have access
+  // Scala causes these to be tried, but we don't have access
   // to this internal unbound header here, so we use raw numbers
   // LDNS_RSASHA1            = 5,
   // LDNS_RSASHA1_NSEC3      = 7,

@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018, The MoNerO Project
+// Copyright (c) 2014-2019, The Monero Project
 //
 // All rights reserved.
 //
@@ -42,7 +42,7 @@
 
 using namespace epee;
 
-namespace Torque {
+namespace Scala {
 
 TransactionHistory::~TransactionHistory() {}
 
@@ -115,7 +115,7 @@ void TransactionHistoryImpl::refresh()
     // - payment_details              - input transfers
 
     // payments are "input transactions";
-    // one input transaction contains only one transfer. e.g. <transaction_id> - <100XTC>
+    // one input transaction contains only one transfer. e.g. <transaction_id> - <100XLA>
 
     std::list<std::pair<crypto::hash, tools::wallet2::payment_details>> in_payments;
     m_wallet->m_wallet->get_payments(in_payments, min_height, max_height);
@@ -143,8 +143,8 @@ void TransactionHistoryImpl::refresh()
     // confirmed output transactions
     // one output transaction may contain more than one money transfer, e.g.
     // <transaction_id>:
-    //    transfer1: 100XTC to <address_1>
-    //    transfer2: 50XTC  to <address_2>
+    //    transfer1: 100XLA to <address_1>
+    //    transfer2: 50XLA  to <address_2>
     //    fee: fee charged per transaction
     //
 
@@ -245,4 +245,4 @@ void TransactionHistoryImpl::refresh()
 
 } // namespace
 
-namespace Bittorque = Torque;
+namespace Bitscala = Scala;

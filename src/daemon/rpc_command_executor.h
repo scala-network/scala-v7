@@ -6,7 +6,7 @@
 
 */
 
-// Copyright (c) 2014-2018, The MoNerO Project
+// Copyright (c) 2014-2019, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -43,10 +43,11 @@
 #include "common/common_fwd.h"
 #include "common/rpc_client.h"
 #include "cryptonote_basic/cryptonote_basic.h"
+#include "net/net_fwd.h"
 #include "rpc/core_rpc_server.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "daemon"
+#undef SCALA_DEFAULT_LOG_CATEGORY
+#define SCALA_DEFAULT_LOG_CATEGORY "daemon"
 
 namespace daemonize {
 
@@ -61,13 +62,14 @@ public:
       uint32_t ip
     , uint16_t port
     , const boost::optional<tools::login>& user
+    , const epee::net_utils::ssl_options_t& ssl_options
     , bool is_rpc = true
     , cryptonote::core_rpc_server* rpc_server = NULL
     );
 
   ~t_rpc_command_executor();
 
-  bool print_peer_list();
+  bool print_peer_list(bool white = true, bool gray = true, size_t limit = 0);
 
   bool print_peer_list_stats();
 
@@ -91,9 +93,9 @@ public:
 
   bool print_height();
 
-  bool print_block_by_hash(crypto::hash block_hash);
+  bool print_block_by_hash(crypto::hash block_hash, bool include_hex);
 
-  bool print_block_by_height(uint64_t height);
+  bool print_block_by_height(uint64_t height, bool include_hex);
 
   bool print_transaction(crypto::hash transaction_hash, bool include_hex, bool include_json);
 
@@ -109,6 +111,8 @@ public:
 
   bool stop_mining();
 
+  bool mining_status();
+
   bool stop_daemon();
 
   bool print_status();
@@ -121,21 +125,19 @@ public:
 
   bool set_limit(int64_t limit_down, int64_t limit_up);
 
-  bool out_peers(uint64_t limit);
+  bool out_peers(bool set, uint32_t limit);
 
-  bool in_peers(uint64_t limit);
+  bool in_peers(bool set, uint32_t limit);
 
-  bool start_save_graph();
-  
-  bool stop_save_graph();
-  
   bool hard_fork_info(uint8_t version);
 
   bool print_bans();
 
-  bool ban(const std::string &ip, time_t seconds);
+  bool ban(const std::string &address, time_t seconds);
 
-  bool unban(const std::string &ip);
+  bool unban(const std::string &address);
+
+  bool banned(const std::string &address);
 
   bool flush_txpool(const std::string &txid);
 
@@ -152,6 +154,14 @@ public:
   bool relay_tx(const std::string &txid);
 
   bool sync_info();
+
+  bool pop_blocks(uint64_t num_blocks);
+
+  bool prune_blockchain();
+
+  bool check_blockchain_pruning();
+
+  bool print_net_stats();
 };
 
 } // namespace daemonize

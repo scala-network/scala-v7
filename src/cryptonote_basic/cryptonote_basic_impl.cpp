@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018, The MoNerO Project
+// Copyright (c) 2014-2019, The Monero Project
 //
 // All rights reserved.
 //
@@ -40,11 +40,11 @@ using namespace epee;
 #include "misc_language.h"
 #include "common/base58.h"
 #include "crypto/hash.h"
-#include "common/int-util.h"
+#include "int-util.h"
 #include "common/dns_utils.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "cn"
+#undef SCALA_DEFAULT_LOG_CATEGORY
+#define SCALA_DEFAULT_LOG_CATEGORY "cn"
 
 namespace cryptonote {
 
@@ -76,11 +76,6 @@ namespace cryptonote {
     return CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V9;
   }
   //-----------------------------------------------------------------------------------------------
-  size_t get_max_block_size()
-  {
-    return CRYPTONOTE_MAX_BLOCK_SIZE;
-  }
-  //-----------------------------------------------------------------------------------------------
   size_t get_max_tx_size()
   {
     return CRYPTONOTE_MAX_TX_SIZE;
@@ -90,14 +85,21 @@ namespace cryptonote {
     static_assert(DIFFICULTY_TARGET_V5%60==0&&DIFFICULTY_TARGET_V2%60==0&&DIFFICULTY_TARGET_V1%60==0,"difficulty targets must be a multiple of 60");
     const int target = version >= 5 ? DIFFICULTY_TARGET_V5 : DIFFICULTY_TARGET_V2;
     const int target_minutes = 1; //Set to 1 but not actually 1 at V5(9th fork) it'll be 300, this is for disinflation.
-    const int emission_speed_factor = EMISSION_SPEED_FACTOR_PER_MINUTE - (target_minutes-1);
+    int emission_speed_factor;
+
+    if(version < 10){
+    emission_speed_factor = EMISSION_SPEED_FACTOR_PER_MINUTE - (target_minutes-1);
+    }
+
+    else{
+    emission_speed_factor = EMISSION_SPEED_FACTOR_PER_MINUTE + 2;
+    }
 
     const uint64_t premine = 12600000000U;
     if(median_weight > 0 && already_generated_coins < premine){
     reward = premine;
     return true;
     }
-
     uint64_t base_reward = (MONEY_SUPPLY - already_generated_coins) >> emission_speed_factor;
     if (base_reward < FINAL_SUBSIDY_PER_MINUTE*target_minutes)
     {
@@ -328,13 +330,13 @@ namespace cryptonote {
 }
 
 //--------------------------------------------------------------------------------
-bool parse_hash256(const std::string str_hash, crypto::hash& hash)
+bool parse_hash256(const std::string &str_hash, crypto::hash& hash)
 {
   std::string buf;
   bool res = epee::string_tools::parse_hexstr_to_binbuff(str_hash, buf);
   if (!res || buf.size() != sizeof(crypto::hash))
   {
-    std::cout << "invalid hash format: <" << str_hash << '>' << std::endl;
+    MERROR("invalid hash format: " << str_hash);
     return false;
   }
   else

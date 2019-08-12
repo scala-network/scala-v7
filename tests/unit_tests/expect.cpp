@@ -1,4 +1,4 @@
-// Copyright (c) 2018, The MoNerO Project
+// Copyright (c) 2018, The Monero Project
 //
 // All rights reserved.
 //
@@ -818,98 +818,98 @@ TEST(Expect, EqualNoCopies)
 TEST(Expect, Macros) {
     EXPECT_TRUE(
         [] () -> ::common_error {
-            MONERO_PRECOND(true);
+            SCALA_PRECOND(true);
             return {common_error::kInvalidErrorCode};
         } () == common_error::kInvalidErrorCode
     );
     EXPECT_TRUE(
         [] () -> ::common_error {
-            MONERO_PRECOND(false);
+            SCALA_PRECOND(false);
             return {common_error::kInvalidErrorCode};
         } () == common_error::kInvalidArgument
     );
     EXPECT_TRUE(
         [] () -> std::error_code {
-            MONERO_PRECOND(true);
+            SCALA_PRECOND(true);
             return {common_error::kInvalidErrorCode};
         } () == common_error::kInvalidErrorCode
     );
     EXPECT_TRUE(
         [] () -> std::error_code {
-            MONERO_PRECOND(false);
+            SCALA_PRECOND(false);
             return {common_error::kInvalidErrorCode};
         } () == common_error::kInvalidArgument
     );
     EXPECT_TRUE(
         [] () -> expect<void> {
-            MONERO_PRECOND(true);
+            SCALA_PRECOND(true);
             return {common_error::kInvalidErrorCode};
         } () == common_error::kInvalidErrorCode
     );
     EXPECT_TRUE(
         [] () -> expect<void> {
-            MONERO_PRECOND(false);
+            SCALA_PRECOND(false);
             return {common_error::kInvalidErrorCode};
         } () == common_error::kInvalidArgument
     );
     EXPECT_TRUE(
         [] () -> expect<int> {
-            MONERO_PRECOND(true);
+            SCALA_PRECOND(true);
             return {common_error::kInvalidErrorCode};
         } () == common_error::kInvalidErrorCode
     );
     EXPECT_TRUE(
         [] () -> expect<int> {
-            MONERO_PRECOND(false);
+            SCALA_PRECOND(false);
             return {common_error::kInvalidErrorCode};
         } () == common_error::kInvalidArgument
     );
 
     EXPECT_TRUE(
         [] () -> std::error_code {
-            MONERO_CHECK(expect<void>{});
+            SCALA_CHECK(expect<void>{});
             return {common_error::kInvalidErrorCode};
         } () == common_error::kInvalidErrorCode
     );
     EXPECT_TRUE(
         [] () -> std::error_code {
-            MONERO_CHECK(expect<void>{common_error::kInvalidArgument});
+            SCALA_CHECK(expect<void>{common_error::kInvalidArgument});
             return {common_error::kInvalidErrorCode};
         } () == common_error::kInvalidArgument
     );
     EXPECT_TRUE(
         [] () -> expect<void> {
-            MONERO_CHECK(expect<void>{});
+            SCALA_CHECK(expect<void>{});
             return {common_error::kInvalidErrorCode};
         } () == common_error::kInvalidErrorCode
     );
     EXPECT_TRUE(
         [] () -> expect<void> {
-            MONERO_CHECK(expect<void>{common_error::kInvalidArgument});
+            SCALA_CHECK(expect<void>{common_error::kInvalidArgument});
             return {common_error::kInvalidErrorCode};
         } () == common_error::kInvalidArgument
     );
     EXPECT_TRUE(
         [] () -> expect<int> {
-            MONERO_CHECK(expect<void>{});
+            SCALA_CHECK(expect<void>{});
             return {common_error::kInvalidErrorCode};
         } () == common_error::kInvalidErrorCode
     );
     EXPECT_TRUE(
         [] () -> expect<int> {
-            MONERO_CHECK(expect<void>{common_error::kInvalidArgument});
+            SCALA_CHECK(expect<void>{common_error::kInvalidArgument});
             return {common_error::kInvalidErrorCode};
         } () == common_error::kInvalidArgument
     );
 
-    EXPECT_NO_THROW(MONERO_UNWRAP(success()));
-    EXPECT_NO_THROW(MONERO_UNWRAP(expect<void>{}));
-    EXPECT_NO_THROW(MONERO_UNWRAP(expect<int>{0}));
+    EXPECT_NO_THROW(SCALA_UNWRAP(success()));
+    EXPECT_NO_THROW(SCALA_UNWRAP(expect<void>{}));
+    EXPECT_NO_THROW(SCALA_UNWRAP(expect<int>{0}));
     EXPECT_THROW(
-        MONERO_UNWRAP(expect<void>{common_error::kInvalidArgument}), std::system_error
+        SCALA_UNWRAP(expect<void>{common_error::kInvalidArgument}), std::system_error
     );
     EXPECT_THROW(
-        MONERO_UNWRAP(expect<int>{common_error::kInvalidArgument}), std::system_error
+        SCALA_UNWRAP(expect<int>{common_error::kInvalidArgument}), std::system_error
     );
 }
 

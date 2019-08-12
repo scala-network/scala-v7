@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018, The MoNerO Project
+// Copyright (c) 2017-2019, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -32,8 +32,8 @@
 #include "dns_utils.h"
 #include "updates.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "updates"
+#undef SCALA_DEFAULT_LOG_CATEGORY
+#define SCALA_DEFAULT_LOG_CATEGORY "updates"
 
 namespace tools
 {
@@ -44,12 +44,9 @@ namespace tools
 
     MDEBUG("Checking updates for " << buildtag << " " << software);
 
-    // All four TorquePulse domains have DNSSEC on and valid
+    // All four ScalaPulse domains have DNSSEC on and valid
     static const std::vector<std::string> dns_urls = {
-        "updates.torquepulse.org",
-        "updates.torquepulse.net",
-        "updates.torquepulse.co",
-        "updates.torquepulse.se"
+        "updates.scalaproject.io"
     };
 
     if (!tools::dns_utils::load_txt_records_from_dns(records, dns_urls))
@@ -99,7 +96,7 @@ namespace tools
 
   std::string get_update_url(const std::string &software, const std::string &subdir, const std::string &buildtag, const std::string &version, bool user)
   {
-    const char *base = user ? "https://downloads.gettorque.org/" : "https://updates.gettorque.org/";
+    const char *base = user ? "https://downloads.getscala.org/" : "https://updates.getscala.org/";
 #ifdef _WIN32
     static const char *extension = strncmp(buildtag.c_str(), "install-", 8) ? ".zip" : ".exe";
 #else
