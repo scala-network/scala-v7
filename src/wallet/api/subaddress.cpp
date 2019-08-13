@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018, The MoNerO Project
+// Copyright (c) 2017-2019, The Monero Project
 //
 // All rights reserved.
 //
@@ -34,7 +34,7 @@
 
 #include <vector>
 
-namespace Torque {
+namespace Scala {
   
 Subaddress::~Subaddress() {}
   

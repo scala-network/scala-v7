@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018, The MoNerO Project
+// Copyright (c) 2014-2019, The Monero Project
 //
 // All rights reserved.
 //
@@ -33,9 +33,7 @@
 
 // bounds checking is done before writing to buffer, but buffer size
 // should be a sensible maximum
-// Push the buffer up by 100000. Since V5 we can't import and exported chain
 #define BUFFER_SIZE 1100000
-// Raised the threshold by the same value added to buffer
 #define CHUNK_SIZE_WARNING_THRESHOLD 600000
 #define NUM_BLOCKS_PER_CHUNK 1
 #define BLOCKCHAIN_RAW "blockchain.raw"

@@ -1,4 +1,4 @@
-// Copyright (c) 2016, Torque Research Labs
+// Copyright (c) 2016, Scala Research Labs
 //
 // Author: Shen Noether <shen.noether@gmx.com>
 // 
@@ -34,8 +34,8 @@
 using namespace crypto;
 using namespace std;
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "ringct"
+#undef SCALA_DEFAULT_LOG_CATEGORY
+#define SCALA_DEFAULT_LOG_CATEGORY "ringct"
 
 namespace rct {
 
@@ -91,7 +91,7 @@ namespace rct {
         printf("]");
         printf("\n");
     }
-    void dp(xtc_amount vali) {
+    void dp(xmr_amount vali) {
         printf("x: ");
         std::cout << vali;
         printf("\n\n");
@@ -116,33 +116,33 @@ namespace rct {
     //Various Conversions 
     
     //uint long long to 32 byte key
-    void d2h(key & amounth, const xtc_amount in) {
+    void d2h(key & amounth, const xmr_amount in) {
         sc_0(amounth.bytes);
-        xtc_amount val = in;
+        xmr_amount val = in;
         int i = 0;
         while (val != 0) {
             amounth[i] = (unsigned char)(val & 0xFF);
             i++;
-            val /= (xtc_amount)256;
+            val /= (xmr_amount)256;
         }
     }
     
     //uint long long to 32 byte key
-    key d2h(const xtc_amount in) {
+    key d2h(const xmr_amount in) {
         key amounth;
         sc_0(amounth.bytes);
-        xtc_amount val = in;
+        xmr_amount val = in;
         int i = 0;
         while (val != 0) {
             amounth[i] = (unsigned char)(val & 0xFF);
             i++;
-            val /= (xtc_amount)256;
+            val /= (xmr_amount)256;
         }
         return amounth;
     }
 
     //uint long long to int[64]
-    void d2b(bits  amountb, xtc_amount val) {
+    void d2b(bits  amountb, xmr_amount val) {
         int i = 0;
         while (val != 0) {
             amountb[i] = val & 1;
@@ -158,11 +158,11 @@ namespace rct {
     //32 byte key to uint long long
     // if the key holds a value > 2^64
     // then the value in the first 8 bytes is returned    
-    xtc_amount h2d(const key & test) {
-        xtc_amount vali = 0;
+    xmr_amount h2d(const key & test) {
+        xmr_amount vali = 0;
         int j = 0;
         for (j = 7; j >= 0; j--) {
-            vali = (xtc_amount)(vali * 256 + (unsigned char)test.bytes[j]);
+            vali = (xmr_amount)(vali * 256 + (unsigned char)test.bytes[j]);
         }
         return vali;
     }
@@ -190,7 +190,6 @@ namespace rct {
         int byte, i, j;
         for (j = 0; j < 8; j++) {
             byte = 0;
-            i = 8 * j;
             for (i = 7; i > -1; i--) {
                 byte = byte * 2 + amountb2[8 * j + i];
             }
@@ -202,11 +201,11 @@ namespace rct {
     }
     
     //int[64] to uint long long
-    xtc_amount b2d(bits amountb) {
-        xtc_amount vali = 0;
+    xmr_amount b2d(bits amountb) {
+        xmr_amount vali = 0;
         int j = 0;
         for (j = 63; j >= 0; j--) {
-            vali = (xtc_amount)(vali * 2 + amountb[j]);
+            vali = (xmr_amount)(vali * 2 + amountb[j]);
         }
         return vali;
     }
@@ -217,6 +216,7 @@ namespace rct {
         {
             case RCTTypeSimple:
             case RCTTypeBulletproof:
+            case RCTTypeBulletproof2:
                 return true;
             default:
                 return false;
@@ -228,6 +228,7 @@ namespace rct {
         switch (type)
         {
             case RCTTypeBulletproof:
+            case RCTTypeBulletproof2:
                 return true;
             default:
                 return false;

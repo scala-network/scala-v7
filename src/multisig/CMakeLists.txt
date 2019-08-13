@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2018, The MoNerO Project
+# Copyright (c) 2017-2019, The Monero Project
 #
 # All rights reserved.
 #
@@ -34,10 +34,10 @@ set(multisig_headers)
 set(multisig_private_headers
   multisig.h)
 
-torque_private_headers(multisig
+scala_private_headers(multisig
   ${multisig_private_headers})
 
-torque_add_library(multisig
+scala_add_library(multisig
   ${multisig_sources}
   ${multisig_headers}
   ${multisig_private_headers})

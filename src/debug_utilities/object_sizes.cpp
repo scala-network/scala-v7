@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018, The MoNerO Project
+// Copyright (c) 2017-2019, The Monero Project
 //
 // All rights reserved.
 //
@@ -29,6 +29,7 @@
 #include <map>
 #include "cryptonote_basic/cryptonote_basic.h"
 #include "cryptonote_basic/tx_extra.h"
+#include "cryptonote_core/cryptonote_core.h"
 #include "cryptonote_core/blockchain.h"
 #include "p2p/p2p_protocol_defs.h"
 #include "net/connection_basic.hpp"
@@ -43,8 +44,8 @@
 #include "wallet/api/unsigned_transaction.h"
 #include "wallet/api/pending_transaction.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "debugtools.objectsizes"
+#undef SCALA_DEFAULT_LOG_CATEGORY
+#define SCALA_DEFAULT_LOG_CATEGORY "debugtools.objectsizes"
 
 class size_logger
 {
@@ -109,12 +110,12 @@ int main(int argc, char* argv[])
   SL(tools::wallet2::unsigned_tx_set);
   SL(tools::wallet2::signed_tx_set);
 
-  SL(Torque::WalletImpl);
-  SL(Torque::AddressBookRow);
-  SL(Torque::TransactionInfoImpl);
-  SL(Torque::TransactionHistoryImpl);
-  SL(Torque::PendingTransactionImpl);
-  SL(Torque::UnsignedTransactionImpl);
+  SL(Scala::WalletImpl);
+  SL(Scala::AddressBookRow);
+  SL(Scala::TransactionInfoImpl);
+  SL(Scala::TransactionHistoryImpl);
+  SL(Scala::PendingTransactionImpl);
+  SL(Scala::UnsignedTransactionImpl);
 
   return 0;
 }

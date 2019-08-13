@@ -1,4 +1,4 @@
-// Copyright (c) 2018, The MoNerO Project
+// Copyright (c) 2018, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -83,10 +83,10 @@ private:
     boost::filesystem::path path =
       boost::filesystem::temp_directory_path();
 #if defined(__MINGW32__) || defined(__MINGW__)
-    filename = tempnam(path.string().c_str(), "torque-ringdb-test-");
+    filename = tempnam(path.string().c_str(), "scala-ringdb-test-");
     EXPECT_TRUE(filename != NULL);
 #else
-    path /= "torque-ringdb-test-XXXXXX";
+    path /= "scala-ringdb-test-XXXXXX";
     filename = strdup(path.string().c_str());
     EXPECT_TRUE(mkdtemp(filename) != NULL);
 #endif
@@ -136,21 +136,21 @@ TEST(ringdb, different_genesis)
   ASSERT_FALSE(ringdb.get_ring(KEY_2, KEY_IMAGE_1, outs2));
 }
 
-TEST(blackball, not_found)
+TEST(spent_outputs, not_found)
 {
   RingDB ringdb;
   ASSERT_TRUE(ringdb.blackball(OUTPUT_1));
   ASSERT_FALSE(ringdb.blackballed(OUTPUT_2));
 }
 
-TEST(blackball, found)
+TEST(spent_outputs, found)
 {
   RingDB ringdb;
   ASSERT_TRUE(ringdb.blackball(OUTPUT_1));
   ASSERT_TRUE(ringdb.blackballed(OUTPUT_1));
 }
 
-TEST(blackball, vector)
+TEST(spent_outputs, vector)
 {
   RingDB ringdb;
   std::vector<std::pair<uint64_t, uint64_t>> outputs;
@@ -174,7 +174,7 @@ TEST(blackball, vector)
   ASSERT_TRUE(ringdb.blackballed(std::make_pair(30, 5)));
 }
 
-TEST(blackball, unblackball)
+TEST(spent_outputs, mark_as_unspent)
 {
   RingDB ringdb;
   ASSERT_TRUE(ringdb.blackball(OUTPUT_1));
@@ -182,7 +182,7 @@ TEST(blackball, unblackball)
   ASSERT_FALSE(ringdb.blackballed(OUTPUT_1));
 }
 
-TEST(blackball, clear)
+TEST(spent_outputs, clear)
 {
   RingDB ringdb;
   ASSERT_TRUE(ringdb.blackball(OUTPUT_1));

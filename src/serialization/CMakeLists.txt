@@ -1,4 +1,4 @@
-# Copyright (c) 2016-2018, The MoNerO Project
+# Copyright (c) 2016-2019, The Monero Project
 #
 # All rights reserved.
 #
@@ -34,9 +34,9 @@ set(serialization_headers)
 set(serialization_private_headers
   json_object.h)
 
-torque_private_headers(serialization
+scala_private_headers(serialization
   ${serialization_private_headers})
-torque_add_library(serialization
+scala_add_library(serialization
   ${serialization_sources}
   ${serialization_headers}
   ${serialization_private_headers})

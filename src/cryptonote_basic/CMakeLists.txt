@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2018, The MoNerO Project
+# Copyright (c) 2014-2019, The Monero Project
 #
 # All rights reserved.
 #
@@ -61,9 +61,9 @@ set(cryptonote_basic_private_headers
   tx_extra.h
   verification_context.h)
 
-torque_private_headers(cryptonote_basic
+scala_private_headers(cryptonote_basic
   ${cryptonote_basic_private_headers})
-torque_add_library(cryptonote_basic
+scala_add_library(cryptonote_basic
   ${cryptonote_basic_sources}
   ${cryptonote_basic_headers}
   ${cryptonote_basic_private_headers})

@@ -358,11 +358,11 @@ int nsec3_has_optout(struct ub_packed_rrset_key* rrset, int r);
  * @param rrset: NSEC3 rrset
  * @param r: RR in rrset
  * @param next: ptr into rdata to next owner hash
- * @param nextcen: length of hash.
+ * @param nextlen: length of hash.
  * @return false on malformed
  */
 int nsec3_get_nextowner(struct ub_packed_rrset_key* rrset, int r,
-	uint8_t** next, size_t* nextcen);
+	uint8_t** next, size_t* nextlen);
 
 /**
  * nsec3Covers

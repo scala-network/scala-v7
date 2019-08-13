@@ -3,11 +3,11 @@
 # maintainer (ask me any questions): rfree
 
 if [[ ! -r "Doxyfile" ]] ; then
-	echo "Error, can not read the Doxyfile - make sure to run this script from top of torque project, where the Doxyfile file is located"
+	echo "Error, can not read the Doxyfile - make sure to run this script from top of scala project, where the Doxyfile file is located"
 	exit 1
 fi
 
-wwwdir="$HOME/torque-www/"
+wwwdir="$HOME/scala-www/"
 if [[ ! -w "$wwwdir" ]] ; then
 	echo "Error, can not write into wwwdir=$wwwdir. It should be a directory readable/connected to your webserver, or a symlink to such directory"
 	exit 1
@@ -19,7 +19,7 @@ if [[ ! -d "$wwwdir/doc" ]] ; then
 fi
 
 echo "Generating:"
-doxygen Doxyfile && echo "Backup previous version:" && rm -rf ~/torque-www-previous && mv "$wwwdir/doc" ~/torque-www-previous && cp -ar doc/ "$wwwdir/" && echo "Done, builded and copied to public - the doxygen docs" && echo "size:" && du -Dsh "$wwwdir/" && echo "files:" && find "$wwwdir/" | wc -l
+doxygen Doxyfile && echo "Backup previous version:" && rm -rf ~/scala-www-previous && mv "$wwwdir/doc" ~/scala-www-previous && cp -ar doc/ "$wwwdir/" && echo "Done, builded and copied to public - the doxygen docs" && echo "size:" && du -Dsh "$wwwdir/" && echo "files:" && find "$wwwdir/" | wc -l
 
 
 

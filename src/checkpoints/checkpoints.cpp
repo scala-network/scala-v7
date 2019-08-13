@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018, The MoNerO Project
+// Copyright (c) 2014-2019, The Monero Project
 //
 // All rights reserved.
 //
@@ -28,20 +28,18 @@
 //
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
-#include "include_base_utils.h"
-
-using namespace epee;
-
 #include "checkpoints.h"
 
 #include "common/dns_utils.h"
-#include "include_base_utils.h"
 #include "string_tools.h"
 #include "storages/portable_storage_template_helper.h" // epee json include
 #include "serialization/keyvalue_serialization.h"
+#include <vector>
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "checkpoints"
+using namespace epee;
+
+#undef SCALA_DEFAULT_LOG_CATEGORY
+#define SCALA_DEFAULT_LOG_CATEGORY "checkpoints"
 
 namespace cryptonote
 {
@@ -76,7 +74,7 @@ namespace cryptonote
   bool checkpoints::add_checkpoint(uint64_t height, const std::string& hash_str)
   {
     crypto::hash h = crypto::null_hash;
-    bool r = epee::string_tools::parse_tpod_from_hex_string(hash_str, h);
+    bool r = epee::string_tools::hex_to_pod(hash_str, h);
     CHECK_AND_ASSERT_MES(r, false, "Failed to parse checkpoint hash string into binary representation!");
 
     // return false if adding at a height we already have AND the hash is different
@@ -212,23 +210,14 @@ namespace cryptonote
   {
     std::vector<std::string> records;
 
-    // All four TorquePulse domains have DNSSEC on and valid
-    static const std::vector<std::string> dns_urls = { "checkpoints.torquepulse.se"
-						     , "checkpoints.torquepulse.org"
-						     , "checkpoints.torquepulse.net"
-						     , "checkpoints.torquepulse.co"
+    // All four ScalaPulse domains have DNSSEC on and valid
+    static const std::vector<std::string> dns_urls = { "checkpoints.scalaproject.io"
     };
 
-    static const std::vector<std::string> testnet_dns_urls = { "testpoints.torquepulse.se"
-							     , "testpoints.torquepulse.org"
-							     , "testpoints.torquepulse.net"
-							     , "testpoints.torquepulse.co"
+    static const std::vector<std::string> testnet_dns_urls = { "testpoints.scalaproject.io"
     };
 
-    static const std::vector<std::string> stagenet_dns_urls = { "stagenetpoints.torquepulse.se"
-                   , "stagenetpoints.torquepulse.org"
-                   , "stagenetpoints.torquepulse.net"
-                   , "stagenetpoints.torquepulse.co"
+    static const std::vector<std::string> stagenet_dns_urls = { "stagenetpoints.scalaproject.io"
     };
 
     if (!tools::dns_utils::load_txt_records_from_dns(records, nettype == TESTNET ? testnet_dns_urls : nettype == STAGENET ? stagenet_dns_urls : dns_urls))
@@ -253,7 +242,7 @@ namespace cryptonote
         // parse the second part as crypto::hash,
         // if this fails move on to the next record
         std::string hashStr = record.substr(pos + 1);
-        if (!epee::string_tools::parse_tpod_from_hex_string(hashStr, hash))
+        if (!epee::string_tools::hex_to_pod(hashStr, hash))
         {
     continue;
         }

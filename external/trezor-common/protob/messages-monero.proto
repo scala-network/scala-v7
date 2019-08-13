@@ -1,0 +1,504 @@
+syntax = "proto2";
+package hw.trezor.messages.scala;
+
+// Sugar for easier handling in Java
+option java_package = "com.satoshilabs.trezor.lib.protobuf";
+option java_outer_classname = "TrezorMessageScala";
+
+/**
+ * Structure representing Scala transaction source entry, UTXO
+ * @embed
+ */
+message ScalaTransactionSourceEntry {
+    repeated ScalaOutputEntry outputs = 1;  // all outputs including decoys (forms the ring)
+    optional uint64 real_output = 2;  // index denoting which item in `outputs` is our real output (not a decoy)
+    optional bytes real_out_tx_key = 3;  // tx key located in the real output's tx
+    repeated bytes real_out_additional_tx_keys = 4;  // additional tx keys if applicable
+    optional uint64 real_output_in_tx_index = 5;  // index of our real output in the tx (aka which output was it in the transaction)
+    optional uint64 amount = 6;
+    optional bool rct = 7;  // is RingCT used (true for newer UTXOs)
+    optional bytes mask = 8;
+    optional ScalaMultisigKLRki multisig_kLRki = 9;
+    message ScalaOutputEntry {
+        optional uint64 idx = 1;
+        optional ScalaRctKeyPublic key = 2;
+        message ScalaRctKeyPublic {
+            optional bytes dest = 1;
+            optional bytes commitment = 2;
+        }
+    }
+    message ScalaMultisigKLRki {
+        optional bytes K = 1;
+        optional bytes L = 2;
+        optional bytes R = 3;
+        optional bytes ki = 4;
+    }
+}
+
+/**
+ * Structure representing Scala transaction destination entry
+ * @embed
+ */
+message ScalaTransactionDestinationEntry {
+    optional uint64 amount = 1;
+    optional ScalaAccountPublicAddress addr = 2;
+    optional bool is_subaddress = 3;
+    optional bytes original = 4;
+    optional bool is_integrated = 5;
+    /**
+     * Structure representing Scala public address
+     */
+    message ScalaAccountPublicAddress {
+        optional bytes spend_public_key = 1;
+        optional bytes view_public_key = 2;
+    }
+}
+
+/**
+ * Range sig parameters / data.
+ * @embed
+ */
+message ScalaTransactionRsigData {
+    optional uint32 rsig_type = 1;  // range signature (aka proof) type
+    optional uint32 offload_type = 2;
+    repeated uint64 grouping = 3;  // aggregation scheme for BP
+
+    optional bytes mask = 4;       // mask vector
+    optional bytes rsig = 5;       // range sig data, all of it or partial (based on rsig_parts)
+    repeated bytes rsig_parts = 6;
+    optional uint32 bp_version = 7;  // Bulletproof version
+}
+
+/**
+ * Request: Ask device for public address derived from seed and address_n
+ * @start
+ * @next ScalaAddress
+ * @next Failure
+ */
+message ScalaGetAddress {
+    repeated uint32 address_n = 1;          // BIP-32 path to derive the key from master node
+    optional bool show_display = 2;         // Optionally show on display before sending the result
+    optional uint32 network_type = 3;       // Main-net / testnet / stagenet
+    optional uint32 account = 4;            // Major subaddr index
+    optional uint32 minor = 5;              // Minor subaddr index
+    optional bytes payment_id = 6;          // Payment ID for integrated address
+}
+
+/**
+ * Response: Contains Scala watch-only credentials derived from device private seed
+ * @end
+ */
+message ScalaAddress {
+    optional bytes address = 1;
+}
+
+/**
+ * Request: Ask device for watch only credentials
+ * @start
+ * @next ScalaWatchKey
+ * @next Failure
+ */
+message ScalaGetWatchKey {
+    repeated uint32 address_n = 1;          // BIP-32 path to derive the key from master node
+    optional uint32 network_type = 2;       // Main-net / testnet / stagenet
+}
+
+/**
+ * Response: Contains Scala watch-only credentials derived from device private seed
+ * @end
+ */
+message ScalaWatchKey {
+    optional bytes watch_key = 1;
+    optional bytes address = 2;
+}
+
+/**
+ * Request: Sub request of ScalaTransactionSign. Initializes transaction signing.
+ * @start
+ * @next ScalaTransactionInitAck
+ */
+message ScalaTransactionInitRequest {
+    optional uint32 version = 1;
+    repeated uint32 address_n = 2;
+    optional uint32 network_type = 3;       // Main-net / testnet / stagenet
+    optional ScalaTransactionData tsx_data = 4;
+    /**
+     * Structure representing Scala initial transaction information
+     */
+    message ScalaTransactionData {
+        optional uint32 version = 1;
+        optional bytes payment_id = 2;
+        optional uint64 unlock_time = 3;
+        repeated ScalaTransactionDestinationEntry outputs = 4;
+        optional ScalaTransactionDestinationEntry change_dts = 5;
+        optional uint32 num_inputs = 6;
+        optional uint32 mixin = 7;
+        optional uint64 fee = 8;
+        optional uint32 account = 9;
+        repeated uint32 minor_indices = 10;
+        optional ScalaTransactionRsigData rsig_data = 11;
+        repeated uint32 integrated_indices = 12;
+        optional uint32 client_version = 13;  // connected client version
+        optional uint32 hard_fork = 14;       // transaction hard fork number
+        optional bytes scala_version = 15;   // scala software version
+    }
+}
+
+/**
+ * Response: Response to transaction signing initialization.
+ * @next ScalaTransactionSetInputRequest
+ */
+message ScalaTransactionInitAck {
+    repeated bytes hmacs = 1;
+    optional ScalaTransactionRsigData rsig_data = 2;
+}
+
+/**
+ * Request: Sub request of ScalaTransactionSign. Sends one UTXO to device
+ * @next ScalaTransactionSetInputAck
+ */
+message ScalaTransactionSetInputRequest {
+    optional ScalaTransactionSourceEntry src_entr = 1;
+}
+
+/**
+ * Response: Response to setting UTXO for signature. Contains sealed values needed for further protocol steps.
+ * @next ScalaTransactionSetInputAck
+ * @next ScalaTransactionInputsPermutationRequest
+ */
+message ScalaTransactionSetInputAck {
+    optional bytes vini = 1;      // xmrtypes.TxinToKey
+    optional bytes vini_hmac = 2;
+    optional bytes pseudo_out = 3;
+    optional bytes pseudo_out_hmac = 4;
+    optional bytes pseudo_out_alpha = 5;
+    optional bytes spend_key = 6;
+}
+
+/**
+ * Request: Sub request of ScalaTransactionSign. Permutation on key images.
+ * @next ScalaTransactionInputsPermutationAck
+ */
+message ScalaTransactionInputsPermutationRequest {
+    repeated uint32 perm = 1;
+}
+
+/**
+ * Response: Response to setting permutation on key images
+ * @next ScalaTransactionInputViniRequest
+ */
+message ScalaTransactionInputsPermutationAck {
+}
+
+/**
+ * Request: Sub request of ScalaTransactionSign. Sends one UTXO to device together with sealed values.
+ * @next ScalaTransactionInputViniAck
+ */
+message ScalaTransactionInputViniRequest {
+    optional ScalaTransactionSourceEntry src_entr = 1;
+    optional bytes vini = 2;      // xmrtypes.TxinToKey
+    optional bytes vini_hmac = 3;
+    optional bytes pseudo_out = 4;
+    optional bytes pseudo_out_hmac = 5;
+}
+
+/**
+ * Response: Response to setting UTXO to the device
+ * @next ScalaTransactionInputViniRequest
+ * @next ScalaTransactionAllInputsSetRequest
+ */
+message ScalaTransactionInputViniAck {
+}
+
+/**
+ * Request: Sub request of ScalaTransactionSign. Sent after all inputs have been sent. Useful for rangeisg offloading.
+ * @next ScalaTransactionAllInputsSetAck
+ */
+message ScalaTransactionAllInputsSetRequest {
+}
+
+/**
+ * Response: Response to after all inputs have been set.
+ * @next ScalaTransactionSetOutputRequest
+ */
+message ScalaTransactionAllInputsSetAck {
+    optional ScalaTransactionRsigData rsig_data = 1;
+}
+
+/**
+ * Request: Sub request of ScalaTransactionSign. Sends one transaction destination to device (HMACed)
+ * @next ScalaTransactionSetOutputAck
+ */
+message ScalaTransactionSetOutputRequest {
+    optional ScalaTransactionDestinationEntry dst_entr = 1;
+    optional bytes dst_entr_hmac = 2;
+    optional ScalaTransactionRsigData rsig_data = 3;
+    optional bool is_offloaded_bp = 4;  // Extra message, with offloaded BP.
+}
+
+/**
+ * Response: Response to setting transaction destination. Contains sealed values needed for further protocol steps.
+ * @next ScalaTransactionSetOutputRequest
+ * @next ScalaTransactionAllOutSetRequest
+ */
+message ScalaTransactionSetOutputAck {
+    optional bytes tx_out = 1;  // xmrtypes.TxOut
+    optional bytes vouti_hmac = 2;
+    optional ScalaTransactionRsigData rsig_data = 3;
+    optional bytes out_pk = 4;
+    optional bytes ecdh_info = 5;
+}
+
+/**
+ * Request: Sub request of ScalaTransactionSign. Sent after all outputs are sent.
+ * @next ScalaTransactionAllOutSetAck
+ */
+message ScalaTransactionAllOutSetRequest {
+    optional ScalaTransactionRsigData rsig_data = 1;
+}
+
+/**
+ * Response: After all outputs are sent the initial RCT signature fields are sent.
+ * @next ScalaTransactionSignInputRequest
+ */
+message ScalaTransactionAllOutSetAck {
+    optional bytes extra = 1;
+    optional bytes tx_prefix_hash = 2;
+    optional ScalaRingCtSig rv = 4;  // xmrtypes.RctSig
+    optional bytes full_message_hash = 5;
+
+    /*
+     * Structure represents initial fields of the Scala RCT signature
+     */
+    message ScalaRingCtSig {
+        optional uint64 txn_fee = 1;
+        optional bytes message = 2;
+        optional uint32 rv_type = 3;
+    }
+}
+
+/**
+ * Request: Sub request of ScalaTransactionSign. Sends UTXO for the signing.
+ * @next ScalaTransactionSignInputAck
+ */
+message ScalaTransactionSignInputRequest {
+    optional ScalaTransactionSourceEntry src_entr = 1;
+    optional bytes vini = 2;     // xmrtypes.TxinToKey
+    optional bytes vini_hmac = 3;
+    optional bytes pseudo_out = 4;
+    optional bytes pseudo_out_hmac = 5;
+    optional bytes pseudo_out_alpha = 6;
+    optional bytes spend_key = 7;
+}
+
+/**
+ * Response: Contains full MG signature of the UTXO + multisig data if applicable.
+ * @next ScalaTransactionSignInputRequest
+ * @next ScalaTransactionFinalRequest
+ */
+message ScalaTransactionSignInputAck {
+    optional bytes signature = 1;
+    optional bytes pseudo_out = 2;  // updated pseudo-out after mask correction
+}
+
+/**
+ * Request: Sub request of ScalaTransactionSign. Final message of the procol after all UTXOs are signed
+ * @next ScalaTransactionFinalAck
+ */
+message ScalaTransactionFinalRequest {
+}
+
+/**
+ * Response: Contains transaction metadata and encryption keys needed for further transaction operations (e.g. multisig, send proof).
+ * @end
+ */
+message ScalaTransactionFinalAck {
+    optional bytes cout_key = 1;
+    optional bytes salt = 2;
+    optional bytes rand_mult = 3;
+    optional bytes tx_enc_keys = 4;
+}
+
+/**
+ * Request: Sub request of ScalaKeyImageSync. Initializing key image sync.
+ * @start
+ * @next ScalaKeyImageExportInitAck
+ */
+message ScalaKeyImageExportInitRequest {
+    optional uint64 num = 1;
+    optional bytes hash = 2;
+    repeated uint32 address_n = 3;               // BIP-32 path to derive the key from master node
+    optional uint32 network_type = 4;            // Main-net / testnet / stagenet
+    repeated ScalaSubAddressIndicesList subs = 5;
+    /**
+     * Structure representing Scala list of sub-addresses
+     */
+    message ScalaSubAddressIndicesList {
+        optional uint32 account = 1;
+        repeated uint32 minor_indices = 2;
+    }
+}
+
+/**
+ * Response: Response to key image sync initialization.
+ * @next ScalaKeyImageSyncStepRequest
+ */
+message ScalaKeyImageExportInitAck {
+}
+
+/**
+ * Request: Sub request of ScalaKeyImageSync. Contains batch of the UTXO to export key image for.
+ * @next ScalaKeyImageSyncStepAck
+ */
+message ScalaKeyImageSyncStepRequest {
+    repeated ScalaTransferDetails tdis = 1;
+    /**
+     * Structure representing Scala UTXO for key image sync
+     */
+    message ScalaTransferDetails {
+        optional bytes out_key = 1;
+        optional bytes tx_pub_key = 2;
+        repeated bytes additional_tx_pub_keys = 3;
+        optional uint64 internal_output_index = 4;
+    }
+}
+
+/**
+ * Response: Response to key image sync step. Contains encrypted exported key image.
+ * @next ScalaKeyImageSyncStepRequest
+ * @next ScalaKeyImageSyncFinalRequest
+ */
+message ScalaKeyImageSyncStepAck {
+    repeated ScalaExportedKeyImage kis = 1;
+    /**
+     * Structure representing Scala encrypted exported key image
+     */
+    message ScalaExportedKeyImage {
+        optional bytes iv = 1;
+        optional bytes blob = 3;
+    }
+}
+
+/**
+ * Request: Sub request of ScalaKeyImageSync. Final message of the sync protocol.
+ * @next ScalaKeyImageSyncFinalAck
+ */
+message ScalaKeyImageSyncFinalRequest {
+}
+
+/**
+ * Response: Response to key image sync step. Contains encryption keys for exported key images.
+ * @end
+ */
+message ScalaKeyImageSyncFinalAck {
+    optional bytes enc_key = 1;
+}
+
+/**
+ * Request: Decrypt tx private keys blob
+ * @next ScalaGetTxKeyAck
+ */
+message ScalaGetTxKeyRequest {
+    repeated uint32 address_n = 1;          // BIP-32 path to derive the key from master node
+    optional uint32 network_type = 2;       // Main-net / testnet / stagenet
+
+    optional bytes salt1 = 3;
+    optional bytes salt2 = 4;
+    optional bytes tx_enc_keys = 5;
+    optional bytes tx_prefix_hash = 6;
+    optional uint32 reason = 7;  // reason to display for user. e.g., tx_proof
+    optional bytes view_public_key = 8;   // addr for derivation
+}
+
+/**
+ * Response: Response with the re-encrypted private keys and derivations blob under view key
+ * @end
+ */
+message ScalaGetTxKeyAck {
+    optional bytes salt = 1;
+    optional bytes tx_keys = 2;
+    optional bytes tx_derivations = 3;
+}
+
+/**
+ * Request: Starts live refresh flow. Asks user permission, switches state
+ * @next ScalaLiveRefreshStartAck
+ */
+message ScalaLiveRefreshStartRequest {
+    repeated uint32 address_n = 1;          // BIP-32 path to derive the key from master node
+    optional uint32 network_type = 2;       // Main-net / testnet / stagenet
+}
+
+/**
+ * Response after user gave permission
+ * @next ScalaLiveRefreshStepRequest
+ * @next ScalaLiveRefreshFinalRequest
+ */
+message ScalaLiveRefreshStartAck {
+
+}
+
+/**
+ * Request: Request to compute a single key image during live sync
+ * @next ScalaLiveRefreshStepAck
+ */
+message ScalaLiveRefreshStepRequest {
+    optional bytes out_key = 1;
+    optional bytes recv_deriv = 2;
+    optional uint64 real_out_idx = 3;
+    optional uint32 sub_addr_major = 4;
+    optional uint32 sub_addr_minor = 5;
+}
+
+/**
+ * Response: Response with the encrypted key image + signature
+ * @next ScalaLiveRefreshStepRequest
+ * @next ScalaLiveRefreshFinishedRequest
+ */
+message ScalaLiveRefreshStepAck {
+    optional bytes salt = 1;
+    optional bytes key_image = 2;
+}
+
+/**
+ * Request: Request terminating live refresh mode.
+ * @next ScalaLiveRefreshFinishedAck
+ */
+message ScalaLiveRefreshFinalRequest {
+
+}
+
+/**
+ * Response: Response on termination of live refresh mode.
+ * @end
+ */
+message ScalaLiveRefreshFinalAck {
+
+}
+
+/**
+ * Request: Universal Scala protocol implementation diagnosis request.
+ * @start
+ * @next DebugScalaDiagAck
+ */
+message DebugScalaDiagRequest {
+    optional uint64 ins = 1;
+    optional uint64 p1 = 2;
+    optional uint64 p2 = 3;
+    repeated uint64 pd = 4;
+    optional bytes data1 = 5;
+    optional bytes data2 = 6;
+}
+
+/**
+ * Response: Response to Scala diagnosis protocol.
+ * @end
+ */
+message DebugScalaDiagAck {
+    optional uint64 ins = 1;
+    optional uint64 p1 = 2;
+    optional uint64 p2 = 3;
+    repeated uint64 pd = 4;
+    optional bytes data1 = 5;
+    optional bytes data2 = 6;
+}

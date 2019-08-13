@@ -2,7 +2,7 @@
 
 function create_wallet {
     wallet_name=$1
-    echo 0 | torque-wallet-cli  --testnet --trusted-daemon --daemon-address localhost:38081 --generate-new-wallet $wallet_name --password "" --restore-height=1
+    echo 0 | scala-wallet-cli  --testnet --trusted-daemon --daemon-address localhost:38081 --generate-new-wallet $wallet_name --password "" --restore-height=1
 }
 
 

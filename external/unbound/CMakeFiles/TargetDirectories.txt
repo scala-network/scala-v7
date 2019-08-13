@@ -1,3 +1,0 @@
-/root/PoW/external/unbound/CMakeFiles/rebuild_cache.dir
-/root/PoW/external/unbound/CMakeFiles/edit_cache.dir
-/root/PoW/external/unbound/CMakeFiles/unbound.dir

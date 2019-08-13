@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018, The MoNerO Project
+// Copyright (c) 2014-2019, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -48,6 +48,7 @@ TEST(protocol_pack, protocol_pack_command)
 
     cryptonote::NOTIFY_RESPONSE_CHAIN_ENTRY::request r2;
     res = epee::serialization::load_t_from_binary(r2, buff);
+    ASSERT_TRUE(res);
     ASSERT_TRUE(r.m_block_ids.size() == i);
     ASSERT_TRUE(r.start_height == 1);
     ASSERT_TRUE(r.total_height == 3);

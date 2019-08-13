@@ -32,9 +32,10 @@
 #include "string_tools.h"
 #include "file_io_utils.h"
 #include "net_parse_helpers.h"
+#include "time_helper.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "net.http"
+#undef SCALA_DEFAULT_LOG_CATEGORY
+#define SCALA_DEFAULT_LOG_CATEGORY "net.http"
 
 #define HTTP_MAX_URI_LEN		 9000 
 #define HTTP_MAX_HEADER_LEN		 100000
@@ -676,7 +677,7 @@ namespace net_utils
 
 		//add additional fields, if it is
 		for(fields_list::const_iterator it = response.m_additional_fields.begin(); it!=response.m_additional_fields.end(); it++)
-			buf += it->first + ":" + it->second + "\r\n";
+			buf += it->first + ": " + it->second + "\r\n";
 
 		buf+="\r\n";
 

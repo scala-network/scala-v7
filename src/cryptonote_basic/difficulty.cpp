@@ -1,4 +1,5 @@
-// Copyright (c) 2014-2017, The MoNerO Project
+// Copyright (c) 2014-2017, The Monero Project
+// Copyright (c) 2018-2019, The Scala Project
 // Copyright (c) 2017 The Masari Project(next_difficulty_v3)
 // All rights reserved.
 //
@@ -37,7 +38,7 @@
 #include <boost/math/special_functions/round.hpp>
 #include <boost/algorithm/clamp.hpp>
 
-#include "common/int-util.h"
+#include "int-util.h"
 #include "crypto/hash.h"
 #include "cryptonote_config.h"
 #include "misc_language.h"
@@ -47,8 +48,8 @@
 #define MAX_AVERAGE_TIMESPAN          (uint64_t) DIFFICULTY_TARGET*6
 #define MIN_AVERAGE_TIMESPAN          (uint64_t) DIFFICULTY_TARGET/24
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "difficulty"
+#undef SCALA_DEFAULT_LOG_CATEGORY
+#define SCALA_DEFAULT_LOG_CATEGORY "difficulty"
 
 namespace cryptonote {
 

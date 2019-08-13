@@ -2,8 +2,8 @@
 
 To run all tests, run:
 
-```
-cd /path/to/torque
+```bash
+cd /path/to/scala
 make [-jn] debug-test # where n is number of compiler processes
 ```
 
@@ -11,14 +11,14 @@ To test a release build, replace `debug-test` with `release-test` in the previou
 
 # Core tests
 
-Core tests take longer than any other Torque tests, due to the high amount of computational work involved in validating core components.
+Core tests take longer than any other Scala tests, due to the high amount of computational work involved in validating core components.
 
 Tests are located in `tests/core_tests/`, and follow a straightforward naming convention. Most cases cover core functionality (`block_reward.cpp`, `chaingen.cpp`, `rct.cpp`, etc.), while some cover basic security tests (`double_spend.cpp` & `integer_overflow.cpp`).
 
-To run only Torque's core tests (after building):
+To run only Scala's core tests (after building):
 
-```
-cd build/debug/tests/core
+```bash
+cd build/debug/tests/core_tests
 ctest
 ```
 
@@ -27,16 +27,16 @@ To run the same tests on a release build, replace `debug` with `release`.
 
 # Crypto Tests
 
-Crypto tests are located under the `tests/crypto` directory. 
+Crypto tests are located under the `tests/crypto` directory.
 
 - `crypto-tests.h` contains test harness headers
 - `main.cpp` implements the driver for the crypto tests
 
 Tests correspond to components under `src/crypto/`. A quick comparison reveals the pattern, and new tests should continue the naming convention.
 
-To run only Torque's crypto tests (after building):
+To run only Scala's crypto tests (after building):
 
-```
+```bash
 cd build/debug/tests/crypto
 ctest
 ```
@@ -50,20 +50,20 @@ To run the same tests on a release build, replace `debug` with `release`.
 # Functional tests
 
 [TODO]
-Functional tests are located under the `tests/functional` directory. 
+Functional tests are located under the `tests/functional` directory.
 
 First, run a regtest daemon in the offline mode and with a fixed difficulty:
-```
-torqued --regtest --offline --fixed-difficulty 1
+```bash
+scalad --regtest --offline --fixed-difficulty 1
 ```
 Alternatively, you can run multiple daemons and let them connect with each other by using `--add-exclusive-node`. In this case, make sure that the same fixed difficulty is given to all the daemons.
 
 Next, restore a mainnet wallet with the following seed and restore height 0 (the file path doesn't matter):
-```
+```bash
 velvet lymph giddy number token physics poetry unquoted nibs useful sabotage limits benches lifestyle eden nitrogen anvil fewest avoid batch vials washing fences goat unquoted
 ```
 
-Open the wallet file with `torque-wallet-rpc` with RPC port 18083. Finally, start tests by invoking ./blockchain.py or ./speed.py
+Open the wallet file with `scala-wallet-rpc` with RPC port 18083. Finally, start tests by invoking ./blockchain.py or ./speed.py
 
 # Fuzz tests
 
@@ -75,9 +75,9 @@ An additional helper utility is provided `contrib/fuzz_testing/fuzz.sh`. AFL mus
 
 Hash tests exist under `tests/hash`, and include a set of target hashes in text files.
 
-To run only Torque's hash tests (after building):
+To run only Scala's hash tests (after building):
 
-```
+```bash
 cd build/debug/tests/hash
 ctest
 ```
@@ -96,12 +96,14 @@ To run the same tests on a release build, replace `debug` with `release`.
 
 Performance tests are located in `tests/performance_tests`, and test features for performance metrics on the host machine.
 
-To run only Torque's performance tests (after building):
+To run only Scala's performance tests (after building):
 
-```
+```bash
 cd build/debug/tests/performance_tests
 ./performance_tests
 ```
+
+The path may be build/Linux/master/debug (adapt as necessary for your platform).
 
 If the `performance_tests` binary does not exist, try running `make` in the `build/debug/tests/performance_tests` directory.
 
@@ -111,9 +113,9 @@ To run the same tests on a release build, replace `debug` with `release`.
 
 Unit tests are defined under the `tests/unit_tests` directory. Independent components are tested individually to ensure they work properly on their own.
 
-To run only Torque's unit tests (after building):
+To run only Scala's unit tests (after building):
 
-```
+```bash
 cd build/debug/tests/unit_tests
 ctest
 ```

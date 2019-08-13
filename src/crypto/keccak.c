@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "common/int-util.h"
+#include "int-util.h"
 #include "hash-ops.h"
 #include "keccak.h"
 
@@ -105,9 +105,12 @@ void keccak(const uint8_t *in, size_t inlen, uint8_t *md, int mdlen)
     memset(st, 0, sizeof(st));
 
     for ( ; inlen >= rsiz; inlen -= rsiz, in += rsiz) {
-        for (i = 0; i < rsizw; i++)
-            st[i] ^= swap64le(((uint64_t *) in)[i]);
-        keccakf(st, KECCAK_ROUNDS);
+      for (i = 0; i < rsizw; i++) {
+        uint64_t ina;
+        memcpy(&ina, in + i * 8, 8);
+        st[i] ^= swap64le(ina);
+      }
+      keccakf(st, KECCAK_ROUNDS);
     }
     
     // last block and padding
@@ -116,7 +119,8 @@ void keccak(const uint8_t *in, size_t inlen, uint8_t *md, int mdlen)
       local_abort("Bad keccak use");
     }
 
-    memcpy(temp, in, inlen);
+    if (inlen > 0)
+      memcpy(temp, in, inlen);
     temp[inlen++] = 1;
     memset(temp + inlen, 0, rsiz - inlen);
     temp[rsiz - 1] |= 0x80;
@@ -145,7 +149,7 @@ void keccak1600(const uint8_t *in, size_t inlen, uint8_t *md)
 #define IS_ALIGNED_64(p) (0 == (7 & ((const char*)(p) - (const char*)0)))
 #define KECCAK_PROCESS_BLOCK(st, block) { \
     for (int i_ = 0; i_ < KECCAK_WORDS; i_++){ \
-        ((st))[i_] ^= ((block))[i_]; \
+        ((st))[i_] ^= swap64le(((block))[i_]); \
     }; \
     keccakf(st, KECCAK_ROUNDS); }
 
@@ -207,7 +211,8 @@ void keccak_finish(KECCAK_CTX * ctx, uint8_t *md){
     }
 
     static_assert(KECCAK_BLOCKLEN > KECCAK_DIGESTSIZE, "");
+    static_assert(KECCAK_DIGESTSIZE % sizeof(uint64_t) == 0, "");
     if (md) {
-        memcpy(md, ctx->hash, KECCAK_DIGESTSIZE);
+        memcpy_swap64le(md, ctx->hash, KECCAK_DIGESTSIZE / sizeof(uint64_t));
     }
 }
