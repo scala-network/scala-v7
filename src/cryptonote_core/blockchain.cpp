@@ -883,36 +883,10 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
   }
 
   LOG_PRINT_L3("Blockchain::" << __func__);
-  crypto::hash top_hash = get_tail_id();
-  {
-    CRITICAL_REGION_LOCAL(m_difficulty_lock);
-    // we can call this without the blockchain lock, it might just give us
-    // something a bit out of date, but that's fine since anything which
-    // requires the blockchain lock will have acquired it in the first place,
-    // and it will be unlocked only when called from the getinfo RPC
-    if (top_hash == m_difficulty_for_next_block_top_hash){
-  size_t target = get_difficulty_target();
-
-  if(get_current_hard_fork_version() < 2){
-    return next_difficulty(timestamps, difficulties, target);
-  }
-  if(get_current_hard_fork_version() < 4){
-    return next_difficulty_v3(timestamps, difficulties, target, true);
-  }
-  if(get_current_hard_fork_version() < 5){{
-      return next_difficulty_v4(timestamps, difficulties, target);
-  }
-  else{
-      return next_difficulty_v5(timestamps, difficulties, target);
-  }
-                                                         }
-  }
-
   CRITICAL_REGION_LOCAL(m_blockchain_lock);
   std::vector<uint64_t> timestamps;
   std::vector<difficulty_type> difficulties;
   auto height = m_db->height();
-  top_hash = get_tail_id();
 
   size_t difficult_block_count;
 
@@ -964,9 +938,6 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
     m_timestamps = timestamps;
     m_difficulties = difficulties;
   }
-
-  CRITICAL_REGION_LOCAL1(m_difficulty_lock);
-  m_difficulty_for_next_block_top_hash = top_hash;
 
   size_t target = get_difficulty_target();
 
