@@ -45,18 +45,21 @@
 #define THREADV __thread
 #endif
 
-static CTHR_MUTEX_TYPE dx_mutex = CTHR_MUTEX_INIT;
-
 typedef struct dx_state {
-  volatile uint64_t  rs_height;
+  CTHR_MUTEX_TYPE rs_mutex;
+  char rs_hash[HASH_SIZE];
+  uint64_t  rs_height;
   defyx_cache *rs_cache;
 } dx_state;
 
-static dx_state dx_s[2];
+static CTHR_MUTEX_TYPE dx_mutex = CTHR_MUTEX_INIT;
+static CTHR_MUTEX_TYPE dx_dataset_mutex = CTHR_MUTEX_INIT;
+
+static dx_state dx_s[2] = {{CTHR_MUTEX_INIT,{0},0,0},{CTHR_MUTEX_INIT,{0},0,0}};
 
 static defyx_dataset *dx_dataset;
-THREADV int dx_s_toggle;
-THREADV defyx_vm *dx_vm = NULL;
+static uint64_t dx_dataset_height;
+static THREADV defyx_vm *dx_vm = NULL;
 
 static void local_abort(const char *msg)
 {
@@ -132,7 +135,7 @@ static inline int use_dx_jit(void)
   if (use_dx_jit_flag != -1)
     return use_dx_jit_flag;
 
-  const char *env = getenv("MONERO_USE_DX_JIT");
+  const char *env = getenv("MONERO_USE_RX_JIT");
   if (!env) {
     use_dx_jit_flag = 1;
   }
@@ -172,22 +175,6 @@ void dx_seedheights(const uint64_t height, uint64_t *seedheight, uint64_t *nexth
   *nextheight = dx_seedheight(height + SEEDHASH_EPOCH_LAG);
 }
 
-bool dx_needhash(const uint64_t height, uint64_t *seedheight) {
-  dx_state *dx_sp;
-  uint64_t s_height = dx_seedheight(height);
-  int toggle = (s_height & SEEDHASH_EPOCH_BLOCKS) != 0;
-  bool ret;
-  bool changed = (toggle != dx_s_toggle);
-  *seedheight = s_height;
-  dx_s_toggle = toggle;
-  dx_sp = &dx_s[dx_s_toggle];
-  ret = (dx_sp->rs_cache == NULL) || (dx_sp->rs_height != s_height);
-  /* if cache is ok but we've flipped caches, reset vm */
-  if (!ret && changed && dx_vm != NULL)
-    defyx_vm_set_cache(dx_vm, dx_sp->rs_cache);
-  return ret;
-}
-
 typedef struct seedinfo {
   defyx_cache *si_cache;
   unsigned long si_start;
@@ -200,7 +187,7 @@ static CTHR_THREAD_RTYPE dx_seedthread(void *arg) {
   CTHR_THREAD_RETURN;
 }
 
-static void dx_initdata(defyx_cache *rs_cache, const int miners) {
+static void dx_initdata(defyx_cache *rs_cache, const int miners, const uint64_t seedheight) {
   if (miners > 1) {
     unsigned long delta = defyx_dataset_item_count() / miners;
     unsigned long start = 0;
@@ -236,106 +223,108 @@ static void dx_initdata(defyx_cache *rs_cache, const int miners) {
   } else {
     defyx_init_dataset(dx_dataset, rs_cache, 0, defyx_dataset_item_count());
   }
+  dx_dataset_height = seedheight;
 }
 
-static void dx_seedhash_int(dx_state *dx_sp, const uint64_t height, const char *hash, const int miners) {
+void dx_slow_hash(const uint64_t mainheight, const uint64_t seedheight, const char *seedhash, const void *data, size_t length,
+  char *hash, int miners, int is_alt) {
+  uint64_t s_height = dx_seedheight(mainheight);
+  int toggle = (s_height & SEEDHASH_EPOCH_BLOCKS) != 0;
   defyx_flags flags = RANDOMX_FLAG_DEFAULT;
+  dx_state *dx_sp;
   defyx_cache *cache;
+
   CTHR_MUTEX_LOCK(dx_mutex);
+
+  if (is_alt) {
+    if (s_height == seedheight && !memcmp(dx_s[toggle].rs_hash, seedhash, HASH_SIZE))
+      is_alt = 0;
+  } else {
+
+  /* RPC could request an earlier block on mainchain */
+    if (s_height > seedheight)
+      is_alt = 1;
+    /* miner can be ahead of mainchain */
+    else if (s_height < seedheight)
+      toggle ^= 1;
+  }
+
+  toggle ^= (is_alt != 0);
+
+  dx_sp = &dx_s[toggle];
+  CTHR_MUTEX_LOCK(dx_sp->rs_mutex);
+  CTHR_MUTEX_UNLOCK(dx_mutex);
+
   cache = dx_sp->rs_cache;
-  if (dx_sp->rs_height != height || cache == NULL) {
+  if (cache == NULL) {
     if (use_dx_jit())
       flags |= RANDOMX_FLAG_JIT;
     if (cache == NULL) {
       cache = defyx_alloc_cache(flags | RANDOMX_FLAG_LARGE_PAGES);
-      if (cache == NULL)
+      if (cache == NULL) {
         cache = defyx_alloc_cache(flags);
+      }
       if (cache == NULL)
         local_abort("Couldn't allocate RandomX cache");
     }
-    defyx_init_cache(cache, hash, 32);
-    if (miners && dx_dataset != NULL)
-      dx_initdata(cache, miners);
-    dx_sp->rs_height = height;
-    if (dx_sp->rs_cache == NULL)
-      dx_sp->rs_cache = cache;
   }
-  CTHR_MUTEX_UNLOCK(dx_mutex);
-  if (dx_vm != NULL)
-    defyx_vm_set_cache(dx_vm, dx_sp->rs_cache);
-}
-
-void dx_seedhash(const uint64_t height, const char *hash, const int miners) {
-  dx_state *dx_sp = &dx_s[dx_s_toggle];
-  dx_seedhash_int(dx_sp, height, hash, miners);
-}
-
-static char dx_althash[32];	// seedhash for alternate blocks
-
-void dx_alt_slowhash(const uint64_t mainheight, const uint64_t seedheight, const char *seedhash, const void *data, size_t length, char *hash) {
-  uint64_t s_height = dx_seedheight(mainheight);
-  int alt_toggle = (s_height & SEEDHASH_EPOCH_BLOCKS) == 0;
-  dx_state *dx_sp = &dx_s[alt_toggle];
-  if (dx_sp->rs_height != seedheight || dx_sp->rs_cache == NULL || memcmp(seedhash, dx_althash, sizeof(dx_althash))) {
-    memcpy(dx_althash, seedhash, sizeof(dx_althash));
-    dx_sp->rs_height = 1;
-    dx_seedhash_int(dx_sp, seedheight, seedhash, 0);
+  if (dx_sp->rs_height != seedheight || dx_sp->rs_cache == NULL || memcmp(seedhash, dx_sp->rs_hash, HASH_SIZE)) {
+    defyx_init_cache(cache, seedhash, HASH_SIZE);
+    dx_sp->rs_cache = cache;
+    dx_sp->rs_height = seedheight;
+    memcpy(dx_sp->rs_hash, seedhash, HASH_SIZE);
   }
   if (dx_vm == NULL) {
     defyx_flags flags = RANDOMX_FLAG_DEFAULT;
-    if (use_dx_jit())
+    if (use_dx_jit()) {
       flags |= RANDOMX_FLAG_JIT;
-    if(!force_software_aes() && check_aes_hw())
-      flags |= RANDOMX_FLAG_HARD_AES;
-    dx_vm = defyx_create_vm(flags | RANDOMX_FLAG_LARGE_PAGES, dx_sp->rs_cache, NULL);
-    if(dx_vm == NULL) //large pages failed
-      dx_vm = defyx_create_vm(flags, dx_sp->rs_cache, NULL);
-    if(dx_vm == NULL) {//fallback if everything fails
-      flags = RANDOMX_FLAG_DEFAULT;
-      dx_vm = defyx_create_vm(flags, dx_sp->rs_cache, NULL);
     }
-    if (dx_vm == NULL)
-      local_abort("Couldn't allocate RandomX VM");
-  }
-  defyx_calculate_hash(dx_vm, data, length, hash);
-}
-
-void dx_slow_hash(const void *data, size_t length, char *hash, int miners) {
-  if (dx_vm == NULL) {
-    dx_state *dx_sp = &dx_s[dx_s_toggle];
-    defyx_flags flags = RANDOMX_FLAG_DEFAULT;
-    if (use_dx_jit())
-      flags |= RANDOMX_FLAG_JIT;
     if(!force_software_aes() && check_aes_hw())
       flags |= RANDOMX_FLAG_HARD_AES;
     if (miners) {
+      CTHR_MUTEX_LOCK(dx_dataset_mutex);
       if (dx_dataset == NULL) {
-        CTHR_MUTEX_LOCK(dx_mutex);
+        dx_dataset = defyx_alloc_dataset(RANDOMX_FLAG_LARGE_PAGES);
         if (dx_dataset == NULL) {
-          dx_dataset = defyx_alloc_dataset(RANDOMX_FLAG_LARGE_PAGES);
-          if (dx_dataset == NULL)
-            dx_dataset = defyx_alloc_dataset(RANDOMX_FLAG_DEFAULT);
-          if (dx_dataset != NULL)
-            dx_initdata(dx_sp->rs_cache, miners);
+          dx_dataset = defyx_alloc_dataset(RANDOMX_FLAG_DEFAULT);
         }
-        CTHR_MUTEX_UNLOCK(dx_mutex);
+        if (dx_dataset != NULL)
+          dx_initdata(dx_sp->rs_cache, miners, seedheight);
       }
       if (dx_dataset != NULL)
         flags |= RANDOMX_FLAG_FULL_MEM;
-      else
+      else {
         miners = 0;
+      }
+      CTHR_MUTEX_UNLOCK(dx_dataset_mutex);
+
     }
+
     dx_vm = defyx_create_vm(flags | RANDOMX_FLAG_LARGE_PAGES, dx_sp->rs_cache, dx_dataset);
-    if(dx_vm == NULL) //large pages failed
+    if(dx_vm == NULL) { //large pages failed
       dx_vm = defyx_create_vm(flags, dx_sp->rs_cache, dx_dataset);
+    }
     if(dx_vm == NULL) {//fallback if everything fails
       flags = RANDOMX_FLAG_DEFAULT | (miners ? RANDOMX_FLAG_FULL_MEM : 0);
       dx_vm = defyx_create_vm(flags, dx_sp->rs_cache, dx_dataset);
     }
     if (dx_vm == NULL)
       local_abort("Couldn't allocate RandomX VM");
+  } else if (miners) {
+    CTHR_MUTEX_LOCK(dx_dataset_mutex);
+    if (dx_dataset != NULL && dx_dataset_height != seedheight)
+      dx_initdata(cache, miners, seedheight);
+    CTHR_MUTEX_UNLOCK(dx_dataset_mutex);
+  } else {
+    defyx_vm_set_cache(dx_vm, dx_sp->rs_cache);
   }
+  /* mainchain users can run in parallel */
+  if (!is_alt)
+    CTHR_MUTEX_UNLOCK(dx_sp->rs_mutex);
   defyx_calculate_hash(dx_vm, data, length, hash);
+  /* altchain slot users always get fully serialized */
+  if (is_alt)
+    CTHR_MUTEX_UNLOCK(dx_sp->rs_mutex);
 }
 
 void dx_slow_hash_allocate_state(void) {
@@ -349,10 +338,11 @@ void dx_slow_hash_free_state(void) {
 }
 
 void dx_stop_mining(void) {
+  CTHR_MUTEX_LOCK(dx_dataset_mutex);
   if (dx_dataset != NULL) {
-    defyx_release_dataset(dx_dataset);
-	dx_dataset = NULL;
+    defyx_dataset *rd = dx_dataset;
+    dx_dataset = NULL;
+    defyx_release_dataset(rd);
   }
+  CTHR_MUTEX_UNLOCK(dx_dataset_mutex);
 }
-
-
