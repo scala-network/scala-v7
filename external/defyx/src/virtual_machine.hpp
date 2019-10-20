@@ -65,6 +65,8 @@ protected:
 		defyx_dataset* datasetPtr;
 	};
 	uint64_t datasetOffset;
+public:
+	std::string cacheKey;
 };
 
 namespace defyx {
