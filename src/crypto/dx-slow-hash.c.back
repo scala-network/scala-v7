@@ -1,5 +1,4 @@
 // Copyright (c) 2019, The Monero Project
-// Copyright (c) 2019, The Scala Network
 //
 // All rights reserved.
 //
@@ -159,11 +158,8 @@ void dx_reorg(const uint64_t split_height) {
   int i;
   CTHR_MUTEX_LOCK(dx_mutex);
   for (i=0; i<2; i++) {
-    if (split_height <= dx_s[i].rs_height) {
-      if (dx_s[i].rs_height == dx_dataset_height)
-        dx_dataset_height = 1;
+    if (split_height < dx_s[i].rs_height)
       dx_s[i].rs_height = 1;	/* set to an invalid seed height */
-    }
   }
   CTHR_MUTEX_UNLOCK(dx_mutex);
 }
@@ -240,11 +236,11 @@ void dx_slow_hash(const uint64_t mainheight, const uint64_t seedheight, const ch
 
   CTHR_MUTEX_LOCK(dx_mutex);
 
-  /* if alt block but with same seed as mainchain, no need for alt cache */
   if (is_alt) {
     if (s_height == seedheight && !memcmp(dx_s[toggle].rs_hash, seedhash, HASH_SIZE))
       is_alt = 0;
   } else {
+
   /* RPC could request an earlier block on mainchain */
     if (s_height > seedheight)
       is_alt = 1;
@@ -282,8 +278,6 @@ void dx_slow_hash(const uint64_t mainheight, const uint64_t seedheight, const ch
     defyx_flags flags = RANDOMX_FLAG_DEFAULT;
     if (use_dx_jit()) {
       flags |= RANDOMX_FLAG_JIT;
-      //if (!miners)
-      //    flags |= RANDOMX_FLAG_SECURE;
     }
     if(!force_software_aes() && check_aes_hw())
       flags |= RANDOMX_FLAG_HARD_AES;
@@ -303,7 +297,9 @@ void dx_slow_hash(const uint64_t mainheight, const uint64_t seedheight, const ch
         miners = 0;
       }
       CTHR_MUTEX_UNLOCK(dx_dataset_mutex);
+
     }
+
     dx_vm = defyx_create_vm(flags | RANDOMX_FLAG_LARGE_PAGES, dx_sp->rs_cache, dx_dataset);
     if(dx_vm == NULL) { //large pages failed
       dx_vm = defyx_create_vm(flags, dx_sp->rs_cache, dx_dataset);
@@ -320,7 +316,6 @@ void dx_slow_hash(const uint64_t mainheight, const uint64_t seedheight, const ch
       dx_initdata(cache, miners, seedheight);
     CTHR_MUTEX_UNLOCK(dx_dataset_mutex);
   } else {
-    /* this is a no-op if the cache hasn't changed */
     defyx_vm_set_cache(dx_vm, dx_sp->rs_cache);
   }
   /* mainchain users can run in parallel */
