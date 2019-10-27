@@ -93,7 +93,12 @@ extern "C" {
 	void defyx_init_cache(defyx_cache *cache, const void *key, size_t keySize) {
 		assert(cache != nullptr);
 		assert(keySize == 0 || key != nullptr);
-		cache->initialize(cache, key, keySize);
+		std::string cacheKey;
+		cacheKey.assign((const char *)key, keySize);
+		if (cache->cacheKey != cacheKey || !cache->isInitialized()) {
+			cache->initialize(cache, key, keySize);
+			cache->cacheKey = cacheKey;
+		}
 	}
 
 	void defyx_release_cache(defyx_cache* cache) {
@@ -234,8 +239,10 @@ extern "C" {
 					UNREACHABLE;
 			}
 
-			if(cache != nullptr)
+			if(cache != nullptr) {
 				vm->setCache(cache);
+				vm->cacheKey = cache->cacheKey;
+			}
 
 			if(dataset != nullptr)
 				vm->setDataset(dataset);
@@ -253,7 +260,10 @@ extern "C" {
 	void defyx_vm_set_cache(defyx_vm *machine, defyx_cache* cache) {
 		assert(machine != nullptr);
 		assert(cache != nullptr && cache->isInitialized());
-		machine->setCache(cache);
+		if (machine->cacheKey != cache->cacheKey) {
+			machine->setCache(cache);
+			machine->cacheKey = cache->cacheKey;
+		}
 	}
 
 	void defyx_vm_set_dataset(defyx_vm *machine, defyx_dataset *dataset) {

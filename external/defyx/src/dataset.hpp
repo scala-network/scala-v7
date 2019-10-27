@@ -50,6 +50,7 @@ struct defyx_cache {
 	defyx::DatasetInitFunc* datasetInit;
 	defyx::SuperscalarProgram programs[RANDOMX_CACHE_ACCESSES];
 	std::vector<uint64_t> reciprocalCache;
+	std::string cacheKey;
 
 	bool isInitialized() {
 		return programs[0].getSize() != 0;

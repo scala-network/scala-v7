@@ -83,6 +83,8 @@ using namespace epee;
 #include "miner.h"
 
 
+
+
 extern "C" void slow_hash_allocate_state();
 extern "C" void slow_hash_free_state();
 namespace cryptonote
