@@ -37,7 +37,10 @@
 #define WINABI
 #endif
 
+.global DECL(defyx_prefetch_scratchpad)
+.global DECL(defyx_prefetch_scratchpad_end)
 .global DECL(defyx_program_prologue)
+.global DECL(defyx_program_prologue_first_load)
 .global DECL(defyx_program_loop_begin)
 .global DECL(defyx_program_loop_load)
 .global DECL(defyx_program_start)
@@ -65,6 +68,16 @@
 
 #define db .byte
 
+DECL(defyx_prefetch_scratchpad):
+	mov rdx, rax
+	and eax, RANDOMX_SCRATCHPAD_MASK
+	prefetcht0 [rsi+rax]
+	ror rdx, 32
+	and edx, RANDOMX_SCRATCHPAD_MASK
+	prefetcht0 [rsi+rdx]
+
+DECL(defyx_prefetch_scratchpad_end):
+
 .balign 64
 DECL(defyx_program_prologue):
 #if defined(WINABI)
@@ -75,6 +88,14 @@ DECL(defyx_program_prologue):
 	movapd xmm13, xmmword ptr [mantissaMask+rip]
 	movapd xmm14, xmmword ptr [exp240+rip]
 	movapd xmm15, xmmword ptr [scaleMask+rip]
+
+DECL(defyx_program_prologue_first_load):
+	xor rax, r8
+	xor rax, r8
+	mov rdx, rax
+	and eax, RANDOMX_SCRATCHPAD_MASK
+	ror rdx, 32
+	and edx, RANDOMX_SCRATCHPAD_MASK
 	jmp DECL(defyx_program_loop_begin)
 
 .balign 64
