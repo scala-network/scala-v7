@@ -1,0 +1,3 @@
+Just extract the TAR.
+
+It will create the subdirectory "MacOSX10.11.sdk", which a prerequisite to build the mac version.
