@@ -1,3 +1,4 @@
+# Copyright (c) 2018, The Scala Project
 # Copyright (c) 2014-2019, The Monero Project
 #
 # All rights reserved.
@@ -105,6 +106,10 @@ if(NOT CMAKE_BUILD_TYPE)
   message(STATUS "Setting default build type: ${CMAKE_BUILD_TYPE}")
 endif()
 string(TOLOWER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_LOWER)
+
+# On Darwin, ensure the user-defined paths are used to find PCSC
+# before falling back to the system frameworks.
+set(CMAKE_FIND_FRAMEWORK "LAST")
 
 # ARCH defines the target architecture, either by an explicit identifier or
 # one of the following two keywords. By default, ARCH a value of 'native':
