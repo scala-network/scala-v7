@@ -183,8 +183,12 @@ namespace cryptonote
     {
         LOG_PRINT_L0("IPFS instances are down, starting one now.");
         /*Start a new instance of IPFS */
+
         #ifdef __linux__
-        IPFSStartNode("/opt/IPFS_scala");
+          LOG_PRINT_L0(IPFSStartNode("/opt/IPFS_scala"));
+        #endif
+        #ifdef WIN32
+          LOG_PRINT_L0(IPFSStartNode("C:\\temp_ipfs"));
         #endif
 
         std::this_thread::sleep_for (std::chrono::seconds(10));
