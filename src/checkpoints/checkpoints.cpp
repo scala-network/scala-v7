@@ -29,14 +29,24 @@
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #include "checkpoints.h"
-
 #include "common/dns_utils.h"
 #include "string_tools.h"
 #include "storages/portable_storage_template_helper.h" // epee json include
 #include "serialization/keyvalue_serialization.h"
 #include <vector>
+#include "libznipfs/json.hpp"
+#include "libznipfs/HTTPRequest.hpp"
+#ifdef __linux__
+#include <unistd.h>
+#include "libznipfs/libznipfs_linux.h"
+#endif
+#ifdef WIN32
+#include <windows.h>
+#include "libznipfs/libznipfs-windows.h"
+#endif
 
 using namespace epee;
+using nlohmann::json;
 
 #undef SCALA_DEFAULT_LOG_CATEGORY
 #define SCALA_DEFAULT_LOG_CATEGORY "checkpoints"
@@ -67,10 +77,23 @@ namespace cryptonote
   };
 
   //---------------------------------------------------------------------------
+  void mySleep(int sleepMs)
+  {
+  #ifdef LINUX
+      usleep(sleepMs * 1000);   // usleep takes sleep time in us (1 millionth of a second)
+  #endif
+  #ifdef WINDOWS
+      Sleep(sleepMs);
+  #endif
+  }
+
+
   checkpoints::checkpoints()
   {
   }
   //---------------------------------------------------------------------------
+
+
   bool checkpoints::add_checkpoint(uint64_t height, const std::string& hash_str)
   {
     crypto::hash h = crypto::null_hash;
@@ -159,14 +182,52 @@ namespace cryptonote
 
   bool checkpoints::init_default_checkpoints(network_type nettype)
   {
-    if (nettype == TESTNET)
+    try
     {
-      return true;
+        http_hayzu::Request request("http://localhost:5001/api/v0/shutdown");
+        const http_hayzu::Response getResponse = request.send("GET");
+        LOG_PRINT_L0("A running IPFS instance was shutdown");
     }
-    if (nettype == STAGENET)
+    catch (const std::exception &e)
     {
-      return true;
+        LOG_PRINT_L0("A running IPFS instance was not found, hence we're going to start one.");
+        /*Start a new instance of IPFS */
+
+        #ifdef __linux__
+        IPFSStartNode("/opt/IPFS_scala");
+        #endif
+
+        /* Connect to a seed peer */
+        /* Cunty server please don't abuse */
+
+        mySleep(5000); /* Sleep for 5 seconds to let IPFS startup */
+
+        try
+        {
+                http_hayzu::Request request2("http://127.0.0.1:5001/api/v0/swarm/connect?arg=/ip4/149.91.88.54/tcp/4001/ipfs/QmXpo52G757vmEuyroVdXqPKNtJdwa7DMYwkehn2yFYB8b");
+                const http_hayzu::Response getResponse2 = request2.send("GET");
+                LOG_PRINT_L0("Connected to QmXpo52G757vmEuyroVdXqPKNtJdwa7DMYwkehn2yFYB8b peer");
+                try{
+                        http_hayzu::Request request3("http://127.0.0.1:8080/ipfs/QmQhwBJi4V8C7D4vpZTkhW3BAYS3PCVnXrMVv4Vu3MJrCn/points.json");
+                        const http_hayzu::Response getResponse3 = request3.send("GET");
+                        std::string jsonRes = std::string(getResponse3.body.begin(), getResponse3.body.end());
+                        json second = json::parse(jsonRes);
+			std::string sId = second["hashlines"][1]["height"];
+			int height_ipfs = std::stoi(sId);
+                        ADD_CHECKPOINT(height_ipfs,second["hashlines"][1]["hash"]);
+                        LOG_PRINT_L0("Added checkpoint from IPFS!");
+                }
+                catch (const std::exception &e){
+                        LOG_PRINT_L0("Was not able to get the checkpoint for some reason");
+                }
+        }
+        catch (const std::exception &e)
+        {
+                LOG_PRINT_L0("Couldn't connect to QmXpo52G757vmEuyroVdXqPKNtJdwa7DMYwkehn2yFYB8b peer, IPFS functions might be slow");
+        }
     }
+
+
 
     ADD_CHECKPOINT(1,"8fdac8eb91e8b35f3ed608a33fb446fca5d207095c97ce75090700175d22082f");
     ADD_CHECKPOINT(10,"246f96b4b6793f195715a95d911b95a957bc81a992450b19909ee6d5045c6911");
@@ -230,6 +291,11 @@ namespace cryptonote
     ADD_CHECKPOINT(566200,"0fa4b56537d191932854fb2faf5fdd53931c0eb384e65abd7d0ec96accb721fe");
     ADD_CHECKPOINT(567222,"57a3acfc3c9ba353731cb3a3266e0de89d8ed0f700ae6d407d1481738a8d315a");
     ADD_CHECKPOINT(567507,"e385c6d652678a8f65dec43e95e0690fb6dd916c8913f048854e78c8d41d547c");
+    ADD_CHECKPOINT(573299,"53b24d306283ac1cf3bc7990588d0bc9163d18fd49945c76fb8d833043af461f");
+    ADD_CHECKPOINT(573454,"32f8fc33f88f8c9d65d3eda4b4f8b76ddd435e0bb32e62271014ea002e792d5e");
+    ADD_CHECKPOINT(577775,"19b910637cd817359d594287b502a3aab41f63ec9a83911315e9f7e2a1382adc");
+    ADD_CHECKPOINT(599838,"12ba81da94a271cdee2ba83bf6b5aacde82da50cdcd4a5d2e5bb8a07173ca969");
+
     return true;
   }
 
@@ -319,13 +385,12 @@ namespace cryptonote
   bool checkpoints::load_new_checkpoints(const std::string &json_hashfile_fullpath, network_type nettype, bool dns)
   {
     bool result;
-
     result = load_checkpoints_from_json(json_hashfile_fullpath);
     if (dns)
     {
       result &= load_checkpoints_from_dns(nettype);
     }
-
     return result;
   }
 }
+

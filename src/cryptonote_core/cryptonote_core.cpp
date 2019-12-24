@@ -1907,6 +1907,11 @@ namespace cryptonote
     return get_blockchain_storage().prune_blockchain(pruning_seed);
   }
   //-----------------------------------------------------------------------------------------------
+  bool core::is_within_compiled_block_hash_area(uint64_t height) const
+  {
+    return get_blockchain_storage().is_within_compiled_block_hash_area(height);
+  }
+  //-----------------------------------------------------------------------------------------------
   std::time_t core::get_start_time() const
   {
     return start_time;
