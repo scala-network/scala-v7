@@ -36,6 +36,8 @@
 #include <vector>
 #include "libznipfs/json.hpp"
 #include "libznipfs/HTTPRequest.hpp"
+#include <thread>         // std::this_thread::sleep_for
+#include <chrono>         // std::chrono::seconds
 #ifdef __linux__
 #include <unistd.h>
 #include "libznipfs/libznipfs_linux.h"
@@ -77,17 +79,6 @@ namespace cryptonote
   };
 
   //---------------------------------------------------------------------------
-  void mySleep(int sleepMs)
-  {
-  #ifdef LINUX
-      usleep(sleepMs * 1000);   // usleep takes sleep time in us (1 millionth of a second)
-  #endif
-  #ifdef WINDOWS
-      Sleep(sleepMs);
-  #endif
-  }
-
-
   checkpoints::checkpoints()
   {
   }
@@ -190,41 +181,27 @@ namespace cryptonote
     }
     catch (const std::exception &e)
     {
-        LOG_PRINT_L0("A running IPFS instance was not found, hence we're going to start one.");
+        LOG_PRINT_L0("IPFS instances are down, starting one now.");
         /*Start a new instance of IPFS */
-
         #ifdef __linux__
         IPFSStartNode("/opt/IPFS_scala");
         #endif
 
-        /* Connect to a seed peer */
-        /* Cunty server please don't abuse */
-
-        mySleep(5000); /* Sleep for 5 seconds to let IPFS startup */
-
-        try
-        {
-                http_hayzu::Request request2("http://127.0.0.1:5001/api/v0/swarm/connect?arg=/ip4/149.91.88.54/tcp/4001/ipfs/QmXpo52G757vmEuyroVdXqPKNtJdwa7DMYwkehn2yFYB8b");
-                const http_hayzu::Response getResponse2 = request2.send("GET");
-                LOG_PRINT_L0("Connected to QmXpo52G757vmEuyroVdXqPKNtJdwa7DMYwkehn2yFYB8b peer");
-                try{
-                        http_hayzu::Request request3("http://127.0.0.1:8080/ipfs/QmQhwBJi4V8C7D4vpZTkhW3BAYS3PCVnXrMVv4Vu3MJrCn/points.json");
+        std::this_thread::sleep_for (std::chrono::seconds(10));
+        try{
+                        /* Todo: replace later with an IPNS link so that it can be dynamic */
+                        http_hayzu::Request request3("http://localhost:8080/ipfs/QmQhwBJi4V8C7D4vpZTkhW3BAYS3PCVnXrMVv4Vu3MJrCn/points.json");
                         const http_hayzu::Response getResponse3 = request3.send("GET");
                         std::string jsonRes = std::string(getResponse3.body.begin(), getResponse3.body.end());
                         json second = json::parse(jsonRes);
-			std::string sId = second["hashlines"][1]["height"];
-			int height_ipfs = std::stoi(sId);
-                        ADD_CHECKPOINT(height_ipfs,second["hashlines"][1]["hash"]);
-                        LOG_PRINT_L0("Added checkpoint from IPFS!");
-                }
-                catch (const std::exception &e){
-                        LOG_PRINT_L0("Was not able to get the checkpoint for some reason");
-                }
-        }
-        catch (const std::exception &e)
-        {
-                LOG_PRINT_L0("Couldn't connect to QmXpo52G757vmEuyroVdXqPKNtJdwa7DMYwkehn2yFYB8b peer, IPFS functions might be slow");
-        }
+			                  int height_ipfs = second["hashlines"][1]["height"];
+                        std::string hash_ipfs = second["hashlines"][1]["hash"];
+                        LOG_PRINT_L0("Adding Checkpoint for height " << height_ipfs);
+                        ADD_CHECKPOINT(height_ipfs,hash_ipfs);
+            }
+catch (const std::exception &e){
+                        std::cerr << "IPFS GET Request failed, error: " << e.what() << '\n';
+            }
     }
 
 
