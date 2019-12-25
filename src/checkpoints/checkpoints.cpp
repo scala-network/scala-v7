@@ -266,7 +266,7 @@ namespace cryptonote
     #endif
     #ifdef WIN32
     std::string scala_dir_usable = boost::filesystem::canonical(scala_dir).string() + "\\checkpoints.json";
-    scala_dir_usable = boost::algorithm:replace_all_copy(scala_dir_usable,"/","\\");
+    scala_dir_usable = boost::algorithm::replace_all_copy(scala_dir_usable,"/","\\");
     #endif
 
     try
@@ -289,7 +289,7 @@ namespace cryptonote
         #endif
         #ifdef WIN32
           location = boost::filesystem::canonical(scala_dir).string() + "\\IPFS_Scala";
-          location = boost::algorithm:replace_all_copy(location,"/","\\");
+          location = boost::algorithm::replace_all_copy(location,"/","\\");
           c_location = &(location[0]);
           LOG_PRINT_L0(IPFSStartNode(c_location));
         #endif
