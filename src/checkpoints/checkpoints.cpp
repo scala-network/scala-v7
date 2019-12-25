@@ -283,18 +283,18 @@ namespace cryptonote
         char *c_location;
 
         #ifdef __linux__
-          location = boost::filesystem::canonical(scala_dir).string() + "/IPFS_Scala";
+          location = boost::filesystem::canonical(scala_dir).string();
           c_location = &(location[0]);
           LOG_PRINT_L0(IPFSStartNode(c_location));
         #endif
         #ifdef WIN32
-          location = boost::filesystem::canonical(scala_dir).string() + "\\IPFS_Scala";
+          location = boost::filesystem::canonical(scala_dir).string();
           location = boost::algorithm::replace_all_copy(location,"/","\\");
           c_location = &(location[0]);
           LOG_PRINT_L0(IPFSStartNode(c_location));
         #endif
         #ifdef __darwin__
-          location = boost::filesystem::canonical(scala_dir).string() + "/IPFS_Scala";
+          location = boost::filesystem::canonical(scala_dir).string();
           c_location = &(location[0]);
           LOG_PRINT_L0(IPFSStartNode(c_location));
         #endif
@@ -310,19 +310,20 @@ namespace cryptonote
                         //json third = json::parse(jsonResBig);
                         std::ofstream o(scala_dir_usable);
                         o << jsonResBig;
-                        load_checkpoints_from_json(scala_dir_usable);
+                        //load_checkpoints_from_json(scala_dir_usable); /*Don't load here because this will be loaded in later anyway */
                         LOG_PRINT_L0("Added large checkpoint file from IPFS at hash QmYWbeSx649S9nnm6WSTkYu6eoDwp9a3AmqRyTS1kBFkJ5");
 
-
-                        /* Todo: replace later with an IPNS link so that it can be dynamic */
+                        /*
+                        /* Todo: replace later with an IPNS link so that it can be dynamic
                         http_hayzu::Request request3("http://localhost:8080/ipfs/QmQhwBJi4V8C7D4vpZTkhW3BAYS3PCVnXrMVv4Vu3MJrCn/points.json");
                         const http_hayzu::Response getResponse3 = request3.send("GET");
                         std::string jsonRes = std::string(getResponse3.body.begin(), getResponse3.body.end());
                         json second = json::parse(jsonRes);
 			                  int height_ipfs = second["hashlines"][1]["height"];
                         std::string hash_ipfs = second["hashlines"][1]["hash"];
-                        LOG_PRINT_L0("Adding Checkpoint for last height " << height_ipfs);
-                        ADD_CHECKPOINT(height_ipfs,hash_ipfs);
+                        //LOG_PRINT_L0("Adding Checkpoint for last height " << height_ipfs);
+                        //ADD_CHECKPOINT(height_ipfs,hash_ipfs);
+                        */
             }
             catch (const std::exception &e){
                         std::cerr << "IPFS GET Request failed, error: " << e.what() << '\n';
