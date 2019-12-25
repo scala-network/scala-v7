@@ -292,13 +292,11 @@ namespace cryptonote
           location = boost::algorithm:replace_all_copy(location,"/","\\");
           c_location = &(location[0]);
           LOG_PRINT_L0(IPFSStartNode(c_location));
-          LOG_PRINT_L0(IPFSStartNode("C:\\IPFS_scala"));
         #endif
         #ifdef __darwin__
           location = boost::filesystem::canonical(scala_dir).string() + "/IPFS_Scala";
           c_location = &(location[0]);
           LOG_PRINT_L0(IPFSStartNode(c_location));
-          LOG_PRINT_L0(IPFSStartNode("/tmp/IPFS_scala"));
         #endif
 
         std::this_thread::sleep_for (std::chrono::seconds(10));
