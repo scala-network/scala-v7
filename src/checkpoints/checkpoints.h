@@ -144,6 +144,16 @@ namespace cryptonote
      * @return false if any conflict is found, otherwise true
      */
     bool check_for_conflicts(const checkpoints& other) const;
+    /**
+     * @brief try and connect to a swarm IPFS node
+     *
+     * If able to connect daemon will fetch a large checkpoint file and add it to daemon,
+     * else it will just use some of the hardcoded checkpoints.
+     *
+     *
+     * @return false if not able to connect to swarm node, true if able to connect.
+     */
+    bool add_swarm_seed();
 
     /**
      * @brief loads the default main chain checkpoints
