@@ -41,6 +41,7 @@
 #include <thread>         // std::this_thread::sleep_for
 #include <chrono>         // std::chrono::seconds
 #include <cstring>
+#include <boost/algorithm/string.hpp>
 #ifdef __linux__
 #include <unistd.h>
 #include "libznipfs/libznipfs_linux.h"
@@ -265,6 +266,7 @@ namespace cryptonote
     #endif
     #ifdef WIN32
     std::string scala_dir_usable = boost::filesystem::canonical(scala_dir).string() + "\\checkpoints.json";
+    scala_dir_usable = boost::algorithm:replace_all_copy(scala_dir_usable,"/","\\");
     #endif
 
     try
@@ -277,14 +279,25 @@ namespace cryptonote
     {
         LOG_PRINT_L0("IPFS instances are down, starting one now.");
         /*Start a new instance of IPFS */
+        std::string location;
+        char *c_location;
 
         #ifdef __linux__
-          LOG_PRINT_L0(IPFSStartNode("/opt/IPFS_scala"));
+          location = boost::filesystem::canonical(scala_dir).string() + "/IPFS_Scala";
+          c_location = &(location[0]);
+          LOG_PRINT_L0(IPFSStartNode(c_location));
         #endif
         #ifdef WIN32
+          location = boost::filesystem::canonical(scala_dir).string() + "\\IPFS_Scala";
+          location = boost::algorithm:replace_all_copy(location,"/","\\");
+          c_location = &(location[0]);
+          LOG_PRINT_L0(IPFSStartNode(c_location));
           LOG_PRINT_L0(IPFSStartNode("C:\\IPFS_scala"));
         #endif
         #ifdef __darwin__
+          location = boost::filesystem::canonical(scala_dir).string() + "/IPFS_Scala";
+          c_location = &(location[0]);
+          LOG_PRINT_L0(IPFSStartNode(c_location));
           LOG_PRINT_L0(IPFSStartNode("/tmp/IPFS_scala"));
         #endif
 
