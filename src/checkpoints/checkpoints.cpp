@@ -369,7 +369,7 @@ namespace cryptonote
     #endif
     #ifdef WIN32
     std::string scala_dir_usable1 = boost::filesystem::canonical(scala_dir1).string() + "\\checkpoints.json";
-    scala_dir_usable1 = boost::algorithm::replace_all_copy(scala_dir_usable,"/","\\");
+    scala_dir_usable1 = boost::algorithm::replace_all_copy(scala_dir_usable1,"/","\\");
     #endif
 
     try
