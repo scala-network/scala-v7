@@ -187,6 +187,14 @@ namespace cryptonote
     bool load_checkpoints_from_json(const std::string &json_hashfile_fullpath);
 
     /**
+     * @brief load new checkpoints from an IPFS hash hosted on a serverless page
+     *
+     *
+     * @return true if loading successful and no conflicts
+     */
+    bool load_dynamic_checkpoints();
+
+    /**
      * @brief load new checkpoints from DNS
      *
      * @param nettype network type

@@ -4219,6 +4219,10 @@ void Blockchain::check_against_checkpoints(const checkpoints& points, bool enfor
 // with an existing checkpoint.
 bool Blockchain::update_checkpoints(const std::string& file_path, bool check_dns)
 {
+  if(!m_checkpoints.load_dynamic_checkpoints()){
+     return false;
+  }
+  
   if (!m_checkpoints.load_checkpoints_from_json(file_path))
   {
       return false;

@@ -180,6 +180,7 @@ namespace cryptonote
     {
     http_hayzu::Request requestSwarm("http://localhost:5001/api/v0/swarm/connect?arg=/ip4/149.91.88.54/tcp/4001/ipfs/QmXpo52G757vmEuyroVdXqPKNtJdwa7DMYwkehn2yFYB8b");
     const http_hayzu::Response getResponse = requestSwarm.send("GET");
+    
     LOG_PRINT_L0("Added QmXpo52G757vmEuyroVdXqPKNtJdwa7DMYwkehn2yFYB8b as Swarm Seed!");
     return true;
     }
@@ -256,7 +257,6 @@ namespace cryptonote
 
   bool checkpoints::init_default_checkpoints(network_type nettype)
   {
-    
     boost::filesystem::path scala_dir = tools::get_default_data_dir(); // Scala's Data Directory
     #ifdef __linux__
     std::string scala_dir_usable = boost::filesystem::canonical(scala_dir).string() + "/checkpoints.json";
@@ -303,27 +303,13 @@ namespace cryptonote
         bool swarm_result = add_swarm_seed();
         if(swarm_result == true){
         try{
-                        /* Add the big checkpoint file */
+                        /* Add the big init checkpoint file */
                         http_hayzu::Request request4("http://localhost:8080/ipfs/QmYWbeSx649S9nnm6WSTkYu6eoDwp9a3AmqRyTS1kBFkJ5/checkpoints.json");
                         const http_hayzu::Response getResponse4 = request4.send("GET");
                         std::string jsonResBig = std::string(getResponse4.body.begin(), getResponse4.body.end());
-                        //json third = json::parse(jsonResBig);
                         std::ofstream o(scala_dir_usable);
                         o << jsonResBig;
-                        //load_checkpoints_from_json(scala_dir_usable); /*Don't load here because this will be loaded in later anyway */
                         LOG_PRINT_L0("Added large checkpoint file from IPFS at hash QmYWbeSx649S9nnm6WSTkYu6eoDwp9a3AmqRyTS1kBFkJ5");
-
-                        /*
-                        /* Todo: replace later with an IPNS link so that it can be dynamic
-                        http_hayzu::Request request3("http://localhost:8080/ipfs/QmQhwBJi4V8C7D4vpZTkhW3BAYS3PCVnXrMVv4Vu3MJrCn/points.json");
-                        const http_hayzu::Response getResponse3 = request3.send("GET");
-                        std::string jsonRes = std::string(getResponse3.body.begin(), getResponse3.body.end());
-                        json second = json::parse(jsonRes);
-			                  int height_ipfs = second["hashlines"][1]["height"];
-                        std::string hash_ipfs = second["hashlines"][1]["hash"];
-                        //LOG_PRINT_L0("Adding Checkpoint for last height " << height_ipfs);
-                        //ADD_CHECKPOINT(height_ipfs,hash_ipfs);
-                        */
             }
             catch (const std::exception &e){
                         std::cerr << "IPFS GET Request failed, error: " << e.what() << '\n';
@@ -370,6 +356,42 @@ namespace cryptonote
     }
 
     return true;
+  }
+
+  bool checkpoints::load_dynamic_checkpoints()
+  {
+    boost::filesystem::path scala_dir1 = tools::get_default_data_dir(); // Scala's Data Directory
+    #ifdef __linux__
+    std::string scala_dir_usable1 = boost::filesystem::canonical(scala_dir1).string() + "/checkpoints.json";
+    #endif
+    #ifdef __darwin__
+    std::string scala_dir_usable1 = boost::filesystem::canonical(scala_dir1).string() + "/checkpoints.json";
+    #endif
+    #ifdef WIN32
+    std::string scala_dir_usable1 = boost::filesystem::canonical(scala_dir1).string() + "\\checkpoints.json";
+    scala_dir_usable1 = boost::algorithm::replace_all_copy(scala_dir_usable,"/","\\");
+    #endif
+
+    try
+    {
+    http_hayzu::Request requestIPNS("http://ipns.scalaproject.io/");
+    const http_hayzu::Response getIPNS = requestIPNS.send("GET");
+    std::string IPNS_json = std::string(getIPNS.body.begin(), getIPNS.body.end());
+    json IPNS_json_parsed = json::parse(IPNS_json);
+    std::string IPFS_location = IPNS_json_parsed["ipfs_hash"];
+    std::string IPFS_location_url = "http://localhost:8080/ipfs/" + IPFS_location;
+
+    http_hayzu::Request dynamicCheckpoints(IPFS_location_url);
+    const http_hayzu::Response getDynamicCheckpoints = dynamicCheckpoints.send("GET");
+    std::string jsonDC = std::string(getDynamicCheckpoints.body.begin(), getDynamicCheckpoints.body.end());
+    std::ofstream o(scala_dir_usable1);
+    o << jsonDC;
+    return true;
+
+    }catch(const std::exception& e){
+      std::cerr << "IPNS Request failed, error: " << e.what() << '\n';
+      return false;
+    }
   }
 
   bool checkpoints::load_checkpoints_from_dns(network_type nettype)
