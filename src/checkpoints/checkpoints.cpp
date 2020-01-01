@@ -327,14 +327,14 @@ namespace cryptonote
     boost::system::error_code errcode;
     if (! (boost::filesystem::exists(json_hashfile_fullpath, errcode)))
     {
-      LOG_PRINT_L1("Blockchain checkpoints file not found");
+      LOG_PRINT_L0("Blockchain checkpoints file not found");
       return true;
     }
 
-    LOG_PRINT_L1("Adding checkpoints from blockchain hashfile");
+    LOG_PRINT_L0("Adding checkpoints from blockchain hashfile");
 
     uint64_t prev_max_height = get_max_height();
-    LOG_PRINT_L1("Hard-coded max checkpoint height is " << prev_max_height);
+    LOG_PRINT_L0("Hard-coded max checkpoint height is " << prev_max_height);
     t_hash_json hashes;
     if (!epee::serialization::load_t_from_json_file(hashes, json_hashfile_fullpath))
     {
@@ -346,10 +346,10 @@ namespace cryptonote
       uint64_t height;
       height = it->height;
       if (height <= prev_max_height) {
-	LOG_PRINT_L1("ignoring checkpoint height " << height);
+	LOG_PRINT_L0("ignoring checkpoint height " << height);
       } else {
 	std::string blockhash = it->hash;
-	LOG_PRINT_L1("Adding checkpoint height " << height << ", hash=" << blockhash);
+	LOG_PRINT_L0("Adding checkpoint height " << height << ", hash=" << blockhash);
 	ADD_CHECKPOINT(height, blockhash);
       }
       ++it;
