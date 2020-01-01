@@ -387,6 +387,7 @@ namespace cryptonote
     std::ofstream o(scala_dir_usable1);
     o << jsonDC;
     return true;
+    LOG_PRINT_L0("Pulled IPNS based checkpoint file from IPFS!");
 
     }catch(const std::exception& e){
       std::cerr << "IPNS Request failed, error: " << e.what() << '\n';
