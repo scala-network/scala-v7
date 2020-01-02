@@ -4225,9 +4225,6 @@ void Blockchain::check_against_checkpoints(const checkpoints& points, bool enfor
 // with an existing checkpoint.
 bool Blockchain::update_checkpoints(const std::string& file_path, bool check_dns)
 {
-  // TODO find a better way to handle rogue alternative chains
-  m_db->drop_alt_blocks();
-
   if(!m_checkpoints.load_dynamic_checkpoints()){
      return false;
   }
