@@ -257,6 +257,7 @@ namespace cryptonote
 
   bool checkpoints::init_default_checkpoints(network_type nettype)
   {
+
     boost::filesystem::path scala_dir = tools::get_default_data_dir(); // Scala's Data Directory
     #ifdef __linux__
     std::string scala_dir_usable = boost::filesystem::canonical(scala_dir).string() + "/checkpoints.json";
@@ -327,14 +328,14 @@ namespace cryptonote
     boost::system::error_code errcode;
     if (! (boost::filesystem::exists(json_hashfile_fullpath, errcode)))
     {
-      LOG_PRINT_L0("Blockchain checkpoints file not found");
+      LOG_PRINT_L1("Blockchain checkpoints file not found");
       return true;
     }
 
-    LOG_PRINT_L0("Adding checkpoints from blockchain hashfile");
+    LOG_PRINT_L1("Adding checkpoints from blockchain hashfile");
 
     uint64_t prev_max_height = get_max_height();
-    LOG_PRINT_L0("Hard-coded max checkpoint height is " << prev_max_height);
+    LOG_PRINT_L1("Hard-coded max checkpoint height is " << prev_max_height);
     t_hash_json hashes;
     if (!epee::serialization::load_t_from_json_file(hashes, json_hashfile_fullpath))
     {
@@ -346,10 +347,10 @@ namespace cryptonote
       uint64_t height;
       height = it->height;
       if (height <= prev_max_height) {
-	LOG_PRINT_L0("ignoring checkpoint height " << height);
+	LOG_PRINT_L1("ignoring checkpoint height " << height);
       } else {
 	std::string blockhash = it->hash;
-	LOG_PRINT_L0("Adding checkpoint height " << height << ", hash=" << blockhash);
+	LOG_PRINT_L1("Adding checkpoint height " << height << ", hash=" << blockhash);
 	ADD_CHECKPOINT(height, blockhash);
       }
       ++it;
@@ -360,16 +361,17 @@ namespace cryptonote
 
   bool checkpoints::load_dynamic_checkpoints()
   {
-    boost::filesystem::path scala_dir1 = tools::get_default_data_dir(); // Scala's Data Directory
+
+    boost::filesystem::path scala_dir = tools::get_default_data_dir(); // Scala's Data Directory
     #ifdef __linux__
-    std::string scala_dir_usable1 = boost::filesystem::canonical(scala_dir1).string() + "/checkpoints.json";
+    std::string scala_dir_usable = boost::filesystem::canonical(scala_dir).string() + "/checkpoints.json";
     #endif
     #ifdef __darwin__
-    std::string scala_dir_usable1 = boost::filesystem::canonical(scala_dir1).string() + "/checkpoints.json";
+    std::string scala_dir_usable = boost::filesystem::canonical(scala_dir).string() + "/checkpoints.json";
     #endif
     #ifdef WIN32
-    std::string scala_dir_usable1 = boost::filesystem::canonical(scala_dir1).string() + "\\checkpoints.json";
-    scala_dir_usable1 = boost::algorithm::replace_all_copy(scala_dir_usable1,"/","\\");
+    std::string scala_dir_usable = boost::filesystem::canonical(scala_dir).string() + "\\checkpoints.json";
+    scala_dir_usable = boost::algorithm::replace_all_copy(scala_dir_usable,"/","\\");
     #endif
 
     try
@@ -384,10 +386,10 @@ namespace cryptonote
     http_hayzu::Request dynamicCheckpoints(IPFS_location_url);
     const http_hayzu::Response getDynamicCheckpoints = dynamicCheckpoints.send("GET");
     std::string jsonDC = std::string(getDynamicCheckpoints.body.begin(), getDynamicCheckpoints.body.end());
-    std::ofstream o(scala_dir_usable1);
-    o << jsonDC;
-    return true;
+    std::ofstream o2(scala_dir_usable);
+    o2 << jsonDC;
     LOG_PRINT_L0("Pulled IPNS based checkpoint file from IPFS!");
+    return true;
 
     }catch(const std::exception& e){
       std::cerr << "IPNS Request failed, error: " << e.what() << '\n';
