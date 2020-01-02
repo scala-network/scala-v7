@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2018-2019, tevador <tevador@gmail.com>
+Copyright (c) 2019, tevador <tevador@gmail.com>
 
 All rights reserved.
 
@@ -26,51 +26,47 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
+#include "cpu.hpp"
 
-#include <cstdint>
-#include <vector>
-#include <stdexcept>
-#include "common.hpp"
+#if defined(_M_X64) || defined(__x86_64__)
+	#define HAVE_CPUID
+	#ifdef _WIN32
+		#include <intrin.h>
+		#define cpuid(info, x) __cpuidex(info, x, 0)
+	#else //GCC
+		#include <cpuid.h>
+		void cpuid(int info[4], int InfoType) {
+			__cpuid_count(InfoType, 0, info[0], info[1], info[2], info[3]);
+		}
+	#endif
+#endif
+
+#if defined(HAVE_HWCAP)
+	#include <sys/auxv.h>
+	#include <asm/hwcap.h>
+#endif
 
 namespace defyx {
 
-	class Program;
-	struct ProgramConfiguration;
-	class SuperscalarProgram;
+	Cpu::Cpu() : aes_(false), ssse3_(false), avx2_(false) {
+#ifdef HAVE_CPUID
+		int info[4];
+		cpuid(info, 0);
+		int nIds = info[0];
+		if (nIds >= 0x00000001) {
+			cpuid(info, 0x00000001);
+			ssse3_ = (info[2] & (1 << 9)) != 0;
+			aes_ = (info[2] & (1 << 25)) != 0;
+		}
+		if (nIds >= 0x00000007) {
+			cpuid(info, 0x00000007);
+			avx2_ = (info[1] & (1 << 5)) != 0;
+		}
+#elif defined(__aarch64__) && defined(HWCAP_AES)
+		long hwcaps = getauxval(AT_HWCAP);
+		aes_ = (hwcaps & HWCAP_AES) != 0;
+#endif
+		//TODO POWER8 AES
+	}
 
-	class JitCompilerFallback {
-	public:
-		JitCompilerFallback() {
-			throw std::runtime_error("JIT compilation is not supported on this platform");
-		}
-		void generateProgram(Program&, ProgramConfiguration&) {
-
-		}
-		void generateProgramLight(Program&, ProgramConfiguration&, uint32_t) {
-
-		}
-		template<size_t N>
-		void generateSuperscalarHash(SuperscalarProgram(&programs)[N], std::vector<uint64_t> &) {
-
-		}
-		void generateDatasetInitCode() {
-
-		}
-		ProgramFunc* getProgramFunc() {
-			return nullptr;
-		}
-		DatasetInitFunc* getDatasetInitFunc() {
-			return nullptr;
-		}
-		uint8_t* getCode() {
-			return nullptr;
-		}
-		size_t getCodeSize() {
-			return 0;
-		}
-		void enableWriting() {}
-		void enableExecution() {}
-		void enableAll() {}
-	};
 }

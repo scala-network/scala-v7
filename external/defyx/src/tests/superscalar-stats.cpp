@@ -17,7 +17,7 @@ int main() {
 	int64_t size = 0;
 	for (int i = 0; i < count; ++i) {
 		defyx::SuperscalarProgram prog;
-		defyx::Blake2Generator gen(seed, i);
+		defyx::Blake2Generator gen(seed, sizeof(seed), i);
 		defyx::generateSuperscalar(prog, gen);
 		asicLatency += prog.asicLatency;
 		codesize += prog.codeSize;

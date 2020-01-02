@@ -6,9 +6,10 @@ int main() {
 	const char myInput[] = "DefyX example input";
 	char hash[RANDOMX_HASH_SIZE];
 
-	defyx_cache *myCache = defyx_alloc_cache(RANDOMX_FLAG_DEFAULT);
+	defyx_flags flags = defyx_get_flags();
+	defyx_cache *myCache = defyx_alloc_cache(flags);
 	defyx_init_cache(myCache, &myKey, sizeof myKey);
-	defyx_vm *myMachine = defyx_create_vm(RANDOMX_FLAG_DEFAULT, myCache, NULL);
+	defyx_vm *myMachine = defyx_create_vm(flags, myCache, NULL);
 
 	defyx_calculate_hash(myMachine, &myInput, sizeof myInput, hash);
 

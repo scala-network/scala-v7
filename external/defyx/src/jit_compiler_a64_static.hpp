@@ -1,5 +1,6 @@
 /*
 Copyright (c) 2018-2019, tevador <tevador@gmail.com>
+Copyright (c) 2019, SChernykh    <https://github.com/SChernykh>
 
 All rights reserved.
 
@@ -28,49 +29,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
-#include <cstdint>
-#include <vector>
-#include <stdexcept>
-#include "common.hpp"
-
-namespace defyx {
-
-	class Program;
-	struct ProgramConfiguration;
-	class SuperscalarProgram;
-
-	class JitCompilerFallback {
-	public:
-		JitCompilerFallback() {
-			throw std::runtime_error("JIT compilation is not supported on this platform");
-		}
-		void generateProgram(Program&, ProgramConfiguration&) {
-
-		}
-		void generateProgramLight(Program&, ProgramConfiguration&, uint32_t) {
-
-		}
-		template<size_t N>
-		void generateSuperscalarHash(SuperscalarProgram(&programs)[N], std::vector<uint64_t> &) {
-
-		}
-		void generateDatasetInitCode() {
-
-		}
-		ProgramFunc* getProgramFunc() {
-			return nullptr;
-		}
-		DatasetInitFunc* getDatasetInitFunc() {
-			return nullptr;
-		}
-		uint8_t* getCode() {
-			return nullptr;
-		}
-		size_t getCodeSize() {
-			return 0;
-		}
-		void enableWriting() {}
-		void enableExecution() {}
-		void enableAll() {}
-	};
+extern "C" {
+	void defyx_program_aarch64(void* reg, void* mem, void* scratchpad, uint64_t iterations);
+	void defyx_program_aarch64_main_loop();
+	void defyx_program_aarch64_vm_instructions();
+	void defyx_program_aarch64_imul_rcp_literals_end();
+	void defyx_program_aarch64_vm_instructions_end();
+	void defyx_program_aarch64_cacheline_align_mask1();
+	void defyx_program_aarch64_cacheline_align_mask2();
+	void defyx_program_aarch64_update_spMix1();
+	void defyx_program_aarch64_vm_instructions_end_light();
+	void defyx_program_aarch64_light_cacheline_align_mask();
+	void defyx_program_aarch64_light_dataset_offset();
+	void defyx_init_dataset_aarch64();
+	void defyx_init_dataset_aarch64_end();
+	void defyx_calc_dataset_item_aarch64();
+	void defyx_calc_dataset_item_aarch64_prefetch();
+	void defyx_calc_dataset_item_aarch64_mix();
+	void defyx_calc_dataset_item_aarch64_store_result();
+	void defyx_calc_dataset_item_aarch64_end();
 }

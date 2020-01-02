@@ -45,7 +45,7 @@ set_thread_affinity(const unsigned &cpuid)
 {
     std::thread::native_handle_type thread;
 #if defined(_WIN32) || defined(__CYGWIN__)
-    //thread = static_cast<std::thread::native_handle_type>(GetCurrentThread());
+    thread = reinterpret_cast<std::thread::native_handle_type>(GetCurrentThread());
 #else
     thread = static_cast<std::thread::native_handle_type>(pthread_self());
 #endif
@@ -64,8 +64,8 @@ set_thread_affinity(std::thread::native_handle_type thread,
     rc = thread_policy_set(mach_thread, THREAD_AFFINITY_POLICY,
             (thread_policy_t)&policy, 1);
 #elif defined(_WIN32) || defined(__CYGWIN__)
-    rc = 0;
-#else
+    rc = SetThreadAffinityMask(reinterpret_cast<HANDLE>(thread), 1ULL << cpuid) == 0 ? -2 : 0;
+#elif !defined(__OpenBSD__) && !defined(__FreeBSD__) && !defined(__ANDROID__)
     cpu_set_t cs;
     CPU_ZERO(&cs);
     CPU_SET(cpuid, &cs);

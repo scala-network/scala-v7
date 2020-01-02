@@ -218,7 +218,7 @@ namespace defyx {
 	}
 
 	JitCompilerX86::JitCompilerX86() {
-		code = (uint8_t*)allocExecutableMemory(CodeSize);
+		code = (uint8_t*)allocMemoryPages(CodeSize);
 		memcpy(code, codePrologue, prologueSize);
 		memcpy(code + epilogueOffset, codeEpilogue, epilogueSize);
 	}
@@ -227,11 +227,23 @@ namespace defyx {
 		freePagedMemory(code, CodeSize);
 	}
 
+	void JitCompilerX86::enableAll() {
+		setPagesRWX(code, CodeSize);
+	}
+
+	void JitCompilerX86::enableWriting() {
+		setPagesRW(code, CodeSize);
+	}
+
+	void JitCompilerX86::enableExecution() {
+		setPagesRX(code, CodeSize);
+	}
+
 	void JitCompilerX86::generateProgram(Program& prog, ProgramConfiguration& pcfg) {
 		generateProgramPrologue(prog, pcfg);
 		memcpy(code + codePos, codeReadDataset, readDatasetSize);
 		codePos += readDatasetSize;
-		generateProgramEpilogue(prog);
+		generateProgramEpilogue(prog, pcfg);
 	}
 
 	void JitCompilerX86::generateProgramLight(Program& prog, ProgramConfiguration& pcfg, uint32_t datasetOffset) {
@@ -242,7 +254,7 @@ namespace defyx {
 		emitByte(CALL);
 		emit32(superScalarHashOffset - (codePos + 4));
 		emit(codeReadDatasetLightSshFin, readDatasetLightFinSize);
-		generateProgramEpilogue(prog);
+		generateProgramEpilogue(prog, pcfg);
 	}
 
 	template<size_t N>
@@ -286,12 +298,13 @@ namespace defyx {
 		for (unsigned i = 0; i < 8; ++i) {
 			registerUsage[i] = -1;
 		}
+
+		codePos = ((uint8_t*)defyx_program_prologue_first_load) - ((uint8_t*)defyx_program_prologue);
+		code[codePos + sizeof(REX_XOR_RAX_R64)] = 0xc0 + pcfg.readReg0;
+		code[codePos + sizeof(REX_XOR_RAX_R64) * 2 + 1] = 0xc0 + pcfg.readReg1;
+
 		codePos = prologueSize;
 		memcpy(code + codePos - 48, &pcfg.eMask, sizeof(pcfg.eMask));
-		emit(REX_XOR_RAX_R64);
-		emitByte(0xc0 + pcfg.readReg0);
-		emit(REX_XOR_RAX_R64);
-		emitByte(0xc0 + pcfg.readReg1);
 		memcpy(code + codePos, codeLoopLoad, loopLoadSize);
 		codePos += loopLoadSize;
 		for (unsigned i = 0; i < prog.getSize(); ++i) {
@@ -306,7 +319,12 @@ namespace defyx {
 		emitByte(0xc0 + pcfg.readReg3);
 	}
 
-	void JitCompilerX86::generateProgramEpilogue(Program& prog) {
+	void JitCompilerX86::generateProgramEpilogue(Program& prog, ProgramConfiguration& pcfg) {
+		emit(REX_MOV_RR64);
+		emitByte(0xc0 + pcfg.readReg0);
+		emit(REX_XOR_RAX_R64);
+		emitByte(0xc0 + pcfg.readReg1);
+		emit((const uint8_t*)&defyx_prefetch_scratchpad, ((uint8_t*)&defyx_prefetch_scratchpad_end) - ((uint8_t*)&defyx_prefetch_scratchpad));
 		memcpy(code + codePos, codeLoopStore, loopStoreSize);
 		codePos += loopStoreSize;
 		emit(SUB_EBX);

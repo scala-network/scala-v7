@@ -29,7 +29,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 extern "C" {
+	void defyx_prefetch_scratchpad();
+	void defyx_prefetch_scratchpad_end();
 	void defyx_program_prologue();
+	void defyx_program_prologue_first_load();
 	void defyx_program_loop_begin();
 	void defyx_program_loop_load();
 	void defyx_program_start();

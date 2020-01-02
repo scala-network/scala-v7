@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define RANDOMX_H
 
 #include <stddef.h>
+#include <stdint.h>
 
 #define RANDOMX_HASH_SIZE 32
 #define RANDOMX_DATASET_ITEM_SIZE 64
@@ -44,15 +45,48 @@ typedef enum {
   RANDOMX_FLAG_HARD_AES = 2,
   RANDOMX_FLAG_FULL_MEM = 4,
   RANDOMX_FLAG_JIT = 8,
+  RANDOMX_FLAG_SECURE = 16,
+  RANDOMX_FLAG_ARGON2_SSSE3 = 32,
+  RANDOMX_FLAG_ARGON2_AVX2 = 64,
+  RANDOMX_FLAG_ARGON2 = 96
 } defyx_flags;
 
 typedef struct defyx_dataset defyx_dataset;
 typedef struct defyx_cache defyx_cache;
 typedef struct defyx_vm defyx_vm;
 
+
 #if defined(__cplusplus)
+
+#ifdef __cpp_constexpr
+#define CONSTEXPR constexpr
+#else
+#define CONSTEXPR
+#endif
+
+inline CONSTEXPR defyx_flags operator |(defyx_flags a, defyx_flags b) {
+	return static_cast<defyx_flags>(static_cast<int>(a) | static_cast<int>(b));
+}
+inline CONSTEXPR defyx_flags operator &(defyx_flags a, defyx_flags b) {
+	return static_cast<defyx_flags>(static_cast<int>(a) & static_cast<int>(b));
+}
+inline defyx_flags& operator |=(defyx_flags& a, defyx_flags b) {
+	return a = a | b;
+}
+
 extern "C" {
 #endif
+
+/**
+ * @return The recommended flags to be used on the current machine.
+ *         Does not include:
+ *            RANDOMX_FLAG_LARGE_PAGES
+ *            RANDOMX_FLAG_FULL_MEM
+ *            RANDOMX_FLAG_SECURE
+ *         These flags must be added manually if desired.
+ *         On OpenBSD RANDOMX_FLAG_SECURE is enabled by default in JIT mode as W^X is enforced by the OS.
+ */
+RANDOMX_EXPORT defyx_flags defyx_get_flags(void);
 
 /**
  * Creates a defyx_cache structure and allocates memory for DefyX Cache.
@@ -61,15 +95,23 @@ extern "C" {
  *        RANDOMX_FLAG_LARGE_PAGES - allocate memory in large pages
  *        RANDOMX_FLAG_JIT - create cache structure with JIT compilation support; this makes
  *                           subsequent Dataset initialization faster
+ *        Optionally, one of these two flags may be selected:
+ *        RANDOMX_FLAG_ARGON2_SSSE3 - optimized Argon2 for CPUs with the SSSE3 instruction set
+ *                                   makes subsequent cache initialization faster
+ *        RANDOMX_FLAG_ARGON2_AVX2 - optimized Argon2 for CPUs with the AVX2 instruction set
+ *                                   makes subsequent cache initialization faster
  *
  * @return Pointer to an allocated defyx_cache structure.
- *         NULL is returned if memory allocation fails or if the RANDOMX_FLAG_JIT
- *         is set and JIT compilation is not supported on the current platform.
+ *         Returns NULL if:
+ *         (1) memory allocation fails
+ *         (2) the RANDOMX_FLAG_JIT is set and JIT compilation is not supported on the current platform
+ *         (3) an invalid or unsupported RANDOMX_FLAG_ARGON2 value is set
  */
 RANDOMX_EXPORT defyx_cache *defyx_alloc_cache(defyx_flags flags);
 
 /**
  * Initializes the cache memory and SuperscalarHash using the provided key value.
+ * Does nothing if called again with the same key value.
  *
  * @param cache is a pointer to a previously allocated defyx_cache structure. Must not be NULL.
  * @param key is a pointer to memory which contains the key value. Must not be NULL.
@@ -119,7 +161,7 @@ RANDOMX_EXPORT void defyx_init_dataset(defyx_dataset *dataset, defyx_cache *cach
  * Returns a pointer to the internal memory buffer of the dataset structure. The size
  * of the internal memory buffer is defyx_dataset_item_count() * RANDOMX_DATASET_ITEM_SIZE.
  *
- * @param dataset is dataset is a pointer to a previously allocated defyx_dataset structure. Must not be NULL.
+ * @param dataset is a pointer to a previously allocated defyx_dataset structure. Must not be NULL.
  *
  * @return Pointer to the internal memory buffer of the dataset structure.
 */
@@ -135,12 +177,14 @@ RANDOMX_EXPORT void defyx_release_dataset(defyx_dataset *dataset);
 /**
  * Creates and initializes a DefyX virtual machine.
  *
- * @param flags is any combination of these 4 flags (each flag can be set or not set):
+ * @param flags is any combination of these 5 flags (each flag can be set or not set):
  *        RANDOMX_FLAG_LARGE_PAGES - allocate scratchpad memory in large pages
  *        RANDOMX_FLAG_HARD_AES - virtual machine will use hardware accelerated AES
  *        RANDOMX_FLAG_FULL_MEM - virtual machine will use the full dataset
  *        RANDOMX_FLAG_JIT - virtual machine will use a JIT compiler
- *        The numeric values of the flags are ordered so that a higher value will provide
+ *        RANDOMX_FLAG_SECURE - when combined with RANDOMX_FLAG_JIT, the JIT pages are never
+ *                              writable and executable at the same time (W^X policy)
+ *        The numeric values of the first 4 flags are ordered so that a higher value will provide
  *        faster hash calculation and a lower numeric value will provide higher portability.
  *        Using RANDOMX_FLAG_DEFAULT (all flags not set) works on all platforms, but is the slowest.
  * @param cache is a pointer to an initialized defyx_cache structure. Can be
@@ -159,7 +203,8 @@ RANDOMX_EXPORT defyx_vm *defyx_create_vm(defyx_flags flags, defyx_cache *cache, 
 
 /**
  * Reinitializes a virtual machine with a new Cache. This function should be called anytime
- * the Cache is reinitialized with a new key.
+ * the Cache is reinitialized with a new key. Does nothing if called with a Cache containing
+ * the same key value as already set.
  *
  * @param machine is a pointer to a defyx_vm structure that was initialized
  *        without RANDOMX_FLAG_FULL_MEM. Must not be NULL.
@@ -193,6 +238,22 @@ RANDOMX_EXPORT void defyx_destroy_vm(defyx_vm *machine);
  *        be NULL and at least RANDOMX_HASH_SIZE bytes must be available for writing.
 */
 RANDOMX_EXPORT void defyx_calculate_hash(defyx_vm *machine, const void *input, size_t inputSize, void *output);
+
+/**
+ * Paired functions used to calculate multiple DefyX hashes more efficiently.
+ * defyx_calculate_hash_first is called for the first input value.
+ * defyx_calculate_hash_next will output the hash value of the previous input.
+ *
+ * @param machine is a pointer to a defyx_vm structure. Must not be NULL.
+ * @param input is a pointer to memory to be hashed. Must not be NULL.
+ * @param inputSize is the number of bytes to be hashed.
+ * @param nextInput is a pointer to memory to be hashed for the next hash. Must not be NULL.
+ * @param nextInputSize is the number of bytes to be hashed for the next hash.
+ * @param output is a pointer to memory where the hash will be stored. Must not
+ *        be NULL and at least RANDOMX_HASH_SIZE bytes must be available for writing.
+*/
+RANDOMX_EXPORT void defyx_calculate_hash_first(defyx_vm* machine, const void* input, size_t inputSize);
+RANDOMX_EXPORT void defyx_calculate_hash_next(defyx_vm* machine, const void* nextInput, size_t nextInputSize, void* output);
 
 #if defined(__cplusplus)
 }

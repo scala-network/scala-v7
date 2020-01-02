@@ -16,26 +16,13 @@
 #include "../jit_compiler.hpp"
 #include "../aes_hash.hpp"
 
-struct CacheKey {
-	void* key;
-	size_t size = 0;
-};
-
 defyx_cache* cache;
 defyx_vm* vm = nullptr;
-CacheKey currentKey;
 
 template<size_t N>
 void initCache(const char (&key)[N]) {
 	assert(cache != nullptr);
-	if (N - 1 == currentKey.size && memcmp(currentKey.key, key, N - 1) == 0)
-		return;
-	//std::cout << "defyx_init_cache with key ";
-	//outputHex(std::cout, key, N - 1);
-	//std::cout << std::endl;
 	defyx_init_cache(cache, key, N - 1);
-	currentKey.key = (void*)key;
-	currentKey.size = N - 1;
 	if (vm != nullptr)
 		defyx_vm_set_cache(vm, cache);
 }
@@ -156,6 +143,11 @@ int main() {
 		defyx::JitCompiler jit;
 		jit.generateSuperscalarHash(cache->programs, cache->reciprocalCache);
 		jit.generateDatasetInitCode();
+#ifdef __OpenBSD__
+		jit.enableExecution();
+#else
+		jit.enableAll();
+#endif
 		uint64_t datasetItem[8];
 		jit.getDatasetInitFunc()(cache, (uint8_t*)&datasetItem, 0, 1);
 		assert(datasetItem[0] == 0x680588a85ae222db);
@@ -962,30 +954,34 @@ int main() {
 		assert(ibc.memMask == defyx::ScratchpadL3Mask);
 	});
 
+#ifdef __OpenBSD__
+	vm = defyx_create_vm(RANDOMX_FLAG_DEFAULT | RANDOMX_FLAG_SECURE, cache, nullptr);
+#else
 	vm = defyx_create_vm(RANDOMX_FLAG_DEFAULT, cache, nullptr);
+#endif
 
 	auto test_a = [&] {
 		char hash[RANDOMX_HASH_SIZE];
 		calcStringHash("test key 000", "This is a test", &hash);
-		assert(equalsHex(hash, "b33f8d10a8655d6f1925e3754adeb0a6da4c2f48a81cd4c220a412f1ef016a15"));
+		assert(equalsHex(hash, "639183aae1bf4c9a35884cb46b09cad9175f04efd7684e7262a0ac1c2f0b4e3f"));
 	};
 
 	auto test_b = [&] {
 		char hash[RANDOMX_HASH_SIZE];
 		calcStringHash("test key 000", "Lorem ipsum dolor sit amet", &hash);
-		assert(equalsHex(hash, "62ac336786ad3a7aff990beb2f643bd748d81dba585a52149d0baebdea0e9823"));
+		assert(equalsHex(hash, "300a0adb47603dedb42228ccb2b211104f4da45af709cd7547cd049e9489c969"));
 	};
 
 	auto test_c = [&] {
 		char hash[RANDOMX_HASH_SIZE];
 		calcStringHash("test key 000", "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua", &hash);
-		assert(equalsHex(hash, "6c550ebe765f7b784d2c183552fbb6048b58f17a3f115baf2b968724eb2f7a23"));
+		assert(equalsHex(hash, "c36d4ed4191e617309867ed66a443be4075014e2b061bcdaf9ce7b721d2b77a8"));
 	};
 
 	auto test_d = [&] {
 		char hash[RANDOMX_HASH_SIZE];
 		calcStringHash("test key 001", "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua", &hash);
-		assert(equalsHex(hash, "cb602b9c498b67e31e519fbdc07e288de46f949b14ad620380df6250eaffbd4e"));
+		assert(equalsHex(hash, "e9ff4503201c0c2cca26d285c93ae883f9b1d30c9eb240b820756f2d5a7905fc"));
 	};
 
 	auto test_e = [&] {
@@ -994,7 +990,7 @@ int main() {
 		//std::cout << std::endl;
 		//outputHex(std::cout, (const char*)hash, sizeof(hash));
 		//std::cout << std::endl;
-		assert(equalsHex(hash, "f60caf300917760337e8ce51487484e6a33d4aaa15aa79c985efb4ea00390918"));
+		assert(equalsHex(hash, "c56414121acda1713c2f2a819d8ae38aed7c80c35c2a769298d34f03833cd5f1"));
 	};
 
 	runTest("Hash test 1a (interpreter)", stringsEqual(RANDOMX_ARGON_SALT, "DefyX\x03"), test_a);
@@ -1007,12 +1003,18 @@ int main() {
 
 	runTest("Hash test 1e (interpreter)", stringsEqual(RANDOMX_ARGON_SALT, "DefyX\x03"), test_e);
 
-	defyx_release_cache(cache);
-	cache = defyx_alloc_cache(RANDOMX_FLAG_JIT);
-	currentKey.size = 0;
-	defyx_destroy_vm(vm);
-	initCache("test key 000");
-	vm = defyx_create_vm(RANDOMX_FLAG_JIT, cache, nullptr);
+	if (RANDOMX_HAVE_COMPILER) {
+		defyx_release_cache(cache);
+		defyx_destroy_vm(vm);
+		vm = nullptr;
+		cache = defyx_alloc_cache(RANDOMX_FLAG_JIT);
+		initCache("test key 000");
+#ifdef __OpenBSD__
+		vm = defyx_create_vm(RANDOMX_FLAG_DEFAULT | RANDOMX_FLAG_SECURE, cache, nullptr);
+#else
+		vm = defyx_create_vm(RANDOMX_FLAG_DEFAULT, cache, nullptr);
+#endif
+	}
 
 	runTest("Hash test 2a (compiler)", RANDOMX_HAVE_COMPILER && stringsEqual(RANDOMX_ARGON_SALT, "DefyX\x03"), test_a);
 
@@ -1023,6 +1025,37 @@ int main() {
 	runTest("Hash test 2d (compiler)", RANDOMX_HAVE_COMPILER && stringsEqual(RANDOMX_ARGON_SALT, "DefyX\x03"), test_d);
 
 	runTest("Hash test 2e (compiler)", RANDOMX_HAVE_COMPILER && stringsEqual(RANDOMX_ARGON_SALT, "DefyX\x03"), test_e);
+
+	defyx_destroy_vm(vm);
+	vm = nullptr;
+
+	auto flags = defyx_get_flags();
+
+	defyx_release_cache(cache);
+	cache = defyx_alloc_cache(RANDOMX_FLAG_ARGON2_SSSE3);
+
+	runTest("Cache initialization: SSSE3", (flags & RANDOMX_FLAG_ARGON2_SSSE3) && RANDOMX_ARGON_ITERATIONS == 3 && RANDOMX_ARGON_LANES == 1 && RANDOMX_ARGON_MEMORY == 262144 && stringsEqual(RANDOMX_ARGON_SALT, "DefyX\x03"), []() {
+		initCache("test key 000");
+		uint64_t* cacheMemory = (uint64_t*)cache->memory;
+		assert(cacheMemory[0] == 0x191e0e1d23c02186);
+		assert(cacheMemory[1568413] == 0xf1b62fe6210bf8b1);
+		assert(cacheMemory[33554431] == 0x1f47f056d05cd99b);
+	});
+
+	if (cache != nullptr)
+		defyx_release_cache(cache);
+	cache = defyx_alloc_cache(RANDOMX_FLAG_ARGON2_AVX2);
+
+	runTest("Cache initialization: AVX2", (flags & RANDOMX_FLAG_ARGON2_AVX2) && RANDOMX_ARGON_ITERATIONS == 3 && RANDOMX_ARGON_LANES == 1 && RANDOMX_ARGON_MEMORY == 262144 && stringsEqual(RANDOMX_ARGON_SALT, "DefyX\x03"), []() {
+		initCache("test key 000");
+		uint64_t* cacheMemory = (uint64_t*)cache->memory;
+		assert(cacheMemory[0] == 0x191e0e1d23c02186);
+		assert(cacheMemory[1568413] == 0xf1b62fe6210bf8b1);
+		assert(cacheMemory[33554431] == 0x1f47f056d05cd99b);
+	});
+
+	if (cache != nullptr)
+		defyx_release_cache(cache);
 
 	std::cout << std::endl << "All tests PASSED" << std::endl;
 
