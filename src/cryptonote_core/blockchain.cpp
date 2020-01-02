@@ -1770,6 +1770,8 @@ bool Blockchain::handle_alternative_block(const block& b, const crypto::hash& id
     }
 
     bool is_a_checkpoint;
+    const crypto::hash blkid_to_remove = cryptonote::get_block_hash(bei.bl);
+
     if(!m_checkpoints.check_block(bei.height, id, is_a_checkpoint))
     {
       LOG_ERROR("CHECKPOINT VALIDATION FAILED");
@@ -1779,7 +1781,11 @@ bool Blockchain::handle_alternative_block(const block& b, const crypto::hash& id
 
     // Check the block's hash against the difficulty target for its alt chain
     difficulty_type current_diff = get_next_difficulty_for_alternative_chain(alt_chain, bei);
-    CHECK_AND_ASSERT_MES(current_diff, false, "!!!!!!! DIFFICULTY OVERHEAD !!!!!!!");
+    if(!current_diff){
+	m_db->remove_alt_block(blkid_to_remove); //Drop the alt block if there is a difficulty overhead
+	return false;
+    }
+    //CHECK_AND_ASSERT_MES(current_diff, false, "!!!!!!! DIFFICULTY OVERHEAD !!!!!!!");
     crypto::hash proof_of_work = null_hash;
     //get_block_longhash(bei.bl, proof_of_work, bei.height);
 
@@ -4219,10 +4225,13 @@ void Blockchain::check_against_checkpoints(const checkpoints& points, bool enfor
 // with an existing checkpoint.
 bool Blockchain::update_checkpoints(const std::string& file_path, bool check_dns)
 {
+  // TODO find a better way to handle rogue alternative chains
+  m_db->drop_alt_blocks();
+
   if(!m_checkpoints.load_dynamic_checkpoints()){
      return false;
   }
-  
+
   if (!m_checkpoints.load_checkpoints_from_json(file_path))
   {
       return false;
