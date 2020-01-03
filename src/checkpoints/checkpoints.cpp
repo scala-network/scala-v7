@@ -278,7 +278,7 @@ namespace cryptonote
     }
     catch (const std::exception &e)
     {
-        LOG_PRINT_L0("IPFS instances are down, starting one now.");
+        LOG_PRINT_L0("No IPFS instance detected, starting one now.");
         /*Start a new instance of IPFS */
         std::string location;
         char *c_location;
