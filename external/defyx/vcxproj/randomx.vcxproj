@@ -22,32 +22,32 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{3346A4AD-C438-4324-8B77-47A16452954B}</ProjectGuid>
     <RootNamespace>defyx</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -131,12 +131,17 @@ SET ERRORLEVEL = 0</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\allocator.cpp" />
+    <ClCompile Include="..\src\argon2_avx2.c">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+    </ClCompile>
     <ClCompile Include="..\src\argon2_core.c" />
     <ClCompile Include="..\src\argon2_ref.c" />
+    <ClCompile Include="..\src\argon2_ssse3.c" />
     <ClCompile Include="..\src\assembly_generator_x86.cpp" />
     <ClCompile Include="..\src\blake2_generator.cpp" />
     <ClCompile Include="..\src\blake2\blake2b.c" />
     <ClCompile Include="..\src\bytecode_machine.cpp" />
+    <ClCompile Include="..\src\cpu.cpp" />
     <ClCompile Include="..\src\vm_compiled_light.cpp" />
     <ClCompile Include="..\src\vm_compiled.cpp" />
     <ClCompile Include="..\src\dataset.cpp" />
@@ -163,11 +168,14 @@ SET ERRORLEVEL = 0</Command>
     <ClInclude Include="..\src\assembly_generator_x86.hpp" />
     <ClInclude Include="..\src\blake2\blake2-impl.h" />
     <ClInclude Include="..\src\blake2\blake2.h" />
+    <ClInclude Include="..\src\blake2\blamka-round-avx2.h" />
     <ClInclude Include="..\src\blake2\blamka-round-ref.h" />
+    <ClInclude Include="..\src\blake2\blamka-round-ssse3.h" />
     <ClInclude Include="..\src\blake2\endian.h" />
     <ClInclude Include="..\src\blake2_generator.hpp" />
     <ClInclude Include="..\src\bytecode_machine.hpp" />
     <ClInclude Include="..\src\common.hpp" />
+    <ClInclude Include="..\src\cpu.hpp" />
     <ClInclude Include="..\src\jit_compiler.hpp" />
     <ClInclude Include="..\src\jit_compiler_a64.hpp" />
     <ClInclude Include="..\src\jit_compiler_fallback.hpp" />

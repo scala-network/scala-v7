@@ -108,6 +108,7 @@ namespace cryptonote
     "disable-dns-checkpoints"
   , "Do not retrieve checkpoints from DNS"
   };
+  
   const command_line::arg_descriptor<size_t> arg_block_download_max_size  = {
     "block-download-max-size"
   , "Set maximum size of block download queue in bytes (0 for default)"
@@ -1905,6 +1906,11 @@ namespace cryptonote
   bool core::prune_blockchain(uint32_t pruning_seed)
   {
     return get_blockchain_storage().prune_blockchain(pruning_seed);
+  }
+  //-----------------------------------------------------------------------------------------------
+  bool core::is_within_compiled_block_hash_area(uint64_t height) const
+  {
+    return get_blockchain_storage().is_within_compiled_block_hash_area(height);
   }
   //-----------------------------------------------------------------------------------------------
   std::time_t core::get_start_time() const

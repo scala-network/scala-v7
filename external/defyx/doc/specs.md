@@ -29,7 +29,7 @@ DefyX is a proof of work (PoW) algorithm which was designed to close the gap bet
 
 **AesHash1R** refers to an AES-based fingerprinting function described in chapter 3.4. It's capable of processing more than 10 bytes per clock cycle and produces a 512-bit output.
 
-**BlakeGenerator** refers to a custom pseudo-random number generator described in chapter 3.4. It's based on the Blake2b hashing function.
+**BlakeGenerator** refers to a custom pseudo-random number generator described in chapter 3.5. It's based on the Blake2b hashing function.
 
 **SuperscalarHash** refers to a custom diffusion function designed to run efficiently on superscalar CPUs (see chapter 7). It transforms a 64-byte input value into a 64-byte output value.
 
@@ -269,15 +269,15 @@ finalState0      finalState1      finalState2      finalState3
 
 The final state is the output of the function.
 
-### 3.4 BlakeGenerator
+### 3.5 BlakeGenerator
 
 BlakeGenerator is a simple pseudo-random number generator based on the Blake2b hashing function. It has a 64-byte internal state `S`.
 
-#### 3.4.1 Initialization
+#### 3.5.1 Initialization
 
 The internal state is initialized from a seed value `K` (0-60 bytes long). The seed value is written into the internal state and padded with zeroes. Then the internal state is initialized as `S = Hash512(S)`.
 
-#### 3.4.2 Random number generation
+#### 3.5.2 Random number generation
 
 The generator can generate 1 byte or 4 bytes at a time by supplying data from its internal state `S`. If there are not enough unused bytes left, the internal state is reinitialized as `S = Hash512(S)`.
 
@@ -329,7 +329,7 @@ Floating point registers `f0`-`f3` are the "additive" registers, which can be th
 
 Floating point registers `e0`-`e3` are the "multiplicative" registers, which can be the destination of floating point multiplication, division and square root instructions. Their value is always positive.
 
-`ma` and `mx` are the memory registers. Both are 32 bits wide. `ma` contains the memory address of the next Dataset read and `mx` contains the address of the next Dataset prefetch.
+`ma` and `mx` are the memory registers. Both are 32 bits wide. `ma` contains the memory address of the next Dataset read and `mx` contains the address of the next Dataset prefetch. The values of `ma` and `mx` registers are always aligned to be a multiple of 64.
 
 The 2-bit `fprc` register determines the rounding mode of all floating point operations according to Table 4.3.1. The four rounding modes are defined by the IEEE 754 standard.
 
@@ -422,7 +422,7 @@ Bits 0-3 of quadword 12 are used to select 4 address registers for program execu
 
 #### 4.5.5 Dataset offset
 
-The `datasetOffset` is calculated by bitwise AND of quadword 13 and the value `RANDOMX_DATASET_EXTRA_SIZE / 64`. The result is multiplied by `64`. This offset is used when reading values from the Dataset.
+The `datasetOffset` is calculated as the remainder of dividing quadword 13 by `RANDOMX_DATASET_EXTRA_SIZE / 64 + 1`. The result is multiplied by `64`. This offset is used when reading values from the Dataset.
 
 #### 4.5.6 Group E register masks
 
@@ -477,10 +477,10 @@ There are 256 opcodes, which are distributed between 29 distinct instructions. E
 
 |group|# instructions|# opcodes||
 |---------|-----------------|----|-|
-|integer |17|129|50.4%|
+|integer |17|120|46.9%|
 |floating point |9|94|36.7%|
-|control |2|17|6.6%|
-|store |1|16|6.3%|
+|control |2|26|10.2%|
+|store |1|16|6.2%|
 ||**29**|**256**|**100%**
 
 All instructions are described below in chapters 5.2 - 5.5.
@@ -553,7 +553,7 @@ For integer instructions, the destination is always an integer register (registe
 
 |frequency|instruction|dst|src|`src == dst ?`|operation|
 |-|-|-|-|-|-|
-|25/256|IADD_RS|R|R|`src = dst`|`dst = dst + (src << mod.shift) (+ imm32)`|
+|16/256|IADD_RS|R|R|`src = dst`|`dst = dst + (src << mod.shift) (+ imm32)`|
 |7/256|IADD_M|R|R|`src = 0`|`dst = dst + [mem]`|
 |16/256|ISUB_R|R|R|`src = imm32`|`dst = dst - src`|
 |7/256|ISUB_M|R|R|`src = 0`|`dst = dst - [mem]`|
@@ -664,7 +664,7 @@ There are 2 control instructions.
 |frequency|instruction|dst|src|operation|
 |-|-|-|-|-|
 |1/256|CFROUND|-|R|`fprc = src >>> imm32`
-|16/256|CBRANCH|R|-|`dst = dst + cimm`, conditional jump
+|25/256|CBRANCH|R|-|`dst = dst + cimm`, conditional jump
 
 #### 5.4.1 CFROUND
 This instruction calculates a 2-bit value by rotating the source register right by `imm32` bits and taking the 2 least significant bits (the value of the source register is unaffected). The result is stored in the `fprc` register. This changes the rounding mode of all subsequent floating point instructions.
@@ -882,7 +882,7 @@ The Dataset is a read-only memory structure that is used during program executio
 
 In order to allow PoW verification with a lower amount of memory, the Dataset is constructed in two steps using an intermediate structure called the "Cache", which can be used to calculate Dataset items on the fly.
 
-The whole Dataset is constructed from the key value `K`, which is an input parameter of DefyX. The whole Dataset needs to be recalculated everytime the key value changes. Fig. 7.1 shows the process of Dataset construction.
+The whole Dataset is constructed from the key value `K`, which is an input parameter of DefyX. The whole Dataset needs to be recalculated everytime the key value changes. Fig. 7.1 shows the process of Dataset construction. Note: the maximum supported length of `K` is 60 bytes. Using a longer key results in implementation-defined behavior.
 
 *Figure 7.1 - Dataset construction*
 
@@ -911,7 +911,7 @@ The finalizer and output calculation steps of Argon2 are omitted. The output is 
 
 ### 7.2 SuperscalarHash initialization
 
-The key value `K` is used to initialize a BlakeGenerator (see chapter 3.4), which is then used to generate 8 SuperscalarHash instances for Dataset initialization.
+The key value `K` is used to initialize a BlakeGenerator (see chapter 3.5), which is then used to generate 8 SuperscalarHash instances for Dataset initialization.
 
 ### 7.3 Dataset block generation
 Dataset items are numbered sequentially with `itemNumber` starting from 0. Each 64-byte Dataset item is generated independently using 8 SuperscalarHash functions (generated according to chapter 7.2) and by XORing randomly selected data from the Cache (constructed according to chapter 7.1).
@@ -934,7 +934,7 @@ The item data is represented by 8 64-bit integer registers: `r0`-`r7`.
 1. XOR all registers with the 64 bytes loaded in step 4 (8 bytes per column in order `r0`-`r7`).
 1. Set `cacheIndex` to the value of the register that has the longest dependency chain in the SuperscalarHash function executed in step 5.
 1. Set `i = i + 1` and go back to step 4 if `i < RANDOMX_CACHE_ACCESSES`.
-1. Concatenate registers `r0`-`r7` in little endian format to get the final Datset item data.
+1. Concatenate registers `r0`-`r7` in little endian format to get the final Dataset item data.
 
 The constants used to initialize register values in step 1 were determined as follows:
 

@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace defyx {
 
 	class Program;
-	class ProgramConfiguration;
+	struct ProgramConfiguration;
 	class SuperscalarProgram;
 
 	class JitCompilerFallback {
@@ -69,5 +69,8 @@ namespace defyx {
 		size_t getCodeSize() {
 			return 0;
 		}
+		void enableWriting() {}
+		void enableExecution() {}
+		void enableAll() {}
 	};
 }

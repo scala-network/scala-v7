@@ -28,7 +28,10 @@ IFDEF RAX
 
 _RANDOMX_JITX86_STATIC SEGMENT PAGE READ EXECUTE
 
+PUBLIC defyx_prefetch_scratchpad
+PUBLIC defyx_prefetch_scratchpad_end
 PUBLIC defyx_program_prologue
+PUBLIC defyx_program_prologue_first_load
 PUBLIC defyx_program_loop_begin
 PUBLIC defyx_program_loop_load
 PUBLIC defyx_program_start
@@ -54,14 +57,35 @@ RANDOMX_CACHE_MASK          EQU (RANDOMX_ARGON_MEMORY*16-1)
 RANDOMX_ALIGN               EQU 4096
 SUPERSCALAR_OFFSET          EQU ((((RANDOMX_ALIGN + 32 * RANDOMX_PROGRAM_SIZE) - 1) / (RANDOMX_ALIGN) + 1) * (RANDOMX_ALIGN))
 
+defyx_prefetch_scratchpad PROC
+	mov rdx, rax
+	and eax, RANDOMX_SCRATCHPAD_MASK
+	prefetcht0 [rsi+rax]
+	ror rdx, 32
+	and edx, RANDOMX_SCRATCHPAD_MASK
+	prefetcht0 [rsi+rdx]
+defyx_prefetch_scratchpad ENDP
+
+defyx_prefetch_scratchpad_end PROC
+defyx_prefetch_scratchpad_end ENDP
+
 ALIGN 64
 defyx_program_prologue PROC
 	include asm/program_prologue_win64.inc
 	movapd xmm13, xmmword ptr [mantissaMask]
 	movapd xmm14, xmmword ptr [exp240]
 	movapd xmm15, xmmword ptr [scaleMask]
-	jmp defyx_program_loop_begin
 defyx_program_prologue ENDP
+
+defyx_program_prologue_first_load PROC
+	xor rax, r8
+	xor rax, r8
+	mov rdx, rax
+	and eax, RANDOMX_SCRATCHPAD_MASK
+	ror rdx, 32
+	and edx, RANDOMX_SCRATCHPAD_MASK
+	jmp defyx_program_loop_begin
+defyx_program_prologue_first_load ENDP
 
 ALIGN 64
 	include asm/program_xmm_constants.inc

@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace defyx {
 
 	class Program;
-	class ProgramConfiguration;
+	struct ProgramConfiguration;
 	class SuperscalarProgram;
 	class JitCompilerX86;
 	class Instruction;
@@ -62,6 +62,9 @@ namespace defyx {
 			return code;
 		}
 		size_t getCodeSize();
+		void enableWriting();
+		void enableExecution();
+		void enableAll();
 	private:
 		static InstructionGeneratorX86 engine[256];
 		std::vector<int32_t> instructionOffsets;
@@ -70,7 +73,7 @@ namespace defyx {
 		int32_t codePos;
 
 		void generateProgramPrologue(Program&, ProgramConfiguration&);
-		void generateProgramEpilogue(Program&);
+		void generateProgramEpilogue(Program&, ProgramConfiguration&);
 		void genAddressReg(Instruction&, bool);
 		void genAddressRegDst(Instruction&);
 		void genAddressImm(Instruction&);

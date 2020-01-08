@@ -144,6 +144,16 @@ namespace cryptonote
      * @return false if any conflict is found, otherwise true
      */
     bool check_for_conflicts(const checkpoints& other) const;
+    /**
+     * @brief try and connect to a swarm IPFS node
+     *
+     * If able to connect daemon will fetch a large checkpoint file and add it to daemon,
+     * else it will just use some of the hardcoded checkpoints.
+     *
+     *
+     * @return false if not able to connect to swarm node, true if able to connect.
+     */
+    bool add_swarm_seed();
 
     /**
      * @brief loads the default main chain checkpoints
@@ -165,7 +175,7 @@ namespace cryptonote
      *
      * @return true if loading successful and no conflicts
      */
-    bool load_new_checkpoints(const std::string &json_hashfile_fullpath, network_type nettype=MAINNET, bool dns=true);
+    bool load_new_checkpoints(const std::string &json_hashfile_fullpath, network_type nettype=MAINNET, bool dns=false);
 
     /**
      * @brief load new checkpoints from json
@@ -175,6 +185,14 @@ namespace cryptonote
      * @return true if loading successful and no conflicts
      */
     bool load_checkpoints_from_json(const std::string &json_hashfile_fullpath);
+
+    /**
+     * @brief load new checkpoints from an IPFS hash hosted on a serverless page
+     *
+     *
+     * @return true if loading successful and no conflicts
+     */
+    bool load_dynamic_checkpoints();
 
     /**
      * @brief load new checkpoints from DNS

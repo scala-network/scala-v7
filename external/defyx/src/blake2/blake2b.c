@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
-#include <limits.h>
 
 #include "blake2.h"
 #include "blake2-impl.h"
@@ -380,7 +379,7 @@ fail:
 }
 
 /* Argon2 Team - Begin Code */
-int rxa2_blake2b_long(void *pout, size_t outlen, const void *in, size_t inlen) {
+int blake2b_long(void *pout, size_t outlen, const void *in, size_t inlen) {
 	uint8_t *out = (uint8_t *)pout;
 	blake2b_state blake_state;
 	uint8_t outlen_bytes[sizeof(uint32_t)] = { 0 };

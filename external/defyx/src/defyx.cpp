@@ -33,17 +33,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vm_compiled.hpp"
 #include "vm_compiled_light.hpp"
 #include "blake2/blake2.h"
+#include "cpu.hpp"
 #include <cassert>
 #include <limits>
 
 extern "C" {
 
+	defyx_flags defyx_get_flags() {
+		defyx_flags flags = RANDOMX_HAVE_COMPILER ? RANDOMX_FLAG_JIT : RANDOMX_FLAG_DEFAULT;
+		defyx::Cpu cpu;
+#ifdef __OpenBSD__
+		if (flags == RANDOMX_FLAG_JIT) {
+			flags |= RANDOMX_FLAG_SECURE;
+		}
+#endif
+		if (HAVE_AES && cpu.hasAes()) {
+			flags |= RANDOMX_FLAG_HARD_AES;
+		}
+		if (defyx_argon2_impl_avx2() != nullptr && cpu.hasAvx2()) {
+			flags |= RANDOMX_FLAG_ARGON2_AVX2;
+		}
+		if (defyx_argon2_impl_ssse3() != nullptr && cpu.hasSsse3()) {
+			flags |= RANDOMX_FLAG_ARGON2_SSSE3;
+		}
+		return flags;
+	}
+
 	defyx_cache *defyx_alloc_cache(defyx_flags flags) {
-		defyx_cache *cache;
+		defyx_cache *cache = nullptr;
+		auto impl = defyx::selectArgonImpl(flags);
+		if (impl == nullptr) {
+			return cache;
+		}
 
 		try {
 			cache = new defyx_cache();
-			switch (flags & (RANDOMX_FLAG_JIT | RANDOMX_FLAG_LARGE_PAGES)) {
+			cache->argonImpl = impl;
+			switch ((int)(flags & (RANDOMX_FLAG_JIT | RANDOMX_FLAG_LARGE_PAGES))) {
 				case RANDOMX_FLAG_DEFAULT:
 					cache->dealloc = &defyx::deallocCache<defyx::DefaultAllocator>;
 					cache->jit = nullptr;
@@ -103,7 +129,9 @@ extern "C" {
 
 	void defyx_release_cache(defyx_cache* cache) {
 		assert(cache != nullptr);
-		cache->dealloc(cache);
+		if (cache->memory != nullptr) {
+			cache->dealloc(cache);
+		}
 		delete cache;
 	}
 
@@ -114,7 +142,7 @@ extern "C" {
 			return nullptr;
 		}
 
-		defyx_dataset *dataset;
+		defyx_dataset *dataset = nullptr;
 
 		try {
 			dataset = new defyx_dataset();
@@ -170,7 +198,7 @@ extern "C" {
 		defyx_vm *vm = nullptr;
 
 		try {
-			switch (flags & (RANDOMX_FLAG_FULL_MEM | RANDOMX_FLAG_JIT | RANDOMX_FLAG_HARD_AES | RANDOMX_FLAG_LARGE_PAGES)) {
+			switch ((int)(flags & (RANDOMX_FLAG_FULL_MEM | RANDOMX_FLAG_JIT | RANDOMX_FLAG_HARD_AES | RANDOMX_FLAG_LARGE_PAGES))) {
 				case RANDOMX_FLAG_DEFAULT:
 					vm = new defyx::InterpretedLightVmDefault();
 					break;
@@ -180,11 +208,21 @@ extern "C" {
 					break;
 
 				case RANDOMX_FLAG_JIT:
-					vm = new defyx::CompiledLightVmDefault();
+					if (flags & RANDOMX_FLAG_SECURE) {
+						vm = new defyx::CompiledLightVmDefaultSecure();
+					}
+					else {
+						vm = new defyx::CompiledLightVmDefault();
+					}
 					break;
 
 				case RANDOMX_FLAG_FULL_MEM | RANDOMX_FLAG_JIT:
-					vm = new defyx::CompiledVmDefault();
+					if (flags & RANDOMX_FLAG_SECURE) {
+						vm = new defyx::CompiledVmDefaultSecure();
+					}
+					else {
+						vm = new defyx::CompiledVmDefault();
+					}
 					break;
 
 				case RANDOMX_FLAG_HARD_AES:
@@ -196,11 +234,21 @@ extern "C" {
 					break;
 
 				case RANDOMX_FLAG_JIT | RANDOMX_FLAG_HARD_AES:
-					vm = new defyx::CompiledLightVmHardAes();
+					if (flags & RANDOMX_FLAG_SECURE) {
+						vm = new defyx::CompiledLightVmHardAesSecure();
+					}
+					else {
+						vm = new defyx::CompiledLightVmHardAes();
+					}
 					break;
 
 				case RANDOMX_FLAG_FULL_MEM | RANDOMX_FLAG_JIT | RANDOMX_FLAG_HARD_AES:
-					vm = new defyx::CompiledVmHardAes();
+					if (flags & RANDOMX_FLAG_SECURE) {
+						vm = new defyx::CompiledVmHardAesSecure();
+					}
+					else {
+						vm = new defyx::CompiledVmHardAes();
+					}
 					break;
 
 				case RANDOMX_FLAG_LARGE_PAGES:
@@ -212,11 +260,21 @@ extern "C" {
 					break;
 
 				case RANDOMX_FLAG_JIT | RANDOMX_FLAG_LARGE_PAGES:
-					vm = new defyx::CompiledLightVmLargePage();
+					if (flags & RANDOMX_FLAG_SECURE) {
+						vm = new defyx::CompiledLightVmLargePageSecure();
+					}
+					else {
+						vm = new defyx::CompiledLightVmLargePage();
+					}
 					break;
 
 				case RANDOMX_FLAG_FULL_MEM | RANDOMX_FLAG_JIT | RANDOMX_FLAG_LARGE_PAGES:
-					vm = new defyx::CompiledVmLargePage();
+					if (flags & RANDOMX_FLAG_SECURE) {
+						vm = new defyx::CompiledVmLargePageSecure();
+					}
+					else {
+						vm = new defyx::CompiledVmLargePage();
+					}
 					break;
 
 				case RANDOMX_FLAG_HARD_AES | RANDOMX_FLAG_LARGE_PAGES:
@@ -228,11 +286,21 @@ extern "C" {
 					break;
 
 				case RANDOMX_FLAG_JIT | RANDOMX_FLAG_HARD_AES | RANDOMX_FLAG_LARGE_PAGES:
-					vm = new defyx::CompiledLightVmLargePageHardAes();
+					if (flags & RANDOMX_FLAG_SECURE) {
+						vm = new defyx::CompiledLightVmLargePageHardAesSecure();
+					}
+					else {
+						vm = new defyx::CompiledLightVmLargePageHardAes();
+					}
 					break;
 
 				case RANDOMX_FLAG_FULL_MEM | RANDOMX_FLAG_JIT | RANDOMX_FLAG_HARD_AES | RANDOMX_FLAG_LARGE_PAGES:
-					vm = new defyx::CompiledVmLargePageHardAes();
+					if (flags & RANDOMX_FLAG_SECURE) {
+						vm = new defyx::CompiledVmLargePageHardAesSecure();
+					}
+					else {
+						vm = new defyx::CompiledVmLargePageHardAes();
+					}
 					break;
 
 				default:
@@ -282,9 +350,11 @@ extern "C" {
 		assert(inputSize == 0 || input != nullptr);
 		assert(output != nullptr);
 		alignas(16) uint64_t tempHash[8];
+
 		int blakeResult = blake2b(tempHash, sizeof(tempHash), input, inputSize, nullptr, 0);
 		int yescryptRH = sipesh(tempHash, sizeof(tempHash), input, inputSize, input, inputSize, 0, 0);
 		int kangarooTwelve = k12(input, inputSize, tempHash);
+
 		assert(blakeResult == 0);
 		machine->initScratchpad(&tempHash);
 		machine->resetRoundingMode();
@@ -297,4 +367,21 @@ extern "C" {
 		machine->getFinalResult(output, RANDOMX_HASH_SIZE);
 	}
 
+	void defyx_calculate_hash_first(defyx_vm* machine, const void* input, size_t inputSize) {
+		blake2b(machine->tempHash, sizeof(machine->tempHash), input, inputSize, nullptr, 0);
+		machine->initScratchpad(machine->tempHash);
+	}
+
+	void defyx_calculate_hash_next(defyx_vm* machine, const void* nextInput, size_t nextInputSize, void* output) {
+		machine->resetRoundingMode();
+		for (uint32_t chain = 0; chain < RANDOMX_PROGRAM_COUNT - 1; ++chain) {
+			machine->run(machine->tempHash);
+			blake2b(machine->tempHash, sizeof(machine->tempHash), machine->getRegisterFile(), sizeof(defyx::RegisterFile), nullptr, 0);
+		}
+		machine->run(machine->tempHash);
+
+		// Finish current hash and fill the scratchpad for the next hash at the same time
+		blake2b(machine->tempHash, sizeof(machine->tempHash), nextInput, nextInputSize, nullptr, 0);
+		machine->hashAndFill(output, RANDOMX_HASH_SIZE, machine->tempHash);
+	}
 }

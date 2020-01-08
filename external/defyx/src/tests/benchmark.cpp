@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "stopwatch.hpp"
 #include "utility.hpp"
 #include "../defyx.h"
+#include "../dataset.hpp"
 #include "../blake2/endian.h"
 #include "../common.hpp"
 #ifdef _WIN32
@@ -81,14 +82,18 @@ void printUsage(const char* executable) {
 	std::cout << "  --help        shows this message" << std::endl;
 	std::cout << "  --mine        mining mode: 2080 MiB" << std::endl;
 	std::cout << "  --verify      verification mode: 256 MiB" << std::endl;
-	std::cout << "  --jit         x86-64 JIT compiled mode (default: interpreter)" << std::endl;
-	std::cout << "  --largePages  use large pages" << std::endl;
-	std::cout << "  --softAes     use software AES (default: x86 AES-NI)" << std::endl;
+	std::cout << "  --jit         JIT compiled mode (default: interpreter)" << std::endl;
+	std::cout << "  --secure      W^X policy for JIT pages (default: off)" << std::endl;
+	std::cout << "  --largePages  use large pages (default: small pages)" << std::endl;
+	std::cout << "  --softAes     use software AES (default: hardware AES)" << std::endl;
 	std::cout << "  --threads T   use T threads (default: 1)" << std::endl;
 	std::cout << "  --affinity A  thread affinity bitmask (default: 0)" << std::endl;
 	std::cout << "  --init Q      initialize dataset with Q threads (default: 1)" << std::endl;
 	std::cout << "  --nonces N    run N nonces (default: 1000)" << std::endl;
 	std::cout << "  --seed S      seed for cache initialization (default: 0)" << std::endl;
+	std::cout << "  --ssse3       use optimized Argon2 for SSSE3 CPUs" << std::endl;
+	std::cout << "  --avx2        use optimized Argon2 for AVX2 CPUs" << std::endl;
+	std::cout << "  --auto        select the best options for the current CPU" << std::endl;
 }
 
 struct MemoryException : public std::exception {
@@ -117,16 +122,19 @@ void mine(defyx_vm* vm, std::atomic<uint32_t>& atomicNonce, AtomicHash& result, 
 	void* noncePtr = blockTemplate + 39;
 	auto nonce = atomicNonce.fetch_add(1);
 
+	store32(noncePtr, nonce);
+	defyx_calculate_hash_first(vm, blockTemplate, sizeof(blockTemplate));
+
 	while (nonce < noncesCount) {
-		store32(noncePtr, nonce);
-		defyx_calculate_hash(vm, blockTemplate, sizeof(blockTemplate), &hash);
-		result.xorWith(hash);
 		nonce = atomicNonce.fetch_add(1);
+		store32(noncePtr, nonce);
+		defyx_calculate_hash_next(vm, blockTemplate, sizeof(blockTemplate), &hash);
+		result.xorWith(hash);
 	}
 }
 
 int main(int argc, char** argv) {
-	bool softAes, miningMode, verificationMode, help, largePages, jit;
+	bool softAes, miningMode, verificationMode, help, largePages, jit, secure, ssse3, avx2, autoFlags;
 	int noncesCount, threadCount, initThreadCount;
 	uint64_t threadAffinity;
 	int32_t seedValue;
@@ -141,15 +149,28 @@ int main(int argc, char** argv) {
 	readIntOption("--init", argc, argv, initThreadCount, 1);
 	readIntOption("--seed", argc, argv, seedValue, 0);
 	readOption("--largePages", argc, argv, largePages);
+	if (!largePages) {
+		readOption("--largepages", argc, argv, largePages);
+	}
 	readOption("--jit", argc, argv, jit);
 	readOption("--help", argc, argv, help);
+	readOption("--secure", argc, argv, secure);
+	readOption("--ssse3", argc, argv, ssse3);
+	readOption("--avx2", argc, argv, avx2);
+	readOption("--auto", argc, argv, autoFlags);
 
 	store32(&seed, seedValue);
 
-	std::cout << "DefyX benchmark v0.0.1" << std::endl;
+	std::cout << "DefyX benchmark v1.1.7" << std::endl;
 
-	if (help || (!miningMode && !verificationMode)) {
+	if (help) {
 		printUsage(argv[0]);
+		return 0;
+	}
+
+	if (!miningMode && !verificationMode) {
+		std::cout << "Please select either the fast mode (--mine) or the slow mode (--verify)" << std::endl;
+		std::cout << "Run '" << argv[0] << " --help' to see all supported options" << std::endl;
 		return 0;
 	}
 
@@ -159,34 +180,79 @@ int main(int argc, char** argv) {
 	std::vector<std::thread> threads;
 	defyx_dataset* dataset;
 	defyx_cache* cache;
-	defyx_flags flags = RANDOMX_FLAG_DEFAULT;
+	defyx_flags flags;
 
-	if (miningMode) {
-		flags = (defyx_flags)(flags | RANDOMX_FLAG_FULL_MEM);
-		std::cout << " - full memory mode" << std::endl;
+	if (autoFlags) {
+		initThreadCount = std::thread::hardware_concurrency();
+		flags = defyx_get_flags();
 	}
 	else {
-		std::cout << " - light memory mode" << std::endl;
+		flags = RANDOMX_FLAG_DEFAULT;
+		if (ssse3) {
+			flags |= RANDOMX_FLAG_ARGON2_SSSE3;
+		}
+		if (avx2) {
+			flags |= RANDOMX_FLAG_ARGON2_AVX2;
+		}
+		if (!softAes) {
+			flags |= RANDOMX_FLAG_HARD_AES;
+		}
+		if (jit) {
+			flags |= RANDOMX_FLAG_JIT;
+#ifdef __OpenBSD__
+			flags |= RANDOMX_FLAG_SECURE;
+#endif
+		}
 	}
 
-	if (jit) {
-		flags = (defyx_flags)(flags | RANDOMX_FLAG_JIT);
-		std::cout << " - JIT compiled mode" << std::endl;
+	if (largePages) {
+		flags |= RANDOMX_FLAG_LARGE_PAGES;
+	}
+	if (miningMode) {
+		flags |= RANDOMX_FLAG_FULL_MEM;
+	}
+#ifndef __OpenBSD__
+	if (secure) {
+		flags |= RANDOMX_FLAG_SECURE;
+	}
+#endif
+
+	if (flags & RANDOMX_FLAG_ARGON2_AVX2) {
+		std::cout << " - Argon2 implementation: AVX2" << std::endl;
+	}
+	else if (flags & RANDOMX_FLAG_ARGON2_SSSE3) {
+		std::cout << " - Argon2 implementation: SSSE3" << std::endl;
+	}
+	else {
+		std::cout << " - Argon2 implementation: reference" << std::endl;
+	}
+
+	if (flags & RANDOMX_FLAG_FULL_MEM) {
+		std::cout << " - full memory mode (2080 MiB)" << std::endl;
+	}
+	else {
+		std::cout << " - light memory mode (256 MiB)" << std::endl;
+	}
+
+	if (flags & RANDOMX_FLAG_JIT) {
+		std::cout << " - JIT compiled mode ";
+		if (flags & RANDOMX_FLAG_SECURE) {
+			std::cout << "(secure)";
+		}
+		std::cout << std::endl;
 	}
 	else {
 		std::cout << " - interpreted mode" << std::endl;
 	}
 
-	if (softAes) {
-		std::cout << " - software AES mode" << std::endl;
-	}
-	else {
-		flags = (defyx_flags)(flags | RANDOMX_FLAG_HARD_AES);
+	if (flags & RANDOMX_FLAG_HARD_AES) {
 		std::cout << " - hardware AES mode" << std::endl;
 	}
+	else {
+		std::cout << " - software AES mode" << std::endl;
+	}
 
-	if (largePages) {
-		flags = (defyx_flags)(flags | RANDOMX_FLAG_LARGE_PAGES);
+	if (flags & RANDOMX_FLAG_LARGE_PAGES) {
 		std::cout << " - large pages mode" << std::endl;
 	}
 	else {
@@ -203,10 +269,13 @@ int main(int argc, char** argv) {
 	std::cout << " ..." << std::endl;
 
 	try {
-		if (jit && !RANDOMX_HAVE_COMPILER) {
+		if (nullptr == defyx::selectArgonImpl(flags)) {
+			throw std::runtime_error("Unsupported Argon2 implementation");
+		}
+		if ((flags & RANDOMX_FLAG_JIT) && !RANDOMX_HAVE_COMPILER) {
 			throw std::runtime_error("JIT compilation is not supported on this platform. Try without --jit");
 		}
-		if (!jit && RANDOMX_HAVE_COMPILER) {
+		if (!(flags & RANDOMX_FLAG_JIT) && RANDOMX_HAVE_COMPILER) {
 			std::cout << "WARNING: You are using the interpreter mode. Use --jit for optimal performance." << std::endl;
 		}
 
@@ -239,6 +308,7 @@ int main(int argc, char** argv) {
 				defyx_init_dataset(dataset, cache, 0, datasetItemCount);
 			}
 			defyx_release_cache(cache);
+			cache = nullptr;
 			threads.clear();
 		}
 		std::cout << "Memory initialized in " << sw.getElapsed() << " s" << std::endl;
@@ -246,7 +316,7 @@ int main(int argc, char** argv) {
 		for (int i = 0; i < threadCount; ++i) {
 			defyx_vm *vm = defyx_create_vm(flags, cache, dataset);
 			if (vm == nullptr) {
-				if (!softAes) {
+				if ((flags & RANDOMX_FLAG_HARD_AES)) {
 					throw std::runtime_error("Cannot create VM with the selected options. Try using --softAes");
 				}
 				if (largePages) {
@@ -263,10 +333,7 @@ int main(int argc, char** argv) {
 				int cpuid = -1;
 				if (threadAffinity)
 					cpuid = cpuid_from_mask(threadAffinity, i);
-				if (softAes)
-					threads.push_back(std::thread(&mine, vms[i], std::ref(atomicNonce), std::ref(result), noncesCount, i, cpuid));
-				else
-					threads.push_back(std::thread(&mine, vms[i], std::ref(atomicNonce), std::ref(result), noncesCount, i, cpuid));
+				threads.push_back(std::thread(&mine, vms[i], std::ref(atomicNonce), std::ref(result), noncesCount, i, cpuid));
 			}
 			for (unsigned i = 0; i < threads.size(); ++i) {
 				threads[i].join();
@@ -286,7 +353,7 @@ int main(int argc, char** argv) {
 		std::cout << "Calculated result: ";
 		result.print(std::cout);
 		if (noncesCount == 1000 && seedValue == 0)
-			std::cout << "Reference result:  38d47ea494480bff8d621189e8e92747288bb1da6c75dc401f2ab4b6807b6010" << std::endl;
+			std::cout << "Reference result:  10b649a3f15c7c7f88277812f2e74b337a0f20ce909af09199cccb960771cfa1" << std::endl;
 		if (!miningMode) {
 			std::cout << "Performance: " << 1000 * elapsed / noncesCount << " ms per hash" << std::endl;
 		}

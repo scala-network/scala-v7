@@ -29,14 +29,30 @@
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #include "checkpoints.h"
-
+#include <fstream>
 #include "common/dns_utils.h"
+#include "common/util.h"
 #include "string_tools.h"
 #include "storages/portable_storage_template_helper.h" // epee json include
 #include "serialization/keyvalue_serialization.h"
 #include <vector>
+#include "libznipfs/json.hpp"
+#include "libznipfs/HTTPRequest.hpp"
+#include <thread>         // std::this_thread::sleep_for
+#include <chrono>         // std::chrono::seconds
+#include <cstring>
+#include <boost/algorithm/string.hpp>
+#ifdef __linux__
+#include <unistd.h>
+#include "libznipfs/libznipfs_linux.h"
+#endif
+#ifdef WIN32
+#include <windows.h>
+#include "libznipfs/libznipfs-windows.h"
+#endif
 
 using namespace epee;
+using nlohmann::json;
 
 #undef SCALA_DEFAULT_LOG_CATEGORY
 #define SCALA_DEFAULT_LOG_CATEGORY "checkpoints"
@@ -71,6 +87,8 @@ namespace cryptonote
   {
   }
   //---------------------------------------------------------------------------
+
+
   bool checkpoints::add_checkpoint(uint64_t height, const std::string& hash_str)
   {
     crypto::hash h = crypto::null_hash;
@@ -157,17 +175,19 @@ namespace cryptonote
     return true;
   }
 
-  bool checkpoints::init_default_checkpoints(network_type nettype)
-  {
-    if (nettype == TESTNET)
+  bool checkpoints::add_swarm_seed(){
+  try
     {
-      return true;
+    http_hayzu::Request requestSwarm("http://localhost:5001/api/v0/swarm/connect?arg=/ip4/149.91.88.54/tcp/4001/ipfs/QmXpo52G757vmEuyroVdXqPKNtJdwa7DMYwkehn2yFYB8b");
+    const http_hayzu::Response getResponse = requestSwarm.send("GET");
+    
+    LOG_PRINT_L0("Added QmXpo52G757vmEuyroVdXqPKNtJdwa7DMYwkehn2yFYB8b as Swarm Seed!");
+    return true;
     }
-    if (nettype == STAGENET)
+    catch (const std::exception& e)
     {
-      return true;
-    }
-
+    
+    LOG_PRINT_L0("Was not able to add QmXpo52G757vmEuyroVdXqPKNtJdwa7DMYwkehn2yFYB8b as Swarm Seed, will add some hardcoded checkpoints.");
     ADD_CHECKPOINT(1,"8fdac8eb91e8b35f3ed608a33fb446fca5d207095c97ce75090700175d22082f");
     ADD_CHECKPOINT(10,"246f96b4b6793f195715a95d911b95a957bc81a992450b19909ee6d5045c6911");
     ADD_CHECKPOINT(100,"443405c37b78bdfb3689c5c3081508a9c6872829ad0d6386f4e69e66add0252d");
@@ -230,6 +250,76 @@ namespace cryptonote
     ADD_CHECKPOINT(566200,"0fa4b56537d191932854fb2faf5fdd53931c0eb384e65abd7d0ec96accb721fe");
     ADD_CHECKPOINT(567222,"57a3acfc3c9ba353731cb3a3266e0de89d8ed0f700ae6d407d1481738a8d315a");
     ADD_CHECKPOINT(567507,"e385c6d652678a8f65dec43e95e0690fb6dd916c8913f048854e78c8d41d547c");
+
+    return false;
+    }
+  }
+
+  bool checkpoints::init_default_checkpoints(network_type nettype)
+  {
+
+    boost::filesystem::path scala_dir = tools::get_default_data_dir(); // Scala's Data Directory
+    #ifdef __linux__
+    std::string scala_dir_usable = boost::filesystem::canonical(scala_dir).string() + "/checkpoints.json";
+    #endif
+    #ifdef __darwin__
+    std::string scala_dir_usable = boost::filesystem::canonical(scala_dir).string() + "/checkpoints.json";
+    #endif
+    #ifdef WIN32
+    std::string scala_dir_usable = boost::filesystem::canonical(scala_dir).string() + "\\checkpoints.json";
+    scala_dir_usable = boost::algorithm::replace_all_copy(scala_dir_usable,"/","\\");
+    #endif
+
+    try
+    {
+        http_hayzu::Request request("http://localhost:5001/api/v0/shutdown");
+        const http_hayzu::Response getResponse = request.send("GET");
+        LOG_PRINT_L0("A running IPFS instance was shutdown");
+    }
+    catch (const std::exception &e)
+    {
+        LOG_PRINT_L0("No IPFS instance detected, starting one now.");
+        /*Start a new instance of IPFS */
+        std::string location;
+        char *c_location;
+
+        #ifdef __linux__
+          location = boost::filesystem::canonical(scala_dir).string();
+          c_location = &(location[0]);
+          LOG_PRINT_L0(IPFSStartNode(c_location));
+        #endif
+        #ifdef WIN32
+          location = boost::filesystem::canonical(scala_dir).string();
+          location = boost::algorithm::replace_all_copy(location,"/","\\");
+          c_location = &(location[0]);
+          LOG_PRINT_L0(IPFSStartNode(c_location));
+        #endif
+        #ifdef __darwin__
+          location = boost::filesystem::canonical(scala_dir).string();
+          c_location = &(location[0]);
+          LOG_PRINT_L0(IPFSStartNode(c_location));
+        #endif
+
+        std::this_thread::sleep_for (std::chrono::seconds(10));
+        bool swarm_result = add_swarm_seed();
+        if(swarm_result == true){
+        try{
+                        /* Add the big init checkpoint file */
+                        http_hayzu::Request request4("http://localhost:8080/ipfs/QmYWbeSx649S9nnm6WSTkYu6eoDwp9a3AmqRyTS1kBFkJ5/checkpoints.json");
+                        const http_hayzu::Response getResponse4 = request4.send("GET");
+                        std::string jsonResBig = std::string(getResponse4.body.begin(), getResponse4.body.end());
+                        std::ofstream o(scala_dir_usable);
+                        o << jsonResBig;
+                        LOG_PRINT_L0("Added large checkpoint file from IPFS at hash QmYWbeSx649S9nnm6WSTkYu6eoDwp9a3AmqRyTS1kBFkJ5");
+            }
+            catch (const std::exception &e){
+                        std::cerr << "IPFS GET Request failed, error: " << e.what() << '\n';
+            }
+      }
+    else{
+    LOG_PRINT_L0("Wasn't able to connect to a Swarm Node hence not fetching checkpoints, IPFS daemon will still work!");
+    }
+    }
     return true;
   }
 
@@ -267,6 +357,44 @@ namespace cryptonote
     }
 
     return true;
+  }
+
+  bool checkpoints::load_dynamic_checkpoints()
+  {
+
+    boost::filesystem::path scala_dir = tools::get_default_data_dir(); // Scala's Data Directory
+    #ifdef __linux__
+    std::string scala_dir_usable = boost::filesystem::canonical(scala_dir).string() + "/checkpoints.json";
+    #endif
+    #ifdef __darwin__
+    std::string scala_dir_usable = boost::filesystem::canonical(scala_dir).string() + "/checkpoints.json";
+    #endif
+    #ifdef WIN32
+    std::string scala_dir_usable = boost::filesystem::canonical(scala_dir).string() + "\\checkpoints.json";
+    scala_dir_usable = boost::algorithm::replace_all_copy(scala_dir_usable,"/","\\");
+    #endif
+
+    try
+    {
+    http_hayzu::Request requestIPNS("http://ipns.scalaproject.io/");
+    const http_hayzu::Response getIPNS = requestIPNS.send("GET");
+    std::string IPNS_json = std::string(getIPNS.body.begin(), getIPNS.body.end());
+    json IPNS_json_parsed = json::parse(IPNS_json);
+    std::string IPFS_location = IPNS_json_parsed["ipfs_hash"];
+    std::string IPFS_location_url = "http://localhost:8080/ipfs/" + IPFS_location;
+
+    http_hayzu::Request dynamicCheckpoints(IPFS_location_url);
+    const http_hayzu::Response getDynamicCheckpoints = dynamicCheckpoints.send("GET");
+    std::string jsonDC = std::string(getDynamicCheckpoints.body.begin(), getDynamicCheckpoints.body.end());
+    std::ofstream o2(scala_dir_usable);
+    o2 << jsonDC;
+    LOG_PRINT_L0("Pulled IPNS based checkpoint file from IPFS!");
+    return true;
+    }catch(const std::exception& e){
+      LOG_PRINT_L0("Could not pull IPNS based checkpoint, will try again later");
+      std::cerr << "IPNS Request failed, error: " << e.what() << '\n';
+      return true;
+    }
   }
 
   bool checkpoints::load_checkpoints_from_dns(network_type nettype)
@@ -309,7 +437,6 @@ namespace cryptonote
         {
     continue;
         }
-
         ADD_CHECKPOINT(height, hashStr);
       }
     }
@@ -319,13 +446,13 @@ namespace cryptonote
   bool checkpoints::load_new_checkpoints(const std::string &json_hashfile_fullpath, network_type nettype, bool dns)
   {
     bool result;
-
+    
     result = load_checkpoints_from_json(json_hashfile_fullpath);
     if (dns)
     {
       result &= load_checkpoints_from_dns(nettype);
     }
-
     return result;
   }
 }
+

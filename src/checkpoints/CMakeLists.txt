@@ -36,10 +36,25 @@ if(APPLE)
   endif()
 endif()
 
+message(${CMAKE_CURRENT_SOURCE_DIR})
+
+
 set(checkpoints_sources
   checkpoints.cpp)
 
-set(checkpoints_headers)
+if(UNIX)
+	set(checkpoints_headers
+    	./libznipfs/json.hpp
+    	./libznipfs/HTTPRequest.hpp
+    	./libznipfs/libznipfs_linux.h)
+else()
+	set(checkpoints_headers
+        ./libznipfs/json.hpp
+        ./libznipfs/HTTPRequest.hpp
+        ./libznipfs/libznipfs-windows.h)
+endif()
+
+
 
 set(checkpoints_private_headers
   checkpoints.h)
@@ -50,15 +65,32 @@ scala_add_library(checkpoints
   ${checkpoints_sources}
   ${checkpoints_headers}
   ${checkpoints_private_headers})
-target_link_libraries(checkpoints
-  PUBLIC
-    common
-    cncrypto
-    ${Boost_DATE_TIME_LIBRARY}
-    ${Boost_PROGRAM_OPTIONS_LIBRARY}
-    ${Boost_SERIALIZATION_LIBRARY}
-    ${Boost_FILESYSTEM_LIBRARY}
-    ${Boost_SYSTEM_LIBRARY}
-    ${Boost_THREAD_LIBRARY}
-  PRIVATE
-    ${EXTRA_LIBRARIES})
+if(UNIX)
+    target_link_libraries(checkpoints
+    PUBLIC
+        common
+        cncrypto
+        ${Boost_DATE_TIME_LIBRARY}
+        ${Boost_PROGRAM_OPTIONS_LIBRARY}
+        ${Boost_SERIALIZATION_LIBRARY}
+        ${Boost_FILESYSTEM_LIBRARY}
+        ${Boost_SYSTEM_LIBRARY}
+        ${Boost_THREAD_LIBRARY}
+        ${CMAKE_CURRENT_SOURCE_DIR}/libznipfs/libznipfs-linux.a
+    PRIVATE
+        ${EXTRA_LIBRARIES})
+else()
+    target_link_libraries(checkpoints
+    PUBLIC
+        common
+        cncrypto
+        ${Boost_DATE_TIME_LIBRARY}
+        ${Boost_PROGRAM_OPTIONS_LIBRARY}
+        ${Boost_SERIALIZATION_LIBRARY}
+        ${Boost_FILESYSTEM_LIBRARY}
+        ${Boost_SYSTEM_LIBRARY}
+        ${Boost_THREAD_LIBRARY}
+        ${CMAKE_CURRENT_SOURCE_DIR}/libznipfs/libznipfs-windows.a
+    PRIVATE
+        ${EXTRA_LIBRARIES})
+endif()

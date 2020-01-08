@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common.hpp"
 #include "superscalar_program.hpp"
 #include "allocator.hpp"
+#include "argon2.h"
 
 /* Global scope for C binding */
 struct defyx_dataset {
@@ -51,6 +52,7 @@ struct defyx_cache {
 	defyx::SuperscalarProgram programs[RANDOMX_CACHE_ACCESSES];
 	std::vector<uint64_t> reciprocalCache;
 	std::string cacheKey;
+	defyx_argon2_impl* argonImpl;
 
 	bool isInitialized() {
 		return programs[0].getSize() != 0;
@@ -59,7 +61,17 @@ struct defyx_cache {
 
 //A pointer to a standard-layout struct object points to its initial member
 static_assert(std::is_standard_layout<defyx_dataset>(), "defyx_dataset must be a standard-layout struct");
+
+//the following assert fails when compiling Debug in Visual Studio (JIT mode will crash in Debug)
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) && defined(_DEBUG)
+#define TO_STR(x) #x
+#define STR(x) TO_STR(x)
+#pragma message ( __FILE__ "(" STR(__LINE__) ") warning: check std::is_standard_layout<defyx_cache>() is disabled for Debug configuration. JIT mode will crash." )
+#undef STR
+#undef TO_STR
+#else
 static_assert(std::is_standard_layout<defyx_cache>(), "defyx_cache must be a standard-layout struct");
+#endif
 
 namespace defyx {
 
@@ -78,4 +90,14 @@ namespace defyx {
 	void initCacheCompile(defyx_cache*, const void*, size_t);
 	void initDatasetItem(defyx_cache* cache, uint8_t* out, uint64_t blockNumber);
 	void initDataset(defyx_cache* cache, uint8_t* dataset, uint32_t startBlock, uint32_t endBlock);
+
+	inline defyx_argon2_impl* selectArgonImpl(defyx_flags flags) {
+		if (flags & RANDOMX_FLAG_ARGON2_AVX2) {
+			return defyx_argon2_impl_avx2();
+		}
+		if (flags & RANDOMX_FLAG_ARGON2_SSSE3) {
+			return defyx_argon2_impl_ssse3();
+		}
+		return &defyx_argon2_fill_segment_ref;
+	}
 }

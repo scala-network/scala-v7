@@ -8,14 +8,17 @@ int main() {
 	const char myInput[] = "DefyX example input";
 	char hash[RANDOMX_HASH_SIZE];
 
-	defyx_cache *myCache = defyx_alloc_cache((defyx_flags)(RANDOMX_FLAG_JIT | RANDOMX_FLAG_LARGE_PAGES));
+	defyx_flags flags = defyx_get_flags();
+	flags |= RANDOMX_FLAG_LARGE_PAGES;
+	flags |= RANDOMX_FLAG_FULL_MEM;
+	defyx_cache *myCache = defyx_alloc_cache(flags);
 	if (myCache == nullptr) {
 		std::cout << "Cache allocation failed" << std::endl;
 		return 1;
 	}
 	defyx_init_cache(myCache, myKey, sizeof myKey);
 
-	defyx_dataset *myDataset = defyx_alloc_dataset(RANDOMX_FLAG_LARGE_PAGES);
+	defyx_dataset *myDataset = defyx_alloc_dataset(flags);
 	if (myDataset == nullptr) {
 		std::cout << "Dataset allocation failed" << std::endl;
 		return 1;
@@ -28,7 +31,7 @@ int main() {
 	t2.join();
 	defyx_release_cache(myCache);
 
-	defyx_vm *myMachine = defyx_create_vm((defyx_flags)(RANDOMX_FLAG_FULL_MEM | RANDOMX_FLAG_JIT | RANDOMX_FLAG_HARD_AES | RANDOMX_FLAG_LARGE_PAGES), nullptr, myDataset);
+	defyx_vm *myMachine = defyx_create_vm(flags, nullptr, myDataset);
 	if (myMachine == nullptr) {
 		std::cout << "Failed to create a virtual machine" << std::endl;
 		return 1;
@@ -40,7 +43,7 @@ int main() {
 	defyx_release_dataset(myDataset);
 
 	for (unsigned i = 0; i < RANDOMX_HASH_SIZE; ++i)
-		std::cout << std::hex << ((int)hash[i] & 0xff);
+		std::cout << std::hex << std::setw(2) << std::setfill('0') << ((int)hash[i] & 0xff);
 
 	std::cout << std::endl;
 

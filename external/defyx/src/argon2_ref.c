@@ -43,6 +43,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "blake2/blake2-impl.h"
 #include "blake2/blake2.h"
 
+static void copy_block(block* dst, const block* src) {
+	memcpy(dst->v, src->v, sizeof(uint64_t) * ARGON2_QWORDS_IN_BLOCK);
+}
+
+static void xor_block(block* dst, const block* src) {
+	int i;
+	for (i = 0; i < ARGON2_QWORDS_IN_BLOCK; ++i) {
+		dst->v[i] ^= src->v[i];
+	}
+}
+
  /*
   * Function fills a new memory block and optionally XORs the old block over the new one.
   * @next_block must be initialized.
@@ -57,13 +68,13 @@ static void fill_block(const block *prev_block, const block *ref_block,
 	block blockR, block_tmp;
 	unsigned i;
 
-	rxa2_copy_block(&blockR, ref_block);
-	rxa2_xor_block(&blockR, prev_block);
-	rxa2_copy_block(&block_tmp, &blockR);
+	copy_block(&blockR, ref_block);
+	xor_block(&blockR, prev_block);
+	copy_block(&block_tmp, &blockR);
 	/* Now blockR = ref_block + prev_block and block_tmp = ref_block + prev_block */
 	if (with_xor) {
 		/* Saving the next block contents for XOR over: */
-		rxa2_xor_block(&block_tmp, next_block);
+		xor_block(&block_tmp, next_block);
 		/* Now blockR = ref_block + prev_block and
 		   block_tmp = ref_block + prev_block + next_block */
 	}
@@ -92,18 +103,11 @@ static void fill_block(const block *prev_block, const block *ref_block,
 			blockR.v[2 * i + 113]);
 	}
 
-	rxa2_copy_block(next_block, &block_tmp);
-	rxa2_xor_block(next_block, &blockR);
+	copy_block(next_block, &block_tmp);
+	xor_block(next_block, &blockR);
 }
 
-static void next_addresses(block *address_block, block *input_block,
-	const block *zero_block) {
-	input_block->v[6]++;
-	fill_block(zero_block, input_block, address_block, 0);
-	fill_block(zero_block, address_block, address_block, 0);
-}
-
-void rxa2_fill_segment(const argon2_instance_t *instance,
+void defyx_argon2_fill_segment_ref(const argon2_instance_t *instance,
 	argon2_position_t position) {
 	block *ref_block = NULL, *curr_block = NULL;
 	block address_block, input_block, zero_block;
@@ -111,38 +115,15 @@ void rxa2_fill_segment(const argon2_instance_t *instance,
 	uint32_t prev_offset, curr_offset;
 	uint32_t starting_index;
 	uint32_t i;
-	int data_independent_addressing;
 
 	if (instance == NULL) {
 		return;
-	}
-
-	data_independent_addressing =
-		(instance->type == Argon2_i) ||
-		(instance->type == Argon2_id && (position.pass == 0) &&
-		(position.slice < ARGON2_SYNC_POINTS / 2));
-
-	if (data_independent_addressing) {
-		rxa2_init_block_value(&zero_block, 0);
-		rxa2_init_block_value(&input_block, 0);
-
-		input_block.v[0] = position.pass;
-		input_block.v[1] = position.lane;
-		input_block.v[2] = position.slice;
-		input_block.v[3] = instance->memory_blocks;
-		input_block.v[4] = instance->passes;
-		input_block.v[5] = instance->type;
 	}
 
 	starting_index = 0;
 
 	if ((0 == position.pass) && (0 == position.slice)) {
 		starting_index = 2; /* we have already generated the first two blocks */
-
-		/* Don't forget to generate the first block of addresses: */
-		if (data_independent_addressing) {
-			next_addresses(&address_block, &input_block, &zero_block);
-		}
 	}
 
 	/* Offset of the current block */
@@ -167,15 +148,7 @@ void rxa2_fill_segment(const argon2_instance_t *instance,
 
 		/* 1.2 Computing the index of the reference block */
 		/* 1.2.1 Taking pseudo-random value from the previous block */
-		if (data_independent_addressing) {
-			if (i % ARGON2_ADDRESSES_IN_BLOCK == 0) {
-				next_addresses(&address_block, &input_block, &zero_block);
-			}
-			pseudo_rand = address_block.v[i % ARGON2_ADDRESSES_IN_BLOCK];
-		}
-		else {
-			pseudo_rand = instance->memory[prev_offset].v[0];
-		}
+		pseudo_rand = instance->memory[prev_offset].v[0];
 
 		/* 1.2.2 Computing the lane of the reference block */
 		ref_lane = ((pseudo_rand >> 32)) % instance->lanes;
@@ -189,7 +162,7 @@ void rxa2_fill_segment(const argon2_instance_t *instance,
 		 * lane.
 		 */
 		position.index = i;
-		ref_index = rxa2_index_alpha(instance, &position, pseudo_rand & 0xFFFFFFFF,
+		ref_index = defyx_argon2_index_alpha(instance, &position, pseudo_rand & 0xFFFFFFFF,
 			ref_lane == position.lane);
 
 		/* 2 Creating a new block */
