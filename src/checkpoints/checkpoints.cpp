@@ -390,10 +390,10 @@ namespace cryptonote
     o2 << jsonDC;
     LOG_PRINT_L0("Pulled IPNS based checkpoint file from IPFS!");
     return true;
-
     }catch(const std::exception& e){
+      LOG_PRINT_L0("Could not pull IPNS based checkpoint, will try again later")
       std::cerr << "IPNS Request failed, error: " << e.what() << '\n';
-      return false;
+      return true;
     }
   }
 
