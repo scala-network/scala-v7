@@ -4224,10 +4224,10 @@ void BlockchainLMDB::remove_alt_block(const crypto::hash &blkid)
   MDB_val v;
   int result = mdb_cursor_get(m_cur_alt_blocks, &k, &v, MDB_SET);
   if (result)
-    throw0(DB_ERROR(lmdb_error("Error locating alternate block " + epee::string_tools::pod_to_hex(blkid) + " in the db: ", result).c_str()));
+    throw1(DB_ERROR(lmdb_error("Error locating alternate block " + epee::string_tools::pod_to_hex(blkid) + " in the db: ", result).c_str()));
   result = mdb_cursor_del(m_cur_alt_blocks, 0);
   if (result)
-    throw0(DB_ERROR(lmdb_error("Error deleting alternate block " + epee::string_tools::pod_to_hex(blkid) + " from the db: ", result).c_str()));
+    throw1(DB_ERROR(lmdb_error("Error deleting alternate block " + epee::string_tools::pod_to_hex(blkid) + " from the db: ", result).c_str()));
 }
 
 uint64_t BlockchainLMDB::get_alt_block_count()
