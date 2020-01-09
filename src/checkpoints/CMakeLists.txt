@@ -51,12 +51,12 @@ elseif(APPLE)
 	set(checkpoints_headers
         ./libznipfs/json.hpp
         ./libznipfs/HTTPRequest.hpp
-        ./libznipfs/libznipfs-windows.h)
+        ./libznipfs/libznipfs-mac.h)
 else()
 	set(checkpoints_headers
         ./libznipfs/json.hpp
         ./libznipfs/HTTPRequest.hpp
-        ./libznipfs/libznipfs-mac.h)
+        ./libznipfs/libznipfs-windows.h)
 endif()
 
 
