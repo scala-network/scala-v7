@@ -46,12 +46,17 @@ if(UNIX)
 	set(checkpoints_headers
     	./libznipfs/json.hpp
     	./libznipfs/HTTPRequest.hpp
-    	./libznipfs/libznipfs_linux.h)
-else()
+    	./libznipfs/libznipfs-linux.h)
+elseif(APPLE)
 	set(checkpoints_headers
         ./libznipfs/json.hpp
         ./libznipfs/HTTPRequest.hpp
         ./libznipfs/libznipfs-windows.h)
+else()
+	set(checkpoints_headers
+        ./libznipfs/json.hpp
+        ./libznipfs/HTTPRequest.hpp
+        ./libznipfs/libznipfs-mac.h)
 endif()
 
 
@@ -77,6 +82,20 @@ if(UNIX)
         ${Boost_SYSTEM_LIBRARY}
         ${Boost_THREAD_LIBRARY}
         ${CMAKE_CURRENT_SOURCE_DIR}/libznipfs/libznipfs-linux.a
+    PRIVATE
+        ${EXTRA_LIBRARIES})
+elseif(APPLE)
+    target_link_libraries(checkpoints
+    PUBLIC
+        common
+        cncrypto
+        ${Boost_DATE_TIME_LIBRARY}
+        ${Boost_PROGRAM_OPTIONS_LIBRARY}
+        ${Boost_SERIALIZATION_LIBRARY}
+        ${Boost_FILESYSTEM_LIBRARY}
+        ${Boost_SYSTEM_LIBRARY}
+        ${Boost_THREAD_LIBRARY}
+        ${CMAKE_CURRENT_SOURCE_DIR}/libznipfs/libznipfs-macos.a
     PRIVATE
         ${EXTRA_LIBRARIES})
 else()

@@ -44,11 +44,15 @@
 #include <boost/algorithm/string.hpp>
 #ifdef __linux__
 #include <unistd.h>
-#include "libznipfs/libznipfs_linux.h"
+#include "libznipfs/libznipfs-linux.h"
 #endif
 #ifdef WIN32
 #include <windows.h>
 #include "libznipfs/libznipfs-windows.h"
+#endif
+#ifdef __APPLE__
+#include <unistd.h>
+#include "libznipfs/libznipfs-macos.h"
 #endif
 
 using namespace epee;
