@@ -28,11 +28,11 @@
 
 if(APPLE)
   if(DEPENDS)
-    list(APPEND EXTRA_LIBRARIES "-framework Foundation -framework ApplicationServices -framework AppKit -framework IOKit")
+    list(APPEND EXTRA_LIBRARIES "-framework Foundation -framework ApplicationServices -framework AppKit -framework IOKit -framework Security")
   else()
     find_library(IOKIT_LIBRARY IOKit)
     mark_as_advanced(IOKIT_LIBRARY)
-    list(APPEND EXTRA_LIBRARIES ${IOKIT_LIBRARY})
+    list(APPEND EXTRA_LIBRARIES ${IOKIT_LIBRARY} "-framework Security")
   endif()
 endif()
 
@@ -42,7 +42,7 @@ message(${CMAKE_CURRENT_SOURCE_DIR})
 set(checkpoints_sources
   checkpoints.cpp)
 
-if(UNIX)
+if("${CMAKE_SYSTEM}" MATCHES "Linux")
 	set(checkpoints_headers
     	./libznipfs/json.hpp
     	./libznipfs/HTTPRequest.hpp
@@ -51,7 +51,7 @@ elseif(APPLE)
 	set(checkpoints_headers
         ./libznipfs/json.hpp
         ./libznipfs/HTTPRequest.hpp
-        ./libznipfs/libznipfs-mac.h)
+        ./libznipfs/libznipfs-macos.h)
 else()
 	set(checkpoints_headers
         ./libznipfs/json.hpp
@@ -70,7 +70,7 @@ scala_add_library(checkpoints
   ${checkpoints_sources}
   ${checkpoints_headers}
   ${checkpoints_private_headers})
-if(UNIX)
+if("${CMAKE_SYSTEM}" MATCHES "Linux")
     target_link_libraries(checkpoints
     PUBLIC
         common

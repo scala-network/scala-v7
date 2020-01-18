@@ -266,7 +266,7 @@ namespace cryptonote
     #ifdef __linux__
     std::string scala_dir_usable = boost::filesystem::canonical(scala_dir).string() + "/checkpoints.json";
     #endif
-    #ifdef __darwin__
+    #ifdef __APPLE__
     std::string scala_dir_usable = boost::filesystem::canonical(scala_dir).string() + "/checkpoints.json";
     #endif
     #ifdef WIN32
@@ -298,7 +298,7 @@ namespace cryptonote
           c_location = &(location[0]);
           LOG_PRINT_L0(IPFSStartNode(c_location));
         #endif
-        #ifdef __darwin__
+        #ifdef __APPLE__
           location = boost::filesystem::canonical(scala_dir).string();
           c_location = &(location[0]);
           LOG_PRINT_L0(IPFSStartNode(c_location));
@@ -370,7 +370,7 @@ namespace cryptonote
     #ifdef __linux__
     std::string scala_dir_usable = boost::filesystem::canonical(scala_dir).string() + "/checkpoints.json";
     #endif
-    #ifdef __darwin__
+    #ifdef __APPLE__
     std::string scala_dir_usable = boost::filesystem::canonical(scala_dir).string() + "/checkpoints.json";
     #endif
     #ifdef WIN32
