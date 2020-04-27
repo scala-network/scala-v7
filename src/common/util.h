@@ -116,6 +116,7 @@ namespace tools
    * Unix: ~/.CRYPTONOTE_NAME
    */
   std::string get_default_data_dir();
+  void set_default_data_dir(std::string default_foldername);
 
 #ifdef WIN32
   /**

@@ -596,6 +596,13 @@ std::string get_nix_version_display_string()
   }
 #endif
   
+  std::string m_default_foldername;
+
+  void set_default_data_dir(std::string default_foldername)
+  {
+    m_default_foldername = default_foldername;
+  }
+
   std::string get_default_data_dir()
   {
     /* Please for the love of god refactor  the ifdefs out of this */
@@ -604,6 +611,9 @@ std::string get_nix_version_display_string()
     // Windows < Vista: C:\Documents and Settings\Username\Application Data\CRYPTONOTE_NAME
     // Windows >= Vista: C:\Users\Username\AppData\Roaming\CRYPTONOTE_NAME
     // Unix & Mac: ~/.CRYPTONOTE_NAME
+    if(!m_default_foldername.empty()) {
+      return m_default_foldername;
+    }
     std::string config_folder;
 
 #ifdef WIN32
@@ -617,7 +627,7 @@ std::string get_nix_version_display_string()
       pathRet = pszHome;
     config_folder = (pathRet + "/." + CRYPTONOTE_NAME);
 #endif
-
+    m_default_foldername = config_folder;
     return config_folder;
   }
 

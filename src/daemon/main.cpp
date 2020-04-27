@@ -270,7 +270,7 @@ int main(int argc, char const * argv[])
 
     // after logs initialized
     tools::create_directories_if_necessary(data_dir.string());
-
+    tools::set_default_data_dir(data_dir.string());
 #ifdef STACK_TRACE
     tools::set_stack_trace_log(log_file_path.filename().string());
 #endif // STACK_TRACE
