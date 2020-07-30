@@ -839,7 +839,7 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
   ++height; // top block height to blockchain height
 
   // Reset network hashrate to 1.0 MH/s when V7 goes live
-  if (m_nettype == MAINNET && (uint64_t)height >= 20 && (uint64_t)height <= MAINNET_HARDFORK_V7_HEIGHT + (uint64_t)DIFFICULTY_BLOCKS_COUNT){
+  if (m_nettype == MAINNET && (uint64_t)height >= 20 && (uint64_t)height <= 20 + (uint64_t)DIFFICULTY_BLOCKS_COUNT){
     return (difficulty_type)1000;
   }
 
