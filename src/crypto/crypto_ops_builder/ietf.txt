@@ -1,0 +1,4 @@
+https://tools.ietf.org/id/draft-josefsson-eddsa-ed25519-02.txt
+
+Note: This draft is now superseded by https://datatracker.ietf.org/doc/rfc8032/
+(review of the differences is left as an exercise for the reader)
