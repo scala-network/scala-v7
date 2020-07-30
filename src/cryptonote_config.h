@@ -270,21 +270,21 @@ namespace cryptonote
 {
    static const std::vector<std::string> ldpow_nodes = { 
      "https://beta-ldpow.scalaproject.io/",
-     "https://beta-ldpow.scalaproject.io/",
-     "https://beta-ldpow.scalaproject.io/",
-     "https://beta-ldpow.scalaproject.io/",
-     "https://beta-ldpow.scalaproject.io/",
-     "https://beta-ldpow.scalaproject.io/",
-     "https://beta-ldpow.scalaproject.io/",
-     "https://beta-ldpow.scalaproject.io/",     
-     "https://beta-ldpow.scalaproject.io/",
-     "https://beta-ldpow.scalaproject.io/",
-     "https://beta-ldpow.scalaproject.io/",
-     "https://beta-ldpow.scalaproject.io/",     
-     "https://beta-ldpow.scalaproject.io/",
-     "https://beta-ldpow.scalaproject.io/",
-     "https://beta-ldpow.scalaproject.io/",
-     "https://beta-ldpow.scalaproject.io/"
+     "https://zeta-ldpow.scalaproject.io/",
+     "https://theta-ldpow.scalaproject.io/",
+     "https://pi-ldpow.scalaproject.io/",
+     "https://alpha-ldpow.scalaproject.io/",
+     "https://gamma-ldpow.scalaproject.io/",
+     "https://delta-ldpow.scalaproject.io/",
+     "https://epsilon-ldpow.scalaproject.io/",
+     "https://iota-ldpow.scalaproject.io/",
+     "https://kappa-ldpow.scalaproject.io/",
+     "https://sigma-ldpow.scalaproject.io/",
+     "https://eta-ldpow.scalaproject.io/",
+     "https://lambda-ldpow.scalaproject.io/",
+     "https://zed-ldpow.scalaproject.io/",
+     "https://omega-ldpow.scalaproject.io/",
+     "https://phi-ldpow.scalaproject.io/"
   };
 
   enum network_type : uint8_t
