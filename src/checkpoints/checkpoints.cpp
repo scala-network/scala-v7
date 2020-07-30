@@ -317,6 +317,7 @@ namespace cryptonote
                       bool ldpow_request = get_request_ldpow(request_url_ldpow, response_ldpow, log_message);
                       if(ldpow_request == true){
                               LOG_PRINT_L1("Request for node " << value << " went through.");
+                              LOG_PRINT_L0("Response from LdPoW " << response_ldpow)
                         			std::stringstream string_stream(response_ldpow);
 			                        ptree strTree;
 			                        read_json(string_stream, strTree);
