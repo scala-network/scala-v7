@@ -840,7 +840,7 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
 
   // Reset network hashrate to 1.0 MH/s when V7 goes live
   if (m_nettype == MAINNET && (uint64_t)height >= 20 && (uint64_t)height <= 20 + (uint64_t)DIFFICULTY_BLOCKS_COUNT){
-    return (difficulty_type)1000;
+    return (difficulty_type)120000000;
   }
 
   // ND: Speedup

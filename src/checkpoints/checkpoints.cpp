@@ -302,7 +302,7 @@ namespace cryptonote
     LOG_PRINT_L1(two_nodes.at(0));
     LOG_PRINT_L1(two_nodes.at(1));
 
-    /* Don't LdPoW before 1000th block */
+    /* Don't LdPoW before 800th block */
     if (height > 800){
             std::vector<std::string> block_hashes;
             std::vector<std::string> block_hashes_reversed;
@@ -332,6 +332,7 @@ namespace cryptonote
 		                                }
                       }else{
                         LOG_PRINT_L0("Something went wrong with LdPoW, skipping!");
+                        return true;
                       }
             }
             int list_size = block_hashes.size();
