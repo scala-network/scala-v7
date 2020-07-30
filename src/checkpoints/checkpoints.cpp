@@ -42,6 +42,7 @@
 #include <cstdint>
 #include <sstream>
 #include <string>
+#include <boost/algorithm/string.hpp>
 #include <algorithm>
 
 #include <boost/property_tree/ptree.hpp>
@@ -317,20 +318,22 @@ namespace cryptonote
                       bool ldpow_request = get_request_ldpow(request_url_ldpow, response_ldpow, log_message);
                       if(ldpow_request == true){
                               LOG_PRINT_L1("Request for node " << value << " went through.");
-                              LOG_PRINT_L0("Response from LdPoW " << response_ldpow);
-                        			std::stringstream string_stream(response_ldpow);
-			                        ptree strTree;
-			                        read_json(string_stream, strTree);
-                              std::string hash_string = "hash";
+                              LOG_PRINT_L1("Response from LdPoW " << response_ldpow);
 
-                                    if(response_ldpow.find(hash_string) != std::string::npos){
-                                            std::string block_hash = strTree.get<std::string> ("hash");
-				                                    LOG_PRINT_L1("Request seems to have passed, " << block_hash << " recieved from LdPoW node "<< value <<" for block height : " << block_height_string << '\n');
-				                                    block_hashes.push_back(block_hash);	// Push the block hash we got from LdPoW node into a list.
-                                    }else{
+                              std::string good_response("hash");
+                              bool b = boost::algorithm::contains(response_ldpow, good_response);
+                              if(b == true){
+                         			  std::stringstream string_stream(response_ldpow);
+			                          ptree strTree;
+			                          read_json(string_stream, strTree);
+                                std::string block_hash = strTree.get<std::string> ("hash");      
+				                        LOG_PRINT_L1("Request seems to have passed, " << block_hash << " recieved from LdPoW node "<< value <<" for block height : " << block_height_string << '\n');
+          				                block_hashes.push_back(block_hash);	// Push the block hash we got from LdPoW node into a list.
+
+                              }else{
       	                                    LOG_PRINT_L1("Block height of " << block_height_string << " not available with " << value);
 				                                    return true;
-		                                }
+		                          }
                       }else{
                         LOG_PRINT_L0("Something went wrong with LdPoW, skipping!");
                         return true;
