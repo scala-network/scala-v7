@@ -85,7 +85,7 @@ namespace cryptonote {
   bool get_block_reward(size_t median_weight, size_t current_block_weight, uint64_t already_generated_coins, uint64_t &reward, uint8_t version, uint64_t height) {
 
     static_assert(DIFFICULTY_TARGET % 60 == 0, "difficulty targets must be a multiple of 60");
-    const uint64_t premine_and_swap_amount = 1362382980400U;
+    const uint64_t premine_and_swap_amount = 1282877336900U;
 
     uint64_t base_reward;
 
