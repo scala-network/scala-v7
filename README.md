@@ -1,5 +1,7 @@
+
 # Scala
 
+Copyright (c) 2018-2020 The Scala Network.
 Copyright (c) 2014-2019 The Monero Project.   
 Portions Copyright (c) 2012-2013 The Cryptonote developers.
 
@@ -7,17 +9,13 @@ Portions Copyright (c) 2012-2013 The Cryptonote developers.
 
   - [Development resources](#development-resources)
   - [Vulnerability response](#vulnerability-response)
-  - [Research](#research)
   - [Announcements](#announcements)
-  - [Translations](#translations)
-  - [Coverage](#coverage)
   - [Introduction](#introduction)
   - [About this project](#about-this-project)
   - [Supporting the project](#supporting-the-project)
   - [License](#license)
   - [Contributing](#contributing)
   - [Scheduled software upgrades](#scheduled-software-upgrades)
-  - [Release staging schedule and protocol](#release-staging-schedule-and-protocol)
   - [Compiling Scala from source](#compiling-scala-from-source)
     - [Dependencies](#dependencies)
   - [Internationalization](#Internationalization)
@@ -27,44 +25,19 @@ Portions Copyright (c) 2012-2013 The Cryptonote developers.
 
 ## Development resources
 
-- Web: [getscala.org](https://getscala.org)
-- Forum: [forum.getscala.org](https://forum.getscala.org)
-- Mail: [dev@getscala.org](mailto:dev@getscala.org)
-- GitHub: [https://github.com/scala-project/scala](https://github.com/scala-project/scala)
-- IRC: [#scala-dev on Freenode](https://webchat.freenode.net/?randomnick=1&channels=%23scala-dev&prompt=1&uio=d4)
-- It is HIGHLY recommended that you join the #scala-dev IRC channel if you are developing software that uses Scala. Due to the nature of this open source software project, joining this channel and idling is the best way to stay updated on best practices and new developments in the Scala ecosystem. All you need to do is join the IRC channel and idle to stay updated with the latest in Scala development. If you do not, you risk wasting resources on developing integrations that are not compatible with the Scala network. The Scala core team and community continuously make efforts to communicate updates, developments, and documentation via other platforms – but for the best information, you need to talk to other Scala developers, and they are on IRC. #scala-dev is about Scala development, not getting help about using Scala, or help about development of other software, including yours, unless it also pertains to Scala code itself. For these cases, checkout #scala. 
+- Web: [scalaproject.io](https://scalaproject.io)
+- Forum: [discord](https://discord.gg/QfCWRfx)
+- Mail: [hello@scalaproject.io](mailto:hello@scalaproject.io)
+- GitHub: [https://github.com/scala-network/scala](https://github.com/scala-network/scala)
+- It is HIGHLY recommended that you join the discord channel if you are developing software that uses Scala. Due to the nature of this open source software project, joining this channel and idling is the best way to stay updated on best practices and new developments in the Scala ecosystem. All you need to do is join the discord channel and idle to stay updated with the latest in Scala development. If you do not, you risk wasting resources on developing integrations that are not compatible with the Scala network. The Scala core team and community continuously make efforts to communicate updates, developments, and documentation via other platforms – but for the best information, you need to talk to other Scala developers, and they are on discord. 
 
 ## Vulnerability response
 
-- Our [Vulnerability Response Process](https://github.com/scala-project/meta/blob/master/VULNERABILITY_RESPONSE_PROCESS.md) encourages responsible disclosure
-- We are also available via [HackerOne](https://hackerone.com/scala)
-
-## Research
-
-The [Scala Research Lab](https://src.getscala.org/resources/research-lab/) is an open forum where the community coordinates research into Scala cryptography, protocols, fungibility, analysis, and more. We welcome collaboration and contributions from outside researchers! Because not all Lab work and publications are distributed as traditional preprints or articles, they may be easy to miss if you are conducting literature reviews for your own Scala research. You are encouraged to get in touch with our researchers if you have questions, wish to collaborate, or would like guidance to help avoid unnecessarily duplicating earlier or known work.
-
-Our researchers are available on IRC in [#scala-research-lab on Freenode](https://webchat.freenode.net/?randomnick=1&channels=%23scala-research-lab&prompt=1&uio=d4) or by email:
-
-- Sarang Noether, Ph.D.: [sarang@getscala.org](mailto:sarang@getscala.org) or [sarang.noether@protonmail.com](mailto:sarang.noether@protonmail.com); [research repository](https://github.com/SarangNoether/research-lab)
-- Surae Noether (Brandon Goodell), Ph.D.: [surae@getscala.org](mailto:surae@getscala.org) or [surae.noether@protonmail.com](mailto:surae.noether@protonmail.com); [research repository](https://github.com/b-g-goodell/research-lab)
+Please reach out to us at [hello@scalaproject.io](mailto:hello@scalaproject.io) if you would like to report any vulnerabilities in the Scala codebase.
 
 ## Announcements
 
-- You can subscribe to an [announcement listserv](https://lists.getscala.org) to get critical announcements from the Scala core team. The announcement list can be very helpful for knowing when software updates are needed.
-
-## Translations
-The CLI wallet is available in different languages. If you want to help translate it, see our self-hosted localization platform, Weblate, on [translate.getscala.org]( https://translate.getscala.org/projects/scala/cli-wallet/). Every translation *must* be uploaded on the platform, pull requests directly editing the code in this repository will be closed. If you need help with Weblate, you can find a guide with screenshots [here](https://github.com/scala-ecosystem/scala-translations/blob/master/weblate.md).
-&nbsp;
-
-If you need help/support/info about translations, contact the localization workgroup. You can find the complete list of contacts on the repository of the workgroup: [scala-translations](https://github.com/scala-ecosystem/scala-translations#contacts).
-
-## Coverage
-
-| Type      | Status |
-|-----------|--------|
-| Coverity  | [![Coverity Status](https://scan.coverity.com/projects/9657/badge.svg)](https://scan.coverity.com/projects/9657/)
-| Coveralls | [![Coveralls Status](https://coveralls.io/repos/github/scala-project/scala/badge.svg?branch=master)](https://coveralls.io/github/scala-project/scala?branch=master)
-| License   | [![License](https://img.shields.io/badge/license-BSD3-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+- You can follow our [twitter](https://twitter.com/scalahq) to get all the new information regarding the project.
 
 ## Introduction
 
@@ -86,25 +59,6 @@ As with many development projects, the repository on Github is considered to be 
 
 **Anyone is welcome to contribute to Scala's codebase!** If you have a fix or code change, feel free to submit it as a pull request directly to the "master" branch. In cases where the change is relatively small or does not affect other parts of the codebase it may be merged in immediately by any one of the collaborators. On the other hand, if the change is particularly large or complex, it is expected that it will be discussed at length either well in advance of the pull request being submitted, or even directly on the pull request.
 
-## Supporting the project
-
-Scala is a 100% community-sponsored endeavor. If you want to join our efforts, the easiest thing you can do is support the project financially. Both Scala and Bitcoin donations can be made to **donate.getscala.org** if using a client that supports the [OpenAlias](https://openalias.org) standard. Alternatively you can send XLA to the Scala donation address via the `donate` command (type `help` in the command-line wallet for details).
-
-The Scala donation address is: `44AFFq5kSiGBoZ4NMDwYtN18obc8AemS33DBLWs3H7otXft3XjrpDtQGv7SqSsaBYBb98uNbr2VBBEt7f2wfn3RVGQBEP3A` (viewkey: `f359631075708155cc3d92a32b75a7d02a5dcf27756707b47a2b31b21c389501`)
-
-The Bitcoin donation address is: `1KTexdemPdxSBcG55heUuTjDRYqbC5ZL8H`
-
-Core development funding and/or some supporting services are also graciously provided by sponsors:
-
-[<img width="80" src="https://static.getscala.org/images/sponsors/myscala.png"/>](https://myscala.com)
-[<img width="150" src="https://static.getscala.org/images/sponsors/kitware.png?1"/>](https://kitware.com)
-[<img width="100" src="https://static.getscala.org/images/sponsors/dome9.png"/>](https://dome9.com)
-[<img width="150" src="https://static.getscala.org/images/sponsors/araxis.png"/>](https://araxis.com)
-[<img width="150" src="https://static.getscala.org/images/sponsors/jetbrains.png"/>](https://www.jetbrains.com/)
-[<img width="150" src="https://static.getscala.org/images/sponsors/navicat.png"/>](https://www.navicat.com/)
-[<img width="150" src="https://static.getscala.org/images/sponsors/symas.png"/>](https://www.symas.com/)
-
-There are also several mining pools that kindly donate a portion of their fees, [a list of them can be found on our Bitcointalk post](https://bitcointalk.org/index.php?topic=583449.0).
 
 ## License
 
@@ -116,45 +70,14 @@ If you want to help out, see [CONTRIBUTING](CONTRIBUTING.md) for a set of guidel
 
 ## Scheduled software upgrades
 
-Scala uses a fixed-schedule software upgrade (hard fork) mechanism to implement new features. This means that users of Scala (end users and service providers) should run current versions and upgrade their software on a regular schedule. Software upgrades occur during the months of April and October. The required software for these upgrades will be available prior to the scheduled date. Please check the repository prior to this date for the proper Scala software version. Below is the historical schedule and the projected schedule for the next upgrade.
-Dates are provided in the format YYYY-MM-DD.
-
-
-| Software upgrade block height  | Date       | Fork version      | Minimum Scala version | Recommended Scala version | Details                                                                            |  
-| ------------------------------ | -----------| ----------------- | ---------------------- | -------------------------- | ---------------------------------------------------------------------------------- |
-| 1009827                        | 2016-03-22 | v2                | v0.9.4                 | v0.9.4                     | Allow only >= ringsize 3, blocktime = 120 seconds, fee-free blocksize 60 kb       |
-| 1141317                        | 2016-09-21 | v3                | v0.9.4                 | v0.10.0                    | Splits coinbase into denominations  |
-| 1220516                        | 2017-01-05 | v4                | v0.10.1                | v0.10.2.1                  | Allow normal and RingCT transactions |
-| 1288616                        | 2017-04-15 | v5                | v0.10.3.0              | v0.10.3.1                  | Adjusted minimum blocksize and fee algorithm      |
-| 1400000                        | 2017-09-16 | v6                | v0.11.0.0              | v0.11.0.0                  | Allow only RingCT transactions, allow only >= ringsize 5      |
-| 1546000                        | 2018-04-06 | v7                | v0.12.0.0              | v0.12.3.0                  | Cryptonight variant 1, ringsize >= 7, sorted inputs
-| 1685555                        | 2018-10-18 | v8                | v0.13.0.0              | v0.13.0.4                  | max transaction size at half the penalty free block size, bulletproofs enabled, cryptonight variant 2, fixed ringsize [11](https://youtu.be/KOO5S4vxi0o)
-| 1686275                        | 2018-10-19 | v9                | v0.13.0.0              | v0.13.0.4                  | bulletproofs required
-| 1788000                        | 2019-03-09 | v10               | v0.14.0.0              | v0.14.1.2                  | New PoW based on Cryptonight-R, new block weight algorithm, slightly more efficient RingCT format
-| 1788720                        | 2019-03-10 | v11               | v0.14.0.0              | v0.14.1.2                  | forbid old RingCT transaction format
-| 1978433                        | 2019-11-30* | v12                | v0.15.0.0              | v0.15.0.0                  | New PoW based on RandomX, only allow >= 2 outputs, change to the block median used to calculate penalty, v1 coinbases are forbidden, rct sigs in coinbase forbidden, 10 block lock time for incoming outputs
-| XXXXXXX                        | XXX-XX-XX | XXX                | vX.XX.X.X              | vX.XX.X.X                  | XXX |
-
-X's indicate that these details have not been determined as of commit date.
-
-\* indicates estimate as of commit date
-
-## Release staging schedule and protocol
-
-Approximately three months prior to a scheduled software upgrade, a branch from master will be created with the new release version tag. Pull requests that address bugs should then be made to both master and the new release branch. Pull requests that require extensive review and testing (generally, optimizations and new features) should *not* be made to the release branch.
+Scala uses a fixed-schedule software upgrade (hard fork) mechanism to implement new features. This means that users of Scala (end users and service providers) should run current versions and upgrade their software on a regular schedule. 
 
 ## Compiling Scala from source
 
 ### Dependencies
 
-The following table summarizes the tools and libraries required to build. A
-few of the libraries are also included in this repository (marked as
-"Vendored"). By default, the build uses the library installed on the system,
-and ignores the vendored sources. However, if no library is found installed on
-the system, then the vendored source will be built and used. The vendored
-sources are also used for statically-linked builds because distribution
-packages often include only shared library binaries (`.so`) but not static
-library archives (`.a`).
+The following table summarizes the tools and libraries required to build. A few of the libraries are also included in this repository (marked as
+"Vendored"). By default, the build uses the library installed on the system, and ignores the vendored sources. However, if no library is found installed on the system, then the vendored source will be built and used. The vendored sources are also used for statically-linked builds because distribution packages often include only shared library binaries (`.so`) but not static library archives (`.a`).
 
 | Dep          | Min. version  | Vendored | Debian/Ubuntu pkg    | Arch pkg     | Void pkg           | Fedora pkg          | Optional | Purpose         |
 | ------------ | ------------- | -------- | -------------------- | ------------ | ------------------ | ------------------- | -------- | --------------- |
@@ -201,7 +124,7 @@ FreeBSD one liner for required to build dependencies
 
 Clone recursively to pull-in needed submodule(s):
 
-`$ git clone --recursive https://github.com/scala-project/scala`
+`$ git clone --recursive https://github.com/scala-network/scala`
 
 If you already have a repo cloned, initialize and update:
 
@@ -219,20 +142,11 @@ invokes cmake commands as needed.
 
     ```bash
     cd scala
-    git checkout release-v0.15
     make
     ```
 
-    *Optional*: If your machine has several cores and enough memory, enable
-    parallel build by running `make -j<number of threads>` instead of `make`. For
-    this to be worthwhile, the machine should have one core and about 2GB of RAM
-    available per thread.
+    *Optional*: If your machine has several cores and enough memory, enable parallel build by running `make -j<number of threads>` instead of `make`. For this to be worthwhile, the machine should have one core and about 2GB of RAM available per thread.
 
-    *Note*: The instructions above will compile the most stable release of the
-    Scala software. If you would like to use and test the most recent software,
-    use ```git checkout master```. The master branch may contain updates that are
-    both unstable and incompatible with release software, though testing is always
-    encouraged.
 
 * The resulting executables can be found in `build/release/bin`
 
@@ -290,9 +204,8 @@ Tested on a Raspberry Pi Zero with a clean install of minimal Raspbian Stretch (
 * Clone scala and checkout the most recent release version:
 
     ```bash
-    git clone https://github.com/scala-project/scala.git
+    git clone --recurisive https://github.com/scala-network/scala.git
     cd scala
-    git checkout tags/v0.15.0.0
     ```
 
 * Build:
@@ -398,7 +311,7 @@ application.
 * To git clone, run:
 
     ```bash
-    git clone --recursive https://github.com/scala-project/scala.git
+    git clone --recursive https://github.com/scala-network/scala.git
     ```
 
 **Building**
@@ -537,55 +450,7 @@ Using `depends` might also be easier to compile Scala on Windows than using MSYS
 
 The produced binaries still link libc dynamically. If the binary is compiled on a current distribution, it might not run on an older distribution with an older installation of libc. Passing `-DBACKCOMPAT=ON` to cmake will make sure that the binary will run on systems having at least libc version 2.17.
 
-## Installing Scala from a package
 
-**DISCLAIMER: These packages are not part of this repository or maintained by this project's contributors, and as such, do not go through the same review process to ensure their trustworthiness and security.**
-
-Packages are available for
-
-* Debian Bullseye and Sid
-
-    ```bash
-    sudo apt install scala
-    ```
-More info and versions in the [Debian package tracker](https://tracker.debian.org/pkg/scala).
-
-* Arch Linux (via [AUR](https://aur.archlinux.org/)):
-  - Stable release: [`scala`](https://aur.archlinux.org/packages/scala)
-  - Bleeding edge: [`scala-git`](https://aur.archlinux.org/packages/scala-git)
-
-* Void Linux:
-
-    ```bash
-    xbps-install -S scala
-    ```
-
-* GuixSD
-
-    ```bash
-    guix package -i scala
-    ```
-
-* Docker
-
-    ```bash
-    # Build using all available cores
-    docker build -t scala .
-    
-    # or build using a specific number of cores (reduce RAM requirement)
-    docker build --build-arg NPROC=1 -t scala .
-    
-    # either run in foreground
-    docker run -it -v /scala/chain:/root/.bitscala -v /scala/wallet:/wallet -p 18080:18080 scala
-    
-    # or in background
-    docker run -it -d -v /scala/chain:/root/.bitscala -v /scala/wallet:/wallet -p 18080:18080 scala
-    ```
-
-* The build needs 3 GB space.
-* Wait one  hour or more
-
-Packaging for your favorite distribution would be a welcome contribution!
 
 ## Running scalad
 
