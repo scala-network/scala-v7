@@ -226,7 +226,6 @@ namespace cryptonote
       if(ipfs_checkpoint == true){
         std::string hash_string = "hash";
         if (response_ipfs_gateway.find(hash_string) != std::string::npos){
-
         std::stringstream string_stream(response_ipfs_gateway);
         ptree stree;
         read_json(string_stream, stree);
@@ -236,8 +235,10 @@ namespace cryptonote
         BOOST_FOREACH(const boost::property_tree::ptree::value_type &v, stree) {
           height = v.second.get<int>("height");
           hash = v.second.get<std::string>("hash");
-
+	  int isTh = height % 1000;
+	  if(isTh == 0){
           MGINFO("Height " << height << " hash " << hash << " from IPFS.");
+	  }
           ADD_CHECKPOINT(height, hash);
         }
         return true;
