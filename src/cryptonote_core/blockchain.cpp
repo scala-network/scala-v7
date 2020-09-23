@@ -1735,7 +1735,7 @@ bool Blockchain::handle_alternative_block(const block& b, const crypto::hash& id
     if (b.major_version >= RX_BLOCK_VERSION)
     {
       crypto::hash seedhash = null_hash;
-      uint64_t seedheight = dx_seedheight(bei.height);
+      uint64_t seedheight = rx_seedheight(bei.height);
       // seedblock is on the alt chain somewhere
       if (alt_chain.size() && alt_chain.front().height <= seedheight)
       {
