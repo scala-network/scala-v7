@@ -10,10 +10,6 @@
 	path = external/rapidjson
 	url = https://github.com/Tencent/rapidjson
 	branch = master
-[submodule "external/panthera"]
-	path = external/panthera
-	url = https://github.com/scala-network/DefyX
-	branch = Panthera_DP
 [submodule "external/trezor-common"]
 	path = external/trezor-common
 	url = https://github.com/trezor/trezor-common
