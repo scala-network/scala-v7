@@ -14,3 +14,6 @@
 	path = external/trezor-common
 	url = https://github.com/trezor/trezor-common
 	branch = master
+[submodule "external/randomx"]
+	path = external/randomx
+	url = https://github.com/scala-network/Panthera
