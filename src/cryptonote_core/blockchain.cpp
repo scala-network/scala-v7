@@ -1735,7 +1735,7 @@ bool Blockchain::handle_alternative_block(const block& b, const crypto::hash& id
     if (b.major_version >= RX_BLOCK_VERSION)
     {
       crypto::hash seedhash = null_hash;
-      uint64_t seedheight = dx_seedheight(bei.height);
+      uint64_t seedheight = rx_seedheight(bei.height);
       // seedblock is on the alt chain somewhere
       if (alt_chain.size() && alt_chain.front().height <= seedheight)
       {
@@ -5005,7 +5005,7 @@ void Blockchain::cancel()
 }
 
 #if defined(PER_BLOCK_CHECKPOINT)
-static const char expected_block_hashes_hash[] = "fce1dc7c17f7679f5f447df206b8f5fe2ef6b1a2845e59f650850a0ef00d265f";
+static const char expected_block_hashes_hash[] = "aa8ae6300497fcd9026b83091e68ee3e894d8637510f55db78a871b5f88a2d95";
 void Blockchain::load_compiled_in_block_hashes(const GetCheckpointsCallback& get_checkpoints)
 {
   if (get_checkpoints == nullptr || !m_fast_sync)

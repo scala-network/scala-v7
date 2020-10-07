@@ -803,7 +803,7 @@ std::list<std::string> listOfAddresses = {
   void get_altblock_longhash(const block& b, crypto::hash& res, const uint64_t main_height, const uint64_t height, const uint64_t seed_height, const crypto::hash& seed_hash)
   {
     blobdata bd = get_block_hashing_blob(b);
-    dx_slow_hash(main_height, seed_height, seed_hash.data, bd.data(), bd.size(), res.data, 0, 1);
+    rx_slow_hash(main_height, seed_height, seed_hash.data, bd.data(), bd.size(), res.data, 0, 1);
   }
 
   bool get_block_longhash(const Blockchain *pbc, const block& b, crypto::hash& res, const uint64_t height, const int miners)
@@ -815,7 +815,7 @@ std::list<std::string> listOfAddresses = {
       crypto::hash hash;
       if (pbc != NULL)
       {
-        seed_height = dx_seedheight(height);
+        seed_height = rx_seedheight(height);
         hash = pbc->get_pending_block_id_by_height(seed_height);
         main_height = pbc->get_current_blockchain_height();
       } else
@@ -824,7 +824,7 @@ std::list<std::string> listOfAddresses = {
         seed_height = 0;
         main_height = 0;
       }
-      dx_slow_hash(main_height, seed_height, hash.data, bd.data(), bd.size(), res.data, miners, 0);
+      rx_slow_hash(main_height, seed_height, hash.data, bd.data(), bd.size(), res.data, miners, 0);
     } else {
       const int pow_variant = b.major_version >= 7 ? b.major_version - 6 : 0;
       crypto::cn_slow_hash(bd.data(), bd.size(), res, pow_variant, height);
@@ -841,6 +841,6 @@ std::list<std::string> listOfAddresses = {
 
   void get_block_longhash_reorg(const uint64_t split_height)
   {
-    dx_reorg(split_height);
+    rx_reorg(split_height);
   }
 }

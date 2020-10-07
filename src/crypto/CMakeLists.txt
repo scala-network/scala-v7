@@ -47,7 +47,7 @@ set(crypto_sources
   random.c
   skein.c
   slow-hash.c
-  dx-slow-hash.c
+  rx-slow-hash.c
   CryptonightR_JIT.c
   tree-hash.c)
 
@@ -90,7 +90,7 @@ scala_add_library(cncrypto
 target_link_libraries(cncrypto
   PUBLIC
     epee
-    defyx
+    randomx
     ${Boost_SYSTEM_LIBRARY}
     ${SODIUM_LIBRARY}
   PRIVATE
