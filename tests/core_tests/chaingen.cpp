@@ -231,7 +231,8 @@ void test_generator::add_block(const cryptonote::block& blk, size_t txs_weight, 
 {
   const size_t block_weight = txs_weight + get_transaction_weight(blk.miner_tx);
   uint64_t block_reward;
-  get_block_reward(misc_utils::median(block_weights), block_weight, already_generated_coins, block_reward, hf_version);
+  uint64_t height = get_block_height(blk);
+  get_block_reward(misc_utils::median(block_weights), block_weight, already_generated_coins, block_reward, hf_version, height);
   m_blocks_info[get_block_hash(blk)] = block_info(blk.prev_id, already_generated_coins + block_reward, block_weight);
 }
 
@@ -986,7 +987,7 @@ bool construct_miner_tx_manually(size_t height, uint64_t already_generated_coins
 
   // This will work, until size of constructed block is less then CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE
   uint64_t block_reward;
-  if (!get_block_reward(0, 0, already_generated_coins, block_reward, 1))
+  if (!get_block_reward(0, 0, already_generated_coins, block_reward, 1, 1))
   {
     LOG_PRINT_L0("Block is too big");
     return false;

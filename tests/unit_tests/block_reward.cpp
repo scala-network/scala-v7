@@ -48,7 +48,7 @@ namespace
   };
 
   #define TEST_ALREADY_GENERATED_COINS(already_generated_coins, expected_reward)                              \
-    m_block_not_too_big = get_block_reward(0, current_block_weight, already_generated_coins, m_block_reward,1); \
+    m_block_not_too_big = get_block_reward(0, current_block_weight, already_generated_coins, m_block_reward,1,1); \
     ASSERT_TRUE(m_block_not_too_big);                                                                         \
     ASSERT_EQ(m_block_reward, expected_reward);
 
@@ -80,14 +80,14 @@ namespace
   protected:
     virtual void SetUp()
     {
-      m_block_not_too_big = get_block_reward(0, 0, already_generated_coins, m_standard_block_reward, 1);
+      m_block_not_too_big = get_block_reward(0, 0, already_generated_coins, m_standard_block_reward, 1, 1);
       ASSERT_TRUE(m_block_not_too_big);
       ASSERT_LT(CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1, m_standard_block_reward);
     }
 
     void do_test(size_t median_block_weight, size_t current_block_weight)
     {
-      m_block_not_too_big = get_block_reward(median_block_weight, current_block_weight, already_generated_coins, m_block_reward, 1);
+      m_block_not_too_big = get_block_reward(median_block_weight, current_block_weight, already_generated_coins, m_block_reward, 1, 1);
     }
 
     static const uint64_t already_generated_coins = 0;
@@ -171,14 +171,14 @@ namespace
 
       m_last_block_weights_median = 7 * CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1;
 
-      m_block_not_too_big = get_block_reward(epee::misc_utils::median(m_last_block_weights), 0, already_generated_coins, m_standard_block_reward, 1);
+      m_block_not_too_big = get_block_reward(epee::misc_utils::median(m_last_block_weights), 0, already_generated_coins, m_standard_block_reward, 1, 1);
       ASSERT_TRUE(m_block_not_too_big);
       ASSERT_LT(CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1, m_standard_block_reward);
     }
 
     void do_test(size_t current_block_weight)
     {
-      m_block_not_too_big = get_block_reward(epee::misc_utils::median(m_last_block_weights), current_block_weight, already_generated_coins, m_block_reward, 1);
+      m_block_not_too_big = get_block_reward(epee::misc_utils::median(m_last_block_weights), current_block_weight, already_generated_coins, m_block_reward, 1, 1);
     }
 
     static const uint64_t already_generated_coins = 0;
