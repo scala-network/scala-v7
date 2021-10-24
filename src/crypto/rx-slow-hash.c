@@ -338,7 +338,7 @@ void rx_slow_hash(const uint64_t mainheight, const uint64_t seedheight, const ch
   /* mainchain users can run in parallel */
   if (!is_alt)
     CTHR_MUTEX_UNLOCK(rx_sp->rs_mutex);
-  randomx_calculate_hash(rx_vm, data, length, hash);
+    randomx_calculate_hash(rx_vm, data, length, hash, false);
   /* altchain slot users always get fully serialized */
   if (is_alt)
     CTHR_MUTEX_UNLOCK(rx_sp->rs_mutex);

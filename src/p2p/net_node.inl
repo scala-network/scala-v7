@@ -61,9 +61,9 @@
 #include "cryptonote_core/cryptonote_core.h"
 #include "net/parse.h"
 
-#include <miniupnp/miniupnpc/miniupnpc.h>
-#include <miniupnp/miniupnpc/upnpcommands.h>
-#include <miniupnp/miniupnpc/upnperrors.h>
+#include <miniupnp/miniupnpc/include/miniupnpc.h>
+#include <miniupnp/miniupnpc/include/upnpcommands.h>
+#include <miniupnp/miniupnpc/include/upnperrors.h>
 
 #undef SCALA_DEFAULT_LOG_CATEGORY
 #define SCALA_DEFAULT_LOG_CATEGORY "net.p2p"
