@@ -1,5 +1,5 @@
-# Copyright (c) 2014-2019, The Monero Project
-# Copyright (c) 2018-2020, The Scala Network
+# Copyright (c) 2014-2021, The Monero Project
+# Copyright (c) 2018-2021, The Scala Network
 #
 # All rights reserved.
 #
@@ -72,10 +72,13 @@ target_link_libraries(wallet_api
     mnemonics
     ${LMDB_LIBRARY}
     ${Boost_CHRONO_LIBRARY}
+    ${Boost_LOCALE_LIBRARY}
+    ${ICU_LIBRARIES}
     ${Boost_SERIALIZATION_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
+    ${CMAKE_THREAD_LIBS_INIT}
     ${Boost_REGEX_LIBRARY}
   PRIVATE
     ${EXTRA_LIBRARIES})

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2019, The Monero Project
+// Copyright (c) 2017-2020, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -826,7 +826,7 @@ bool bulletproof_VERIFY(const std::vector<const Bulletproof*> &proofs)
   proof_data.reserve(proofs.size());
   size_t inv_offset = 0;
   std::vector<rct::key> to_invert;
-  to_invert.reserve(11 * sizeof(proofs));
+  to_invert.reserve(11 * proofs.size());
   size_t max_logM = 0;
   for (const Bulletproof *p: proofs)
   {

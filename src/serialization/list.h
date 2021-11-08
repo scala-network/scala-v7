@@ -1,5 +1,5 @@
-//Copyright (c) 2014-2019, The Monero Project
-//Copyright (c) 2018-2020, The Scala Network
+// Copyright (c) 2014-2021, The Monero Project
+// Copyright (c) 2018-2021, The Scala Network
 // 
 // All rights reserved.
 // 
@@ -45,7 +45,7 @@ namespace serialization
     template <typename T>
     void do_add(std::list<T> &c, T &&e)
     {
-      c.emplace_back(std::move(e));
+      c.emplace_back(std::forward<T>(e));
     }
   }
 }

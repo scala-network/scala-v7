@@ -1,5 +1,5 @@
-//Copyright (c) 2014-2019, The Monero Project
-//Copyright (c) 2018-2020, The Scala Network
+// Copyright (c) 2014-2021, The Monero Project
+// Copyright (c) 2018-2021, The Scala Network
 // 
 // All rights reserved.
 // 
@@ -183,9 +183,11 @@ struct TransactionInfo
     virtual int  direction() const = 0;
     virtual bool isPending() const = 0;
     virtual bool isFailed() const = 0;
+    virtual bool isCoinbase() const = 0;
     virtual uint64_t amount() const = 0;
     virtual uint64_t fee() const = 0;
     virtual uint64_t blockHeight() const = 0;
+    virtual std::string description() const = 0;
     virtual std::set<uint32_t> subaddrIndex() const = 0;
     virtual uint32_t subaddrAccount() const = 0;
     virtual std::string label() const = 0;
@@ -209,6 +211,7 @@ struct TransactionHistory
     virtual TransactionInfo * transaction(const std::string &id) const = 0;
     virtual std::vector<TransactionInfo*> getAll() const = 0;
     virtual void refresh() = 0;
+    virtual void setTxNote(const std::string &txid, const std::string &note) = 0;
 };
 
 /**
@@ -251,6 +254,7 @@ struct AddressBook
     virtual std::vector<AddressBookRow*> getAll() const = 0;
     virtual bool addRow(const std::string &dst_addr , const std::string &payment_id, const std::string &description) = 0;  
     virtual bool deleteRow(std::size_t rowId) = 0;
+    virtual bool setDescription(std::size_t index, const std::string &description) = 0;
     virtual void refresh() = 0;  
     virtual std::string errorString() const = 0;
     virtual int errorCode() const = 0;
@@ -443,7 +447,7 @@ struct Wallet
     };
 
     virtual ~Wallet() = 0;
-    virtual std::string seed() const = 0;
+    virtual std::string seed(const std::string& seed_offset = "") const = 0;
     virtual std::string getSeedLanguage() const = 0;
     virtual void setSeedLanguage(const std::string &arg) = 0;
     //! returns wallet status (Status_Ok | Status_Error)
@@ -453,6 +457,7 @@ struct Wallet
     //! returns both error and error string atomically. suggested to use in instead of status() and errorString()
     virtual void statusWithErrorString(int& status, std::string& errorString) const = 0;
     virtual bool setPassword(const std::string &password) = 0;
+    virtual const std::string& getPassword() const = 0;
     virtual bool setDevicePin(const std::string &pin) { (void)pin; return false; };
     virtual bool setDevicePassphrase(const std::string &passphrase) { (void)passphrase; return false; };
     virtual std::string address(uint32_t accountIndex = 0, uint32_t addressIndex = 0) const = 0;
@@ -508,6 +513,11 @@ struct Wallet
     virtual std::string publicMultisigSignerKey() const = 0;
 
     /*!
+     * \brief stop - interrupts wallet refresh() loop once (doesn't stop background refresh thread)
+     */
+    virtual void stop() = 0;
+
+    /*!
      * \brief store - stores wallet to file.
      * \param path - main filename to store wallet to. additionally stores address file and keys file.
      *               to store to the same file - just pass empty string;
@@ -534,9 +544,10 @@ struct Wallet
      * \param daemon_username
      * \param daemon_password
      * \param lightWallet - start wallet in light mode, connect to a openscala compatible server.
+     * \param proxy_address - set proxy address, empty string to disable
      * \return  - true on success
      */
-    virtual bool init(const std::string &daemon_address, uint64_t upper_transaction_size_limit = 0, const std::string &daemon_username = "", const std::string &daemon_password = "", bool use_ssl = false, bool lightWallet = false) = 0;
+    virtual bool init(const std::string &daemon_address, uint64_t upper_transaction_size_limit = 0, const std::string &daemon_username = "", const std::string &daemon_password = "", bool use_ssl = false, bool lightWallet = false, const std::string &proxy_address = "") = 0;
 
    /*!
     * \brief createWatchOnly - Creates a watch only wallet
@@ -595,6 +606,7 @@ struct Wallet
     virtual ConnectionStatus connected() const = 0;
     virtual void setTrustedDaemon(bool arg) = 0;
     virtual bool trustedDaemon() const = 0;
+    virtual bool setProxy(const std::string &address) = 0;
     virtual uint64_t balance(uint32_t accountIndex = 0) const = 0;
     uint64_t balanceAll() const {
         uint64_t result = 0;
@@ -615,6 +627,12 @@ struct Wallet
     * @return - true if watch only
     */
     virtual bool watchOnly() const = 0;
+
+    /**
+     * @brief isDeterministic - checks if wallet keys are deterministic
+     * @return - true if deterministic
+     */
+    virtual bool isDeterministic() const = 0;
 
     /**
      * @brief blockChainHeight - returns current blockchain height
@@ -891,9 +909,10 @@ struct Wallet
    /*!
     * \brief exportKeyImages - exports key images to file
     * \param filename
+    * \param all - export all key images or only those that have not yet been exported
     * \return                  - true on success
     */
-    virtual bool exportKeyImages(const std::string &filename) = 0;
+    virtual bool exportKeyImages(const std::string &filename, bool all = false) = 0;
    
    /*!
     * \brief importKeyImages - imports key images from file
@@ -902,6 +921,19 @@ struct Wallet
     */
     virtual bool importKeyImages(const std::string &filename) = 0;
 
+    /*!
+     * \brief importOutputs - exports outputs to file
+     * \param filename
+     * \return                  - true on success
+     */
+    virtual bool exportOutputs(const std::string &filename, bool all = false) = 0;
+
+    /*!
+     * \brief importOutputs - imports outputs from file
+     * \param filename
+     * \return                  - true on success
+     */
+    virtual bool importOutputs(const std::string &filename) = 0;
 
     virtual TransactionHistory * history() = 0;
     virtual AddressBook * addressBook() = 0;
@@ -963,7 +995,7 @@ struct Wallet
      * \param message - the message to sign (arbitrary byte data)
      * \return the signature
      */
-    virtual std::string signMessage(const std::string &message) = 0;
+    virtual std::string signMessage(const std::string &message, const std::string &address = "") = 0;
     /*!
      * \brief verifySignedMessage - verify a signature matches a given message
      * \param message - the message (arbitrary byte data)
@@ -989,6 +1021,7 @@ struct Wallet
     virtual bool verifyMessageWithPublicKey(const std::string &message, const std::string &publicKey, const std::string &signature) const = 0;
 
     virtual bool parse_uri(const std::string &uri, std::string &address, std::string &payment_id, uint64_t &amount, std::string &tx_description, std::string &recipient_name, std::vector<std::string> &unknown_parameters, std::string &error) = 0;
+    virtual std::string make_uri(const std::string &address, const std::string &payment_id, uint64_t amount, const std::string &tx_description, const std::string &recipient_name, std::string &error) const = 0;
 
     virtual std::string getDefaultDataDir() const = 0;
    
@@ -997,6 +1030,13 @@ struct Wallet
     * \return true on success
     */
     virtual bool rescanSpent() = 0;
+
+   /*
+    * \brief setOffline - toggle set offline on/off
+    * \param offline - true/false
+    */
+    virtual void setOffline(bool offline) = 0;
+    virtual bool isOffline() const = 0;
     
     //! blackballs a set of outputs
     virtual bool blackballOutputs(const std::vector<std::string> &outputs, bool add) = 0;
@@ -1048,6 +1088,15 @@ struct Wallet
 
     //! shows address on device display
     virtual void deviceShowAddress(uint32_t accountIndex, uint32_t addressIndex, const std::string &paymentId) = 0;
+
+    //! attempt to reconnect to hardware device
+    virtual bool reconnectDevice() = 0;
+
+    //! get bytes received
+    virtual uint64_t getBytesReceived() = 0;
+
+    //! get bytes sent
+    virtual uint64_t getBytesSent() = 0;
 };
 
 /**
@@ -1299,6 +1348,9 @@ struct WalletManager
         std::string subdir,
         const char *buildtag = nullptr,
         const char *current_version = nullptr);
+
+    //! sets proxy address, empty string to disable
+    virtual bool setProxy(const std::string &address) = 0;
 };
 
 

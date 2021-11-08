@@ -1,5 +1,5 @@
-//Copyright (c) 2014-2019, The Monero Project
-//Copyright (c) 2018-2020, The Scala Network
+// Copyright (c) 2014-2021, The Monero Project
+// Copyright (c) 2018-2021, The Scala Network
 // 
 // All rights reserved.
 // 
@@ -132,6 +132,7 @@ namespace cryptonote
     bool set_confirm_missing_payment_id(const std::vector<std::string> &args = std::vector<std::string>());
     bool set_ask_password(const std::vector<std::string> &args = std::vector<std::string>());
     bool set_unit(const std::vector<std::string> &args = std::vector<std::string>());
+    bool set_max_reorg_depth(const std::vector<std::string> &args = std::vector<std::string>());
     bool set_min_output_count(const std::vector<std::string> &args = std::vector<std::string>());
     bool set_min_output_value(const std::vector<std::string> &args = std::vector<std::string>());
     bool set_merge_destinations(const std::vector<std::string> &args = std::vector<std::string>());
@@ -152,11 +153,13 @@ namespace cryptonote
     bool set_setup_background_mining(const std::vector<std::string> &args = std::vector<std::string>());
     bool set_device_name(const std::vector<std::string> &args = std::vector<std::string>());
     bool set_export_format(const std::vector<std::string> &args = std::vector<std::string>());
+    bool set_load_deprecated_formats(const std::vector<std::string> &args = std::vector<std::string>());
     bool set_persistent_rpc_client_id(const std::vector<std::string> &args = std::vector<std::string>());
     bool set_auto_mine_for_rpc_payment_threshold(const std::vector<std::string> &args = std::vector<std::string>());
     bool set_credits_target(const std::vector<std::string> &args = std::vector<std::string>());
-    bool help_advanced(const std::vector<std::string> &args = std::vector<std::string>());
     bool help(const std::vector<std::string> &args = std::vector<std::string>());
+    bool apropos(const std::vector<std::string> &args);
+    bool scan_tx(const std::vector<std::string> &args);
     bool start_mining(const std::vector<std::string> &args);
     bool stop_mining(const std::vector<std::string> &args);
     bool set_daemon(const std::vector<std::string> &args);
@@ -259,6 +262,7 @@ namespace cryptonote
     bool rpc_payment_info(const std::vector<std::string> &args);
     bool start_mining_for_rpc(const std::vector<std::string> &args);
     bool stop_mining_for_rpc(const std::vector<std::string> &args);
+    bool show_qr_code(const std::vector<std::string> &args);
     bool net_stats(const std::vector<std::string>& args);
     bool public_nodes(const std::vector<std::string>& args);
     bool welcome(const std::vector<std::string>& args);
@@ -343,7 +347,7 @@ namespace cryptonote
 
     //----------------- i_wallet2_callback ---------------------
     virtual void on_new_block(uint64_t height, const cryptonote::block& block);
-    virtual void on_money_received(uint64_t height, const crypto::hash &txid, const cryptonote::transaction& tx, uint64_t amount, const cryptonote::subaddress_index& subaddr_index, uint64_t unlock_time);
+    virtual void on_money_received(uint64_t height, const crypto::hash &txid, const cryptonote::transaction& tx, uint64_t amount, const cryptonote::subaddress_index& subaddr_index, bool is_change, uint64_t unlock_time);
     virtual void on_unconfirmed_money_received(uint64_t height, const crypto::hash &txid, const cryptonote::transaction& tx, uint64_t amount, const cryptonote::subaddress_index& subaddr_index);
     virtual void on_money_spent(uint64_t height, const crypto::hash &txid, const cryptonote::transaction& in_tx, uint64_t amount, const cryptonote::transaction& spend_tx, const cryptonote::subaddress_index& subaddr_index);
     virtual void on_skip_transaction(uint64_t height, const crypto::hash &txid, const cryptonote::transaction& tx);
@@ -369,7 +373,7 @@ namespace cryptonote
       void update(uint64_t height, bool force = false)
       {
         auto current_time = std::chrono::system_clock::now();
-        const auto node_update_threshold = std::chrono::seconds(DIFFICULTY_TARGET / 2); // use min of V1/V2
+        const auto node_update_threshold = std::chrono::seconds(DIFFICULTY_TARGET_V1 / 2); // use min of V1/V2
         if (node_update_threshold < current_time - m_blockchain_height_update_time || m_blockchain_height <= height)
         {
           update_blockchain_height();
@@ -461,6 +465,7 @@ namespace cryptonote
     std::atomic<bool> m_need_payment;
     boost::posix_time::ptime m_last_rpc_payment_mining_time;
     bool m_rpc_payment_mining_requested;
+    uint32_t m_rpc_payment_threads = 0;
     bool m_daemon_rpc_payment_message_displayed;
     float m_rpc_payment_hash_rate;
     std::atomic<bool> m_suspend_rpc_payment_mining;
@@ -479,6 +484,7 @@ namespace cryptonote
     void ask_send_all_ready_messages();
     void check_for_messages();
     bool user_confirms(const std::string &question);
+    bool user_confirms_auto_config();
     bool get_message_from_arg(const std::string &arg, mms::message &m);
     bool get_number_from_arg(const std::string &arg, uint32_t &number, const uint32_t lower_bound, const uint32_t upper_bound); 
 
@@ -499,6 +505,7 @@ namespace cryptonote
     void mms_help(const std::vector<std::string> &args);
     void mms_send_signer_config(const std::vector<std::string> &args);
     void mms_start_auto_config(const std::vector<std::string> &args);
+    void mms_config_checksum(const std::vector<std::string> &args);
     void mms_stop_auto_config(const std::vector<std::string> &args);
     void mms_auto_config(const std::vector<std::string> &args);
   };

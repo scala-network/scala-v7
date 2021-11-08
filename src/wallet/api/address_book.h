@@ -1,5 +1,5 @@
-//Copyright (c) 2014-2019, The Monero Project
-//Copyright (c) 2018-2020, The Scala Network
+// Copyright (c) 2014-2021, The Monero Project
+// Copyright (c) 2018-2021, The Scala Network
 //
 // All rights reserved.
 //
@@ -46,6 +46,7 @@ public:
     void refresh() override;
     std::vector<AddressBookRow*> getAll() const override;
     bool addRow(const std::string &dst_addr , const std::string &payment_id, const std::string &description) override;
+    bool setDescription(std::size_t index, const std::string &description) override;
     bool deleteRow(std::size_t rowId) override;
      
     // Error codes. See AddressBook:ErrorCode enum in wallet2_api.h
@@ -66,6 +67,3 @@ private:
 };
 
 }
-
-namespace Bitscala = Scala;
-

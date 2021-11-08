@@ -1,5 +1,5 @@
-//Copyright (c) 2014-2019, The Monero Project
-//Copyright (c) 2018-2020, The Scala Network
+// Copyright (c) 2014-2021, The Monero Project
+// Copyright (c) 2018-2021, The Scala Network
 //
 // All rights reserved.
 //
@@ -46,6 +46,7 @@ public:
     virtual TransactionInfo * transaction(const std::string &id) const;
     virtual std::vector<TransactionInfo*> getAll() const;
     virtual void refresh();
+    virtual void setTxNote(const std::string &txid, const std::string &note);
 
 private:
 
@@ -56,6 +57,3 @@ private:
 };
 
 }
-
-namespace Bitscala = Scala;
-

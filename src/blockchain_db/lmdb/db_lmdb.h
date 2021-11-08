@@ -155,6 +155,7 @@ struct mdb_txn_safe
   static void prevent_new_txns();
   static void wait_no_active_txns();
   static void allow_new_txns();
+  static void increment_txns(int);
 
   mdb_threadinfo* m_tinfo;
   MDB_txn* m_txn;
@@ -230,6 +231,8 @@ public:
 
   virtual difficulty_type get_block_difficulty(const uint64_t& height) const;
 
+  virtual void correct_block_cumulative_difficulties(const uint64_t& start_height, const std::vector<difficulty_type>& new_cumulative_difficulties);
+
   virtual uint64_t get_block_already_generated_coins(const uint64_t& height) const;
 
   virtual uint64_t get_block_long_term_weight(const uint64_t& height) const;
@@ -256,7 +259,7 @@ public:
   virtual bool get_tx_blob(const crypto::hash& h, cryptonote::blobdata &tx) const;
   virtual bool get_pruned_tx_blob(const crypto::hash& h, cryptonote::blobdata &tx) const;
   virtual bool get_pruned_tx_blobs_from(const crypto::hash& h, size_t count, std::vector<cryptonote::blobdata> &bd) const;
-  virtual bool get_blocks_from(uint64_t start_height, size_t min_count, size_t max_count, size_t max_size, std::vector<std::pair<std::pair<cryptonote::blobdata, crypto::hash>, std::vector<std::pair<crypto::hash, cryptonote::blobdata>>>>& blocks, bool pruned, bool skip_coinbase, bool get_miner_tx_hash) const;
+  virtual bool get_blocks_from(uint64_t start_height, size_t min_block_count, size_t max_block_count, size_t max_tx_count, size_t max_size, std::vector<std::pair<std::pair<cryptonote::blobdata, crypto::hash>, std::vector<std::pair<crypto::hash, cryptonote::blobdata>>>>& blocks, bool pruned, bool skip_coinbase, bool get_miner_tx_hash) const;
   virtual bool get_prunable_tx_blob(const crypto::hash& h, cryptonote::blobdata &tx) const;
   virtual bool get_prunable_tx_hash(const crypto::hash& tx_hash, crypto::hash &prunable_hash) const;
 
@@ -282,7 +285,7 @@ public:
 
   virtual bool has_key_image(const crypto::key_image& img) const;
 
-  virtual void add_txpool_tx(const crypto::hash &txid, const cryptonote::blobdata &blob, const txpool_tx_meta_t& meta);
+  virtual void add_txpool_tx(const crypto::hash &txid, const cryptonote::blobdata_ref &blob, const txpool_tx_meta_t& meta);
   virtual void update_txpool_tx(const crypto::hash &txid, const txpool_tx_meta_t& meta);
   virtual uint64_t get_txpool_tx_count(relay_category category = relay_category::broadcasted) const;
   virtual bool txpool_has_tx(const crypto::hash &txid, relay_category tx_category) const;
@@ -295,20 +298,20 @@ public:
   virtual bool update_pruning();
   virtual bool check_pruning();
 
-  virtual void add_alt_block(const crypto::hash &blkid, const cryptonote::alt_block_data_t &data, const cryptonote::blobdata &blob);
+  virtual void add_alt_block(const crypto::hash &blkid, const cryptonote::alt_block_data_t &data, const cryptonote::blobdata_ref &blob);
   virtual bool get_alt_block(const crypto::hash &blkid, alt_block_data_t *data, cryptonote::blobdata *blob);
   virtual void remove_alt_block(const crypto::hash &blkid);
   virtual uint64_t get_alt_block_count();
   virtual void drop_alt_blocks();
 
-  virtual bool for_all_txpool_txes(std::function<bool(const crypto::hash&, const txpool_tx_meta_t&, const cryptonote::blobdata*)> f, bool include_blob = false, relay_category category = relay_category::broadcasted) const;
+  virtual bool for_all_txpool_txes(std::function<bool(const crypto::hash&, const txpool_tx_meta_t&, const cryptonote::blobdata_ref*)> f, bool include_blob = false, relay_category category = relay_category::broadcasted) const;
 
   virtual bool for_all_key_images(std::function<bool(const crypto::key_image&)>) const;
   virtual bool for_blocks_range(const uint64_t& h1, const uint64_t& h2, std::function<bool(uint64_t, const crypto::hash&, const cryptonote::block&)>) const;
   virtual bool for_all_transactions(std::function<bool(const crypto::hash&, const cryptonote::transaction&)>, bool pruned) const;
   virtual bool for_all_outputs(std::function<bool(uint64_t amount, const crypto::hash &tx_hash, uint64_t height, size_t tx_idx)> f) const;
   virtual bool for_all_outputs(uint64_t amount, const std::function<bool(uint64_t height)> &f) const;
-  virtual bool for_all_alt_blocks(std::function<bool(const crypto::hash &blkid, const alt_block_data_t &data, const cryptonote::blobdata *blob)> f, bool include_blob = false) const;
+  virtual bool for_all_alt_blocks(std::function<bool(const crypto::hash &blkid, const alt_block_data_t &data, const cryptonote::blobdata_ref *blob)> f, bool include_blob = false) const;
 
   virtual uint64_t add_block( const std::pair<block, blobdata>& blk
                             , size_t block_weight
@@ -357,6 +360,7 @@ public:
   static int compare_string(const MDB_val *a, const MDB_val *b);
 
 private:
+  void check_mmap_support();
   void do_resize(uint64_t size_increase=0);
 
   bool need_resize(uint64_t threshold_size=0) const;
@@ -374,7 +378,7 @@ private:
 
   virtual void remove_block();
 
-  virtual uint64_t add_transaction_data(const crypto::hash& blk_hash, const std::pair<transaction, blobdata>& tx, const crypto::hash& tx_hash, const crypto::hash& tx_prunable_hash);
+  virtual uint64_t add_transaction_data(const crypto::hash& blk_hash, const std::pair<transaction, blobdata_ref>& tx, const crypto::hash& tx_hash, const crypto::hash& tx_prunable_hash);
 
   virtual void remove_transaction_data(const crypto::hash& tx_hash, const transaction& tx);
 
@@ -419,6 +423,9 @@ private:
 
   uint64_t get_max_block_size();
   void add_max_block_size(uint64_t sz);
+
+  // fix up anything that may be wrong due to past bugs
+  virtual void fixup();
 
   // migrate from older DB version to current
   void migrate(const uint32_t oldversion);

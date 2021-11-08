@@ -1,5 +1,5 @@
-# Copyright (c) 2014-2019, The Monero Project
-# Copyright (c) 2018-2020, The Scala Network
+#Copyright (c) 2014-2021, The Monero Project
+# Copyright (c) 2018-2021, The Scala Network
 #
 # All rights reserved.
 #
@@ -50,6 +50,7 @@ target_link_libraries(simplewallet
     common
     mnemonics
     ${EPEE_READLINE}
+    qrcodegen
     version
     ${Boost_CHRONO_LIBRARY}
     ${Boost_PROGRAM_OPTIONS_LIBRARY}

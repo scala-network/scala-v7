@@ -1,5 +1,5 @@
-//Copyright (c) 2014-2019, The Monero Project
-//Copyright (c) 2018-2020, The Scala Network
+// Copyright (c) 2014-2021, The Monero Project
+// Copyright (c) 2018-2021, The Scala Network
 // 
 // All rights reserved.
 // 
@@ -31,6 +31,7 @@
 
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/uuid/nil_generator.hpp>
+#include <boost/filesystem.hpp>
 #include "include_base_utils.h"
 #include "string_tools.h"
 using namespace epee;
@@ -45,6 +46,7 @@ using namespace epee;
 #include "cryptonote_basic/cryptonote_format_utils.h"
 #include "cryptonote_basic/account.h"
 #include "cryptonote_basic/cryptonote_basic_impl.h"
+#include "cryptonote_basic/merge_mining.h"
 #include "cryptonote_core/tx_sanity_check.h"
 #include "misc_language.h"
 #include "net/parse.h"
@@ -68,6 +70,11 @@ using namespace epee;
 
 #define DEFAULT_PAYMENT_DIFFICULTY 1000
 #define DEFAULT_PAYMENT_CREDITS_PER_HASH 100
+
+#define RESTRICTED_BLOCK_HEADER_RANGE 1000
+#define RESTRICTED_TRANSACTIONS_COUNT 100
+#define RESTRICTED_SPENT_KEY_IMAGES_COUNT 5000
+#define RESTRICTED_BLOCK_COUNT 1000
 
 #define RPC_TRACKER(rpc) \
   PERF_TIMER(rpc); \
@@ -150,6 +157,7 @@ namespace cryptonote
     command_line::add_arg(desc, arg_restricted_rpc);
     command_line::add_arg(desc, arg_bootstrap_daemon_address);
     command_line::add_arg(desc, arg_bootstrap_daemon_login);
+    command_line::add_arg(desc, arg_bootstrap_daemon_proxy);
     cryptonote::rpc_args::init_options(desc, true);
     command_line::add_arg(desc, arg_rpc_payment_address);
     command_line::add_arg(desc, arg_rpc_payment_difficulty);
@@ -168,7 +176,10 @@ namespace cryptonote
     , m_rpc_payment_allow_free_loopback(false)
   {}
   //------------------------------------------------------------------------------------------------------------------------------
-  bool core_rpc_server::set_bootstrap_daemon(const std::string &address, const std::string &username_password)
+  bool core_rpc_server::set_bootstrap_daemon(
+    const std::string &address,
+    const std::string &username_password,
+    const std::string &proxy)
   {
     boost::optional<epee::net_utils::http::login> credentials;
     const auto loc = username_password.find(':');
@@ -176,7 +187,7 @@ namespace cryptonote
     {
       credentials = epee::net_utils::http::login(username_password.substr(0, loc), username_password.substr(loc + 1));
     }
-    return set_bootstrap_daemon(address, credentials);
+    return set_bootstrap_daemon(address, credentials, proxy);
   }
   //------------------------------------------------------------------------------------------------------------------------------
   std::map<std::string, bool> core_rpc_server::get_public_nodes(uint32_t credits_per_hash_threshold/* = 0*/)
@@ -186,6 +197,7 @@ namespace cryptonote
 
     request.gray = true;
     request.white = true;
+    request.include_blocked = false;
     if (!on_get_public_nodes(request, response) || response.status != CORE_RPC_STATUS_OK)
     {
       return {};
@@ -212,7 +224,10 @@ namespace cryptonote
     return result;
   }
   //------------------------------------------------------------------------------------------------------------------------------
-  bool core_rpc_server::set_bootstrap_daemon(const std::string &address, const boost::optional<epee::net_utils::http::login> &credentials)
+  bool core_rpc_server::set_bootstrap_daemon(
+    const std::string &address,
+    const boost::optional<epee::net_utils::http::login> &credentials,
+    const std::string &proxy)
   {
     boost::unique_lock<boost::shared_mutex> lock(m_bootstrap_daemon_mutex);
 
@@ -228,11 +243,11 @@ namespace cryptonote
       auto get_nodes = [this]() {
         return get_public_nodes(credits_per_hash_threshold);
       };
-      m_bootstrap_daemon.reset(new bootstrap_daemon(std::move(get_nodes), rpc_payment_enabled));
+      m_bootstrap_daemon.reset(new bootstrap_daemon(std::move(get_nodes), rpc_payment_enabled, m_bootstrap_daemon_proxy.empty() ? proxy : m_bootstrap_daemon_proxy));
     }
     else
     {
-      m_bootstrap_daemon.reset(new bootstrap_daemon(address, credentials, rpc_payment_enabled));
+      m_bootstrap_daemon.reset(new bootstrap_daemon(address, credentials, rpc_payment_enabled, m_bootstrap_daemon_proxy.empty() ? proxy : m_bootstrap_daemon_proxy));
     }
 
     m_should_use_bootstrap_daemon = m_bootstrap_daemon.get() != nullptr;
@@ -250,8 +265,10 @@ namespace cryptonote
       , const bool restricted
       , const std::string& port
       , bool allow_rpc_payment
+      , const std::string& proxy
     )
   {
+    m_bootstrap_daemon_proxy = proxy;
     m_restricted = restricted;
     m_net_server.set_threads_prefix("RPC");
     m_net_server.set_connection_filter(&m_p2p);
@@ -260,51 +277,66 @@ namespace cryptonote
     if (!rpc_config)
       return false;
 
+    std::string bind_ip_str = rpc_config->bind_ip;
+    std::string bind_ipv6_str = rpc_config->bind_ipv6_address;
+    if (restricted)
+    {
+      const auto restricted_rpc_port_arg = cryptonote::core_rpc_server::arg_rpc_restricted_bind_port;
+      const bool has_restricted_rpc_port_arg = !command_line::is_arg_defaulted(vm, restricted_rpc_port_arg);
+      if (has_restricted_rpc_port_arg && port == command_line::get_arg(vm, restricted_rpc_port_arg))
+      {
+        bind_ip_str = rpc_config->restricted_bind_ip;
+        bind_ipv6_str = rpc_config->restricted_bind_ipv6_address;
+      }
+    }
     disable_rpc_ban = rpc_config->disable_rpc_ban;
+    const std::string data_dir{command_line::get_arg(vm, cryptonote::arg_data_dir)};
     std::string address = command_line::get_arg(vm, arg_rpc_payment_address);
     if (!address.empty() && allow_rpc_payment)
     {
       if (!m_restricted && nettype() != FAKECHAIN)
       {
-        MERROR("RPC payment enabled, but server is not restricted, anyone can adjust their balance to bypass payment");
+        MFATAL("RPC payment enabled, but server is not restricted, anyone can adjust their balance to bypass payment");
         return false;
       }
       cryptonote::address_parse_info info;
       if (!get_account_address_from_str(info, nettype(), address))
       {
-        MERROR("Invalid payment address: " << address);
+        MFATAL("Invalid payment address: " << address);
         return false;
       }
       if (info.is_subaddress)
       {
-        MERROR("Payment address may not be a subaddress: " << address);
+        MFATAL("Payment address may not be a subaddress: " << address);
         return false;
       }
       uint64_t diff = command_line::get_arg(vm, arg_rpc_payment_difficulty);
       uint64_t credits = command_line::get_arg(vm, arg_rpc_payment_credits);
       if (diff == 0 || credits == 0)
       {
-        MERROR("Payments difficulty and/or payments credits are 0, but a payment address was given");
+        MFATAL("Payments difficulty and/or payments credits are 0, but a payment address was given");
         return false;
       }
       m_rpc_payment_allow_free_loopback = command_line::get_arg(vm, arg_rpc_payment_allow_free_loopback);
       m_rpc_payment.reset(new rpc_payment(info.address, diff, credits));
-      m_rpc_payment->load(command_line::get_arg(vm, cryptonote::arg_data_dir));
+      m_rpc_payment->load(data_dir);
       m_p2p.set_rpc_credits_per_hash(RPC_CREDITS_PER_HASH_SCALE * (credits / (float)diff));
     }
 
     if (!m_rpc_payment)
     {
       uint32_t bind_ip;
-      bool ok = epee::string_tools::get_ip_int32_from_string(bind_ip, rpc_config->bind_ip);
+      bool ok = epee::string_tools::get_ip_int32_from_string(bind_ip, bind_ip_str);
       if (ok & !epee::net_utils::is_ip_loopback(bind_ip))
         MWARNING("The RPC server is accessible from the outside, but no RPC payment was setup. RPC access will be free for all.");
     }
 
-    if (!set_bootstrap_daemon(command_line::get_arg(vm, arg_bootstrap_daemon_address),
-      command_line::get_arg(vm, arg_bootstrap_daemon_login)))
+    if (!set_bootstrap_daemon(
+          command_line::get_arg(vm, arg_bootstrap_daemon_address),
+          command_line::get_arg(vm, arg_bootstrap_daemon_login),
+          command_line::get_arg(vm, arg_bootstrap_daemon_proxy)))
     {
-      MERROR("Failed to parse bootstrap daemon address");
+      MFATAL("Failed to parse bootstrap daemon address");
       return false;
     }
 
@@ -316,12 +348,32 @@ namespace cryptonote
     if (m_rpc_payment)
       m_net_server.add_idle_handler([this](){ return m_rpc_payment->on_idle(); }, 60 * 1000);
 
+    bool store_ssl_key = !restricted && rpc_config->ssl_options && rpc_config->ssl_options.auth.certificate_path.empty();
+    const auto ssl_base_path = (boost::filesystem::path{data_dir} / "rpc_ssl").string();
+    if (store_ssl_key && boost::filesystem::exists(ssl_base_path + ".crt"))
+    {
+      // load key from previous run, password prompted by OpenSSL
+      store_ssl_key = false;
+      rpc_config->ssl_options.auth =
+        epee::net_utils::ssl_authentication_t{ssl_base_path + ".key", ssl_base_path + ".crt"};
+    }
+
     auto rng = [](size_t len, uint8_t *ptr){ return crypto::rand(len, ptr); };
-    return epee::http_server_impl_base<core_rpc_server, connection_context>::init(
-      rng, std::move(port), std::move(rpc_config->bind_ip),
-      std::move(rpc_config->bind_ipv6_address), std::move(rpc_config->use_ipv6), std::move(rpc_config->require_ipv4),
+    const bool inited = epee::http_server_impl_base<core_rpc_server, connection_context>::init(
+      rng, std::move(port), std::move(bind_ip_str),
+      std::move(bind_ipv6_str), std::move(rpc_config->use_ipv6), std::move(rpc_config->require_ipv4),
       std::move(rpc_config->access_control_origins), std::move(http_login), std::move(rpc_config->ssl_options)
     );
+
+    if (store_ssl_key && inited)
+    {
+      // new keys were generated, store for next run
+      const auto error = epee::net_utils::store_ssl_keys(m_net_server.get_ssl_context(), ssl_base_path);
+      if (error)
+        MFATAL("Failed to store HTTP SSL cert/key for " << (restricted ? "restricted " : "") << "RPC server: " << error.message());
+      return !bool(error);
+    }
+    return inited;
   }
   //------------------------------------------------------------------------------------------------------------------------------
   bool core_rpc_server::check_payment(const std::string &client_message, uint64_t payment, const std::string &rpc, bool same_ts, std::string &message, uint64_t &credits, std::string &top_hash)
@@ -350,7 +402,6 @@ namespace cryptonote
       message = "Client signature does not verify for " + rpc;
       return false;
     }
-    crypto::public_key local_client;
     if (!m_rpc_payment->pay(client, ts, payment, rpc, same_ts, credits))
     {
       message = CORE_RPC_STATUS_PAYMENT_REQUIRED;
@@ -435,7 +486,7 @@ namespace cryptonote
     m_core.get_blockchain_top(res.height, top_hash);
     ++res.height; // turn top block height into blockchain height
     res.top_block_hash = string_tools::pod_to_hex(top_hash);
-    res.target_height = m_core.get_target_blockchain_height();
+    res.target_height = m_p2p.get_payload_object().is_synchronized() ? 0 : m_core.get_target_blockchain_height();
     store_difficulty(m_core.get_blockchain_storage().get_difficulty_for_next_block(), res.difficulty, res.wide_difficulty, res.difficulty_top64);
     res.target = m_core.get_blockchain_storage().get_difficulty_target();
     res.tx_count = m_core.get_blockchain_storage().get_total_transactions() - res.height; //without coinbase
@@ -457,6 +508,8 @@ namespace cryptonote
         res.cumulative_difficulty, res.wide_cumulative_difficulty, res.cumulative_difficulty_top64);
     res.block_size_limit = res.block_weight_limit = m_core.get_blockchain_storage().get_current_cumulative_block_weight_limit();
     res.block_size_median = res.block_weight_median = m_core.get_blockchain_storage().get_current_cumulative_block_weight_median();
+    res.adjusted_time = m_core.get_blockchain_storage().get_adjusted_time(res.height);
+
     res.start_time = restricted ? 0 : (uint64_t)m_core.get_start_time();
     res.free_space = restricted ? std::numeric_limits<uint64_t>::max() : m_core.get_free_space();
     res.offline = m_core.offline();
@@ -480,6 +533,8 @@ namespace cryptonote
       res.database_size = round_up(res.database_size, 5ull* 1024 * 1024 * 1024);
     res.update_available = restricted ? false : m_core.is_update_available();
     res.version = restricted ? "" : SCALA_VERSION_FULL;
+    res.synchronized = check_core_ready();
+    res.busy_syncing = m_p2p.get_payload_object().is_busy_syncing();
 
     res.status = CORE_RPC_STATUS_OK;
     return true;
@@ -515,9 +570,17 @@ namespace cryptonote
   bool core_rpc_server::on_get_blocks(const COMMAND_RPC_GET_BLOCKS_FAST::request& req, COMMAND_RPC_GET_BLOCKS_FAST::response& res, const connection_context *ctx)
   {
     RPC_TRACKER(get_blocks);
-    bool r;
-    if (use_bootstrap_daemon_if_necessary<COMMAND_RPC_GET_BLOCKS_FAST>(invoke_http_mode::BIN, "/getblocks.bin", req, res, r))
-      return r;
+
+    bool use_bootstrap_daemon;
+    {
+      boost::shared_lock<boost::shared_mutex> lock(m_bootstrap_daemon_mutex);
+      use_bootstrap_daemon = m_should_use_bootstrap_daemon;
+    }
+    if (use_bootstrap_daemon)
+    {
+      bool r;
+      return use_bootstrap_daemon_if_necessary<COMMAND_RPC_GET_BLOCKS_FAST>(invoke_http_mode::BIN, "/getblocks.bin", req, res, r);
+    }
 
     CHECK_PAYMENT(req, res, 1);
 
@@ -536,25 +599,25 @@ namespace cryptonote
       }
     }
 
-    size_t max_blocks = COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT;
+    size_t max_blocks = COMMAND_RPC_GET_BLOCKS_FAST_MAX_BLOCK_COUNT;
     if (m_rpc_payment)
     {
       max_blocks = res.credits / COST_PER_BLOCK;
-      if (max_blocks > COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT)
-        max_blocks = COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT;
+      if (max_blocks > COMMAND_RPC_GET_BLOCKS_FAST_MAX_BLOCK_COUNT)
+        max_blocks = COMMAND_RPC_GET_BLOCKS_FAST_MAX_BLOCK_COUNT;
       if (max_blocks == 0)
       {
         res.status = CORE_RPC_STATUS_PAYMENT_REQUIRED;
-        return false;
+        return true;
       }
     }
 
     std::vector<std::pair<std::pair<cryptonote::blobdata, crypto::hash>, std::vector<std::pair<crypto::hash, cryptonote::blobdata> > > > bs;
-    if(!m_core.find_blockchain_supplement(req.start_height, req.block_ids, bs, res.current_height, res.start_height, req.prune, !req.no_miner_tx, max_blocks))
+    if(!m_core.find_blockchain_supplement(req.start_height, req.block_ids, bs, res.current_height, res.start_height, req.prune, !req.no_miner_tx, max_blocks, COMMAND_RPC_GET_BLOCKS_FAST_MAX_TX_COUNT))
     {
       res.status = "Failed";
       add_host_fail(ctx);
-      return false;
+      return true;
     }
 
     CHECK_PAYMENT_SAME_TS(req, res, bs.size() * COST_PER_BLOCK);
@@ -590,12 +653,12 @@ namespace cryptonote
         if (!r)
         {
           res.status = "Failed";
-          return false;
+          return true;
         }
         if (indices.size() != n_txes_to_lookup || res.output_indices.back().indices.size() != (req.no_miner_tx ? 1 : 0))
         {
           res.status = "Failed";
-          return false;
+          return true;
         }
         for (size_t i = 0; i < indices.size(); ++i)
           res.output_indices.back().indices.push_back({std::move(indices[i])});
@@ -618,7 +681,7 @@ namespace cryptonote
       if(!m_core.get_alternative_blocks(blks))
       {
           res.status = "Failed";
-          return false;
+          return true;
       }
 
       res.blks_hashes.reserve(blks.size());
@@ -639,6 +702,13 @@ namespace cryptonote
     bool r;
     if (use_bootstrap_daemon_if_necessary<COMMAND_RPC_GET_BLOCKS_BY_HEIGHT>(invoke_http_mode::BIN, "/getblocks_by_height.bin", req, res, r))
       return r;
+
+    const bool restricted = m_restricted && ctx;
+    if (restricted && req.heights.size() > RESTRICTED_BLOCK_COUNT)
+    {
+      res.status = "Too many blocks requested in restricted mode";
+      return true;
+    }
 
     res.status = "Failed";
     res.blocks.clear();
@@ -682,7 +752,7 @@ namespace cryptonote
     {
       res.status = "Failed";
       add_host_fail(ctx);
-      return false;
+      return true;
     }
 
     CHECK_PAYMENT_SAME_TS(req, res, res.m_block_ids.size() * COST_PER_BLOCK_HASH);
@@ -760,7 +830,8 @@ namespace cryptonote
       outkey.mask = epee::string_tools::pod_to_hex(i.mask);
       outkey.unlocked = i.unlocked;
       outkey.height = i.height;
-      outkey.txid = epee::string_tools::pod_to_hex(i.txid);
+      if (req.get_txid)
+        outkey.txid = epee::string_tools::pod_to_hex(i.txid);
     }
 
     res.status = CORE_RPC_STATUS_OK;
@@ -794,10 +865,16 @@ namespace cryptonote
     if (use_bootstrap_daemon_if_necessary<COMMAND_RPC_GET_TRANSACTIONS>(invoke_http_mode::JON, "/gettransactions", req, res, ok))
       return ok;
 
-    CHECK_PAYMENT_MIN1(req, res, req.txs_hashes.size() * COST_PER_TX, false);
-
     const bool restricted = m_restricted && ctx;
     const bool request_has_rpc_origin = ctx != NULL;
+
+    if (restricted && req.txs_hashes.size() > RESTRICTED_TRANSACTIONS_COUNT)
+    {
+      res.status = "Too many transactions requested in restricted mode";
+      return true;
+    }
+
+    CHECK_PAYMENT_MIN1(req, res, req.txs_hashes.size() * COST_PER_TX, false);
 
     std::vector<crypto::hash> vh;
     for(const auto& tx_hex_str: req.txs_hashes)
@@ -896,14 +973,26 @@ namespace cryptonote
       LOG_PRINT_L2("Found " << found_in_pool << "/" << vh.size() << " transactions in the pool");
     }
 
-    std::vector<std::string>::const_iterator txhi = req.txs_hashes.begin();
-    std::vector<crypto::hash>::const_iterator vhi = vh.begin();
+    CHECK_AND_ASSERT_MES(txs.size() + missed_txs.size() == vh.size(), false, "mismatched number of txs");
+
+    auto txhi = req.txs_hashes.cbegin();
+    auto vhi = vh.cbegin();
+    auto missedi = missed_txs.cbegin();
+
     for(auto& tx: txs)
     {
       res.txs.push_back(COMMAND_RPC_GET_TRANSACTIONS::entry());
       COMMAND_RPC_GET_TRANSACTIONS::entry &e = res.txs.back();
 
+      while (missedi != missed_txs.end() && *missedi == *vhi)
+      {
+          ++vhi;
+          ++txhi;
+          ++missedi;
+      }
+
       crypto::hash tx_hash = *vhi++;
+      CHECK_AND_ASSERT_MES(tx_hash == std::get<0>(tx), false, "mismatched tx hash");
       e.tx_hash = *txhi++;
       e.prunable_hash = epee::string_tools::pod_to_hex(std::get<2>(tx));
       if (req.split || req.prune || std::get<3>(tx).empty())
@@ -970,6 +1059,7 @@ namespace cryptonote
       if (e.in_pool)
       {
         e.block_height = e.block_timestamp = std::numeric_limits<uint64_t>::max();
+        e.confirmations = 0;
         auto it = per_tx_pool_tx_info.find(tx_hash);
         if (it != per_tx_pool_tx_info.end())
         {
@@ -988,6 +1078,7 @@ namespace cryptonote
       else
       {
         e.block_height = m_core.get_blockchain_storage().get_db().get_tx_block_height(tx_hash);
+        e.confirmations = m_core.get_current_blockchain_height() - e.block_height;
         e.block_timestamp = m_core.get_blockchain_storage().get_db().get_block_timestamp(e.block_height);
         e.received_timestamp = 0;
         e.double_spend_seen = false;
@@ -1006,7 +1097,7 @@ namespace cryptonote
         if (!r)
         {
           res.status = "Failed";
-          return false;
+          return true;
         }
       }
     }
@@ -1028,10 +1119,16 @@ namespace cryptonote
     if (use_bootstrap_daemon_if_necessary<COMMAND_RPC_IS_KEY_IMAGE_SPENT>(invoke_http_mode::JON, "/is_key_image_spent", req, res, ok))
       return ok;
 
-    CHECK_PAYMENT_MIN1(req, res, req.key_images.size() * COST_PER_KEY_IMAGE, false);
-
     const bool restricted = m_restricted && ctx;
     const bool request_has_rpc_origin = ctx != NULL;
+
+    if (restricted && req.key_images.size() > RESTRICTED_SPENT_KEY_IMAGES_COUNT)
+    {
+      res.status = "Too many key images queried in restricted mode";
+      return true;
+    }
+
+    CHECK_PAYMENT_MIN1(req, res, req.key_images.size() * COST_PER_KEY_IMAGE, false);
 
     std::vector<crypto::key_image> key_images;
     for(const auto& ki_hex_str: req.key_images)
@@ -1096,11 +1193,32 @@ namespace cryptonote
   bool core_rpc_server::on_send_raw_tx(const COMMAND_RPC_SEND_RAW_TX::request& req, COMMAND_RPC_SEND_RAW_TX::response& res, const connection_context *ctx)
   {
     RPC_TRACKER(send_raw_tx);
-    bool ok;
-    if (use_bootstrap_daemon_if_necessary<COMMAND_RPC_SEND_RAW_TX>(invoke_http_mode::JON, "/sendrawtransaction", req, res, ok))
-      return ok;
 
-    CHECK_CORE_READY();
+    {
+      bool ok;
+      use_bootstrap_daemon_if_necessary<COMMAND_RPC_SEND_RAW_TX>(invoke_http_mode::JON, "/sendrawtransaction", req, res, ok);
+    }
+
+    const bool restricted = m_restricted && ctx;
+
+    bool skip_validation = false;
+    if (!restricted)
+    {
+      boost::shared_lock<boost::shared_mutex> lock(m_bootstrap_daemon_mutex);
+      if (m_should_use_bootstrap_daemon)
+      {
+        skip_validation = !check_core_ready();
+      }
+      else
+      {
+        CHECK_CORE_READY();
+      }
+    }
+    else
+    {
+      CHECK_CORE_READY();
+    }
+
     CHECK_PAYMENT_MIN1(req, res, COST_PER_TX_RELAY, false);
 
     std::string tx_blob;
@@ -1120,48 +1238,49 @@ namespace cryptonote
     }
     res.sanity_check_failed = false;
 
-    const bool restricted = m_restricted && ctx;
-
-    tx_verification_context tvc{};
-    if(!m_core.handle_incoming_tx({tx_blob, crypto::null_hash}, tvc, (req.do_not_relay ? relay_method::none : relay_method::local), false) || tvc.m_verifivation_failed)
+    if (!skip_validation)
     {
-      res.status = "Failed";
-      std::string reason = "";
-      if ((res.low_mixin = tvc.m_low_mixin))
-        add_reason(reason, "bad ring size");
-      if ((res.double_spend = tvc.m_double_spend))
-        add_reason(reason, "double spend");
-      if ((res.invalid_input = tvc.m_invalid_input))
-        add_reason(reason, "invalid input");
-      if ((res.invalid_output = tvc.m_invalid_output))
-        add_reason(reason, "invalid output");
-      if ((res.too_big = tvc.m_too_big))
-        add_reason(reason, "too big");
-      if ((res.overspend = tvc.m_overspend))
-        add_reason(reason, "overspend");
-      if ((res.fee_too_low = tvc.m_fee_too_low))
-        add_reason(reason, "fee too low");
-      if ((res.too_few_outputs = tvc.m_too_few_outputs))
-        add_reason(reason, "too few outputs");
-      const std::string punctuation = reason.empty() ? "" : ": ";
-      if (tvc.m_verifivation_failed)
+      tx_verification_context tvc{};
+      if(!m_core.handle_incoming_tx({tx_blob, crypto::null_hash}, tvc, (req.do_not_relay ? relay_method::none : relay_method::local), false) || tvc.m_verifivation_failed)
       {
-        LOG_PRINT_L0("[on_send_raw_tx]: tx verification failed" << punctuation << reason);
+        res.status = "Failed";
+        std::string reason = "";
+        if ((res.low_mixin = tvc.m_low_mixin))
+          add_reason(reason, "bad ring size");
+        if ((res.double_spend = tvc.m_double_spend))
+          add_reason(reason, "double spend");
+        if ((res.invalid_input = tvc.m_invalid_input))
+          add_reason(reason, "invalid input");
+        if ((res.invalid_output = tvc.m_invalid_output))
+          add_reason(reason, "invalid output");
+        if ((res.too_big = tvc.m_too_big))
+          add_reason(reason, "too big");
+        if ((res.overspend = tvc.m_overspend))
+          add_reason(reason, "overspend");
+        if ((res.fee_too_low = tvc.m_fee_too_low))
+          add_reason(reason, "fee too low");
+        if ((res.too_few_outputs = tvc.m_too_few_outputs))
+          add_reason(reason, "too few outputs");
+        const std::string punctuation = reason.empty() ? "" : ": ";
+        if (tvc.m_verifivation_failed)
+        {
+          LOG_PRINT_L0("[on_send_raw_tx]: tx verification failed" << punctuation << reason);
+        }
+        else
+        {
+          LOG_PRINT_L0("[on_send_raw_tx]: Failed to process tx" << punctuation << reason);
+        }
+        return true;
       }
-      else
-      {
-        LOG_PRINT_L0("[on_send_raw_tx]: Failed to process tx" << punctuation << reason);
-      }
-      return true;
-    }
 
-    if(tvc.m_relay == relay_method::none)
-    {
-      LOG_PRINT_L0("[on_send_raw_tx]: tx accepted, but not relayed");
-      res.reason = "Not relayed";
-      res.not_relayed = true;
-      res.status = CORE_RPC_STATUS_OK;
-      return true;
+      if(tvc.m_relay == relay_method::none)
+      {
+        LOG_PRINT_L0("[on_send_raw_tx]: tx accepted, but not relayed");
+        res.reason = "Not relayed";
+        res.not_relayed = true;
+        res.status = CORE_RPC_STATUS_OK;
+        return true;
+      }
     }
 
     NOTIFY_NEW_TRANSACTIONS::request r;
@@ -1252,7 +1371,7 @@ namespace cryptonote
     res.is_background_mining_enabled = lMiner.get_is_background_mining_enabled();
     store_difficulty(m_core.get_blockchain_storage().get_difficulty_for_next_block(), res.difficulty, res.wide_difficulty, res.difficulty_top64);
     
-    res.block_target = m_core.get_blockchain_storage().get_current_hard_fork_version() < 2 ? DIFFICULTY_TARGET : DIFFICULTY_TARGET;
+    res.block_target = m_core.get_blockchain_storage().get_current_hard_fork_version() < 2 ? DIFFICULTY_TARGET_V1 : DIFFICULTY_TARGET_V2;
     if ( lMiner.is_mining() ) {
       res.speed = lMiner.get_speed();
       res.threads_count = lMiner.get_threads_count();
@@ -1269,8 +1388,8 @@ namespace cryptonote
       case 1: res.pow_algorithm = "CNv1 (Cryptonight variant 1)"; break;
       case 2: case 3: res.pow_algorithm = "CNv2 (Cryptonight variant 2)"; break;
       case 4: case 5: res.pow_algorithm = "CNv4 (Cryptonight variant 4)"; break;
-      case 6: res.pow_algorithm = "RandomX"; break;
-      default: res.pow_algorithm = "I'm not sure actually"; break;
+      case 6: case 7: case 8: case 9: res.pow_algorithm = "RandomX"; break;
+      default: res.pow_algorithm = "RandomX"; break; // assumed
     }
     if (res.is_background_mining_enabled)
     {
@@ -1313,6 +1432,8 @@ namespace cryptonote
 
     for (auto & entry : white_list)
     {
+      if (!req.include_blocked && m_p2p.is_host_blocked(entry.adr, NULL))
+        continue;
       if (entry.adr.get_type_id() == epee::net_utils::ipv4_network_address::get_type_id())
         res.white_list.emplace_back(entry.id, entry.adr.as<epee::net_utils::ipv4_network_address>().ip(),
             entry.adr.as<epee::net_utils::ipv4_network_address>().port(), entry.last_seen, entry.pruning_seed, entry.rpc_port, entry.rpc_credits_per_hash);
@@ -1325,6 +1446,8 @@ namespace cryptonote
 
     for (auto & entry : gray_list)
     {
+      if (!req.include_blocked && m_p2p.is_host_blocked(entry.adr, NULL))
+        continue;
       if (entry.adr.get_type_id() == epee::net_utils::ipv4_network_address::get_type_id())
         res.gray_list.emplace_back(entry.id, entry.adr.as<epee::net_utils::ipv4_network_address>().ip(),
             entry.adr.as<epee::net_utils::ipv4_network_address>().port(), entry.last_seen, entry.pruning_seed, entry.rpc_port, entry.rpc_credits_per_hash);
@@ -1343,12 +1466,15 @@ namespace cryptonote
   {
     RPC_TRACKER(get_public_nodes);
 
+    COMMAND_RPC_GET_PEER_LIST::request peer_list_req;
     COMMAND_RPC_GET_PEER_LIST::response peer_list_res;
-    const bool success = on_get_peer_list(COMMAND_RPC_GET_PEER_LIST::request(), peer_list_res, ctx);
+    peer_list_req.include_blocked = req.include_blocked;
+    const bool success = on_get_peer_list(peer_list_req, peer_list_res, ctx);
     res.status = peer_list_res.status;
     if (!success)
     {      
-      return false;
+      res.status = "Failed to get peer list";
+      return true;
     }
     if (res.status != CORE_RPC_STATUS_OK)
     {
@@ -1519,15 +1645,15 @@ namespace cryptonote
     {
       credentials = epee::net_utils::http::login(req.username, req.password);
     }
-    
-    if (set_bootstrap_daemon(req.address, credentials))
+
+    if (set_bootstrap_daemon(req.address, credentials, req.proxy))
     {
       res.status = CORE_RPC_STATUS_OK;
     }
     else
     {
       res.status = "Failed to set bootstrap daemon";
-    }    
+    }
 
     return true;
   }
@@ -1550,7 +1676,7 @@ namespace cryptonote
       if (m_should_use_bootstrap_daemon)
       {
         res.status = "This command is unsupported for bootstrap daemon";
-        return false;
+        return true;
       }
     }
     res.count = m_core.get_current_blockchain_height();
@@ -1566,7 +1692,7 @@ namespace cryptonote
       if (m_should_use_bootstrap_daemon)
       {
         res = "This command is unsupported for bootstrap daemon";
-        return false;
+        return true;
       }
     }
     if(req.size() != 1)
@@ -1605,7 +1731,7 @@ namespace cryptonote
   bool core_rpc_server::get_block_template(const account_public_address &address, const crypto::hash *prev_block, const cryptonote::blobdata &extra_nonce, size_t &reserved_offset, cryptonote::difficulty_type  &difficulty, uint64_t &height, uint64_t &expected_reward, block &b, uint64_t &seed_height, crypto::hash &seed_hash, crypto::hash &next_seed_hash, epee::json_rpc::error &error_resp)
   {
     b = boost::value_initialized<cryptonote::block>();
-    if(!m_core.get_block_template(b, prev_block, address, difficulty, height, expected_reward, extra_nonce))
+    if(!m_core.get_block_template(b, prev_block, address, difficulty, height, expected_reward, extra_nonce, seed_height, seed_hash))
     {
       error_resp.code = CORE_RPC_ERROR_CODE_INTERNAL_ERROR;
       error_resp.message = "Internal error: failed to create block template";
@@ -1622,16 +1748,12 @@ namespace cryptonote
       return false;
     }
 
-    if (b.major_version >= RX_BLOCK_VERSION)
-    {
-      uint64_t next_height;
-      crypto::rx_seedheights(height, &seed_height, &next_height);
-      seed_hash = m_core.get_block_id_by_height(seed_height);
-      if (next_height != seed_height)
-        next_seed_hash = m_core.get_block_id_by_height(next_height);
-      else
-        next_seed_hash = seed_hash;
-    }
+    uint64_t next_height;
+    crypto::rx_seedheights(height, &seed_height, &next_height);
+    if (next_height != seed_height)
+      next_seed_hash = m_core.get_block_id_by_height(next_height);
+    else
+      next_seed_hash = seed_hash;
 
     if (extra_nonce.empty())
     {
@@ -1733,7 +1855,6 @@ namespace cryptonote
         return false;
       }
     }
-    uint64_t seed_height;
     crypto::hash seed_hash, next_seed_hash;
     if (!get_block_template(info.address, req.prev_block.empty() ? NULL : &prev_block, blob_reserve, reserved_offset, wdiff, res.height, res.expected_reward, b, res.seed_height, seed_hash, next_seed_hash, error_resp))
       return false;
@@ -1755,6 +1876,162 @@ namespace cryptonote
     return true;
   }
   //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_getminerdata(const COMMAND_RPC_GETMINERDATA::request& req, COMMAND_RPC_GETMINERDATA::response& res, epee::json_rpc::error& error_resp, const connection_context *ctx)
+  {
+    if(!check_core_ready())
+    {
+      error_resp.code = CORE_RPC_ERROR_CODE_CORE_BUSY;
+      error_resp.message = "Core is busy";
+      return false;
+    }
+
+    crypto::hash prev_id, seed_hash;
+    difficulty_type difficulty;
+
+    std::vector<tx_block_template_backlog_entry> tx_backlog;
+    if (!m_core.get_miner_data(res.major_version, res.height, prev_id, seed_hash, difficulty, res.median_weight, res.already_generated_coins, tx_backlog))
+    {
+      error_resp.code = CORE_RPC_ERROR_CODE_INTERNAL_ERROR;
+      error_resp.message = "Internal error: failed to get miner data";
+      LOG_ERROR("Failed to get miner data");
+      return false;
+    }
+
+    res.tx_backlog.clear();
+    res.tx_backlog.reserve(tx_backlog.size());
+
+    for (const auto& entry : tx_backlog)
+    {
+      res.tx_backlog.emplace_back(COMMAND_RPC_GETMINERDATA::response::tx_backlog_entry{string_tools::pod_to_hex(entry.id), entry.weight, entry.fee});
+    }
+
+    res.prev_id = string_tools::pod_to_hex(prev_id);
+    res.seed_hash = string_tools::pod_to_hex(seed_hash);
+    res.difficulty = cryptonote::hex(difficulty);
+
+    res.status = CORE_RPC_STATUS_OK;
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  bool core_rpc_server::on_add_aux_pow(const COMMAND_RPC_ADD_AUX_POW::request& req, COMMAND_RPC_ADD_AUX_POW::response& res, epee::json_rpc::error& error_resp, const connection_context *ctx)
+  {
+    RPC_TRACKER(add_aux_pow);
+    bool r;
+    if (use_bootstrap_daemon_if_necessary<COMMAND_RPC_ADD_AUX_POW>(invoke_http_mode::JON_RPC, "add_aux_pow", req, res, r))
+      return r;
+
+    if (req.aux_pow.empty())
+    {
+      error_resp.code = CORE_RPC_ERROR_CODE_WRONG_PARAM;
+      error_resp.message = "Empty aux pow hash vector";
+      return false;
+    }
+
+    crypto::hash merkle_root;
+    size_t merkle_tree_depth = 0;
+    std::vector<std::pair<crypto::hash, crypto::hash>> aux_pow;
+    std::vector<crypto::hash> aux_pow_raw;
+    aux_pow.reserve(req.aux_pow.size());
+    aux_pow_raw.reserve(req.aux_pow.size());
+    for (const auto &s: req.aux_pow)
+    {
+      aux_pow.push_back({});
+      if (!epee::string_tools::hex_to_pod(s.id, aux_pow.back().first))
+      {
+        error_resp.code = CORE_RPC_ERROR_CODE_WRONG_PARAM;
+        error_resp.message = "Invalid aux pow id";
+        return false;
+      }
+      if (!epee::string_tools::hex_to_pod(s.hash, aux_pow.back().second))
+      {
+        error_resp.code = CORE_RPC_ERROR_CODE_WRONG_PARAM;
+        error_resp.message = "Invalid aux pow hash";
+        return false;
+      }
+      aux_pow_raw.push_back(aux_pow.back().second);
+    }
+
+    size_t path_domain = 1;
+    while ((1u << path_domain) < aux_pow.size())
+      ++path_domain;
+    uint32_t nonce;
+    const uint32_t max_nonce = 65535;
+    bool collision = true;
+    for (nonce = 0; nonce <= max_nonce; ++nonce)
+    {
+      std::vector<bool> slots(aux_pow.size(), false);
+      collision = false;
+      for (size_t idx = 0; idx < aux_pow.size(); ++idx)
+      {
+        const uint32_t slot = cryptonote::get_aux_slot(aux_pow[idx].first, nonce, aux_pow.size());
+        if (slot >= aux_pow.size())
+        {
+          error_resp.code = CORE_RPC_ERROR_CODE_INTERNAL_ERROR;
+          error_resp.message = "Computed slot is out of range";
+          return false;
+        }
+        if (slots[slot])
+        {
+          collision = true;
+          break;
+        }
+        slots[slot] = true;
+      }
+      if (!collision)
+        break;
+    }
+    if (collision)
+    {
+      error_resp.code = CORE_RPC_ERROR_CODE_INTERNAL_ERROR;
+      error_resp.message = "Failed to find a suitable nonce";
+      return false;
+    }
+
+    crypto::tree_hash((const char(*)[crypto::HASH_SIZE])aux_pow_raw.data(), aux_pow_raw.size(), merkle_root.data);
+    res.merkle_root = epee::string_tools::pod_to_hex(merkle_root);
+    res.merkle_tree_depth = cryptonote::encode_mm_depth(aux_pow.size(), nonce);
+
+    blobdata blocktemplate_blob;
+    if (!epee::string_tools::parse_hexstr_to_binbuff(req.blocktemplate_blob, blocktemplate_blob))
+    {
+      error_resp.code = CORE_RPC_ERROR_CODE_WRONG_PARAM;
+      error_resp.message = "Invalid blocktemplate_blob";
+      return false;
+    }
+
+    block b;
+    if (!parse_and_validate_block_from_blob(blocktemplate_blob, b))
+    {
+      error_resp.code = CORE_RPC_ERROR_CODE_WRONG_BLOCKBLOB;
+      error_resp.message = "Wrong blocktemplate_blob";
+      return false;
+    }
+
+    if (!remove_field_from_tx_extra(b.miner_tx.extra, typeid(cryptonote::tx_extra_merge_mining_tag)))
+    {
+      error_resp.code = CORE_RPC_ERROR_CODE_INTERNAL_ERROR;
+      error_resp.message = "Error removing existing merkle root";
+      return false;
+    }
+    if (!add_mm_merkle_root_to_tx_extra(b.miner_tx.extra, merkle_root, merkle_tree_depth))
+    {
+      error_resp.code = CORE_RPC_ERROR_CODE_INTERNAL_ERROR;
+      error_resp.message = "Error adding merkle root";
+      return false;
+    }
+    b.invalidate_hashes();
+    b.miner_tx.invalidate_hashes();
+
+    const blobdata block_blob = t_serializable_object_to_blob(b);
+    const blobdata hashing_blob = get_block_hashing_blob(b);
+
+    res.blocktemplate_blob = string_tools::buff_to_hex_nodelimer(block_blob);
+    res.blockhashing_blob = string_tools::buff_to_hex_nodelimer(hashing_blob);
+    res.aux_pow = req.aux_pow;
+    res.status = CORE_RPC_STATUS_OK;
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
   bool core_rpc_server::on_submitblock(const COMMAND_RPC_SUBMITBLOCK::request& req, COMMAND_RPC_SUBMITBLOCK::response& res, epee::json_rpc::error& error_resp, const connection_context *ctx)
   {
     RPC_TRACKER(submitblock);
@@ -1762,7 +2039,8 @@ namespace cryptonote
       boost::shared_lock<boost::shared_mutex> lock(m_bootstrap_daemon_mutex);
       if (m_should_use_bootstrap_daemon)
       {
-        res.status = "This command is unsupported for bootstrap daemon";
+        error_resp.code = CORE_RPC_ERROR_CODE_UNSUPPORTED_BOOTSTRAP;
+        error_resp.message = "This command is unsupported for bootstrap daemon";
         return false;
       }
     }
@@ -1860,9 +2138,16 @@ namespace cryptonote
         return false;
       }
       b.nonce = req.starting_nonce;
-      miner::find_nonce_for_given_block([this](const cryptonote::block &b, uint64_t height, unsigned int threads, crypto::hash &hash) {
-        return cryptonote::get_block_longhash(&(m_core.get_blockchain_storage()), b, hash, height, threads);
-      }, b, template_res.difficulty, template_res.height);
+      crypto::hash seed_hash = crypto::null_hash;
+      if (b.major_version >= RX_BLOCK_VERSION && !epee::string_tools::hex_to_pod(template_res.seed_hash, seed_hash))
+      {
+        error_resp.code = CORE_RPC_ERROR_CODE_INTERNAL_ERROR;
+        error_resp.message = "Error converting seed hash";
+        return false;
+      }
+      miner::find_nonce_for_given_block([this](const cryptonote::block &b, uint64_t height, const crypto::hash *seed_hash, unsigned int threads, crypto::hash &hash) {
+        return cryptonote::get_block_longhash(&(m_core.get_blockchain_storage()), b, hash, height, seed_hash, threads);
+      }, b, template_res.difficulty, template_res.height, &seed_hash);
 
       submit_req.front() = string_tools::buff_to_hex_nodelimer(block_to_blob(b));
       r = on_submitblock(submit_req, submit_res, error_resp, ctx);
@@ -1901,11 +2186,10 @@ namespace cryptonote
     response.depth = m_core.get_current_blockchain_height() - height - 1;
     response.hash = string_tools::pod_to_hex(hash);
     store_difficulty(m_core.get_blockchain_storage().block_difficulty(height),
-    response.difficulty, response.wide_difficulty, response.difficulty_top64);
+        response.difficulty, response.wide_difficulty, response.difficulty_top64);
     store_difficulty(m_core.get_blockchain_storage().get_db().get_block_cumulative_difficulty(height),
-    response.cumulative_difficulty, response.wide_cumulative_difficulty, response.cumulative_difficulty_top64);
+        response.cumulative_difficulty, response.wide_cumulative_difficulty, response.cumulative_difficulty_top64);
     response.reward = get_block_reward(blk);
-    response.miner_reward = blk.miner_tx.vout[0].amount;
     response.block_size = response.block_weight = m_core.get_blockchain_storage().get_db().get_block_weight(height);
     response.num_txes = blk.tx_hashes.size();
     response.pow_hash = fill_pow_hash ? string_tools::pod_to_hex(get_block_longhash(&(m_core.get_blockchain_storage()), blk, height, 0)) : "";
@@ -1933,34 +2217,37 @@ namespace cryptonote
     }
 
     auto current_time = std::chrono::system_clock::now();
-    if (!m_p2p.get_payload_object().no_sync() &&
-        current_time - m_bootstrap_height_check_time > std::chrono::seconds(30))  // update every 30s
+    if (current_time - m_bootstrap_height_check_time > std::chrono::seconds(30))  // update every 30s
     {
       {
         boost::upgrade_to_unique_lock<boost::shared_mutex> lock(upgrade_lock);
         m_bootstrap_height_check_time = current_time;
       }
 
-      boost::optional<uint64_t> bootstrap_daemon_height = m_bootstrap_daemon->get_height();
-      if (!bootstrap_daemon_height)
+      boost::optional<std::pair<uint64_t, uint64_t>> bootstrap_daemon_height_info = m_bootstrap_daemon->get_height();
+      if (!bootstrap_daemon_height_info)
       {
         MERROR("Failed to fetch bootstrap daemon height");
         return false;
       }
 
-      uint64_t target_height = m_core.get_target_blockchain_height();
-      if (*bootstrap_daemon_height < target_height)
+      const uint64_t bootstrap_daemon_height = bootstrap_daemon_height_info->first;
+      const uint64_t bootstrap_daemon_target_height = bootstrap_daemon_height_info->second;
+      if (bootstrap_daemon_height < bootstrap_daemon_target_height)
       {
         MINFO("Bootstrap daemon is out of sync");
         return m_bootstrap_daemon->handle_result(false, {});
       }
 
-      uint64_t top_height = m_core.get_current_blockchain_height();
-      m_should_use_bootstrap_daemon = top_height + 10 < *bootstrap_daemon_height;
-      MINFO((m_should_use_bootstrap_daemon ? "Using" : "Not using") << " the bootstrap daemon (our height: " << top_height << ", bootstrap daemon's height: " << *bootstrap_daemon_height << ")");
+      if (!m_p2p.get_payload_object().no_sync())
+      {
+        uint64_t top_height = m_core.get_current_blockchain_height();
+        m_should_use_bootstrap_daemon = top_height + 10 < bootstrap_daemon_height;
+        MINFO((m_should_use_bootstrap_daemon ? "Using" : "Not using") << " the bootstrap daemon (our height: " << top_height << ", bootstrap daemon's height: " << bootstrap_daemon_height << ")");
 
-      if (!m_should_use_bootstrap_daemon)
-        return false;
+        if (!m_should_use_bootstrap_daemon)
+          return false;
+      }
     }
 
     if (mode == invoke_http_mode::JON)
@@ -2036,6 +2323,14 @@ namespace cryptonote
 
     CHECK_PAYMENT_MIN1(req, res, COST_PER_BLOCK_HEADER, false);
 
+    const bool restricted = m_restricted && ctx;
+    if (restricted && req.hashes.size() > RESTRICTED_BLOCK_COUNT)
+    {
+      error_resp.code = CORE_RPC_ERROR_CODE_RESTRICTED;
+      error_resp.message = "Too many block headers requested in restricted mode";
+      return false;
+    }
+
     auto get = [this](const std::string &hash, bool fill_pow_hash, block_header_response &block_header, bool restricted, epee::json_rpc::error& error_resp) -> bool {
       crypto::hash block_hash;
       bool hash_parsed = parse_hash256(hash, block_hash);
@@ -2071,7 +2366,6 @@ namespace cryptonote
       return true;
     };
 
-    const bool restricted = m_restricted && ctx;
     if (!req.hash.empty())
     {
       if (!get(req.hash, req.fill_pow_hash, res.block_header, restricted, error_resp))
@@ -2103,6 +2397,14 @@ namespace cryptonote
       error_resp.message = "Invalid start/end heights.";
       return false;
     }
+    const bool restricted = m_restricted && ctx;
+    if (restricted && req.end_height - req.start_height > RESTRICTED_BLOCK_HEADER_RANGE)
+    {
+      error_resp.code = CORE_RPC_ERROR_CODE_RESTRICTED;
+      error_resp.message = "Too many block headers requested.";
+      return false;
+    }
+
     CHECK_PAYMENT_MIN1(req, res, (req.end_height - req.start_height + 1) * COST_PER_BLOCK_HEADER, false);
     for (uint64_t h = req.start_height; h <= req.end_height; ++h)
     {
@@ -2129,7 +2431,6 @@ namespace cryptonote
         return false;
       }
       res.headers.push_back(block_header_response());
-      const bool restricted = m_restricted && ctx;
       bool response_filled = fill_block_header_response(blk, false, block_height, block_hash, res.headers.back(), req.fill_pow_hash && !restricted);
       if (!response_filled)
       {
@@ -2417,14 +2718,13 @@ namespace cryptonote
     {
       for (const auto &str: req.txids)
       {
-        cryptonote::blobdata txid_data;
-        if(!epee::string_tools::parse_hexstr_to_binbuff(str, txid_data))
+        crypto::hash txid;
+        if(!epee::string_tools::hex_to_pod(str, txid))
         {
           failed = true;
         }
         else
         {
-          crypto::hash txid = *reinterpret_cast<const crypto::hash*>(txid_data.data());
           txids.push_back(txid);
         }
       }
@@ -2432,7 +2732,7 @@ namespace cryptonote
     if (!m_core.get_blockchain_storage().flush_txes_from_pool(txids))
     {
       res.status = "Failed to remove one or more tx(es)";
-      return false;
+      return true;
     }
 
     if (failed)
@@ -2441,7 +2741,7 @@ namespace cryptonote
         res.status = "Failed to parse txid";
       else
         res.status = "Failed to parse some of the txids";
-      return false;
+      return true;
     }
 
     res.status = CORE_RPC_STATUS_OK;
@@ -2600,7 +2900,7 @@ namespace cryptonote
       if (req.limit_down != -1)
       {
         res.status = CORE_RPC_ERROR_CODE_WRONG_PARAM;
-        return false;
+        return true;
       }
       epee::net_utils::connection_basic::set_rate_down_limit(nodetool::default_limit_down);
     }
@@ -2614,7 +2914,7 @@ namespace cryptonote
       if (req.limit_up != -1)
       {
         res.status = CORE_RPC_ERROR_CODE_WRONG_PARAM;
-        return false;
+        return true;
       }
       epee::net_utils::connection_basic::set_rate_up_limit(nodetool::default_limit_up);
     }
@@ -2718,17 +3018,17 @@ namespace cryptonote
       if (!tools::download(path.string(), res.auto_uri))
       {
         MERROR("Failed to download " << res.auto_uri);
-        return false;
+        return true;
       }
       if (!tools::sha256sum(path.string(), file_hash))
       {
         MERROR("Failed to hash " << path);
-        return false;
+        return true;
       }
       if (hash != epee::string_tools::pod_to_hex(file_hash))
       {
         MERROR("Download from " << res.auto_uri << " does not match the expected hash");
-        return false;
+        return true;
       }
       MINFO("New version downloaded to " << path);
     }
@@ -2765,26 +3065,31 @@ namespace cryptonote
     RPC_TRACKER(relay_tx);
     CHECK_PAYMENT_MIN1(req, res, req.txids.size() * COST_PER_TX_RELAY, false);
 
+    const bool restricted = m_restricted && ctx;
+
     bool failed = false;
     res.status = "";
     for (const auto &str: req.txids)
     {
-      cryptonote::blobdata txid_data;
-      if(!epee::string_tools::parse_hexstr_to_binbuff(str, txid_data))
+      crypto::hash txid;
+      if(!epee::string_tools::hex_to_pod(str, txid))
       {
         if (!res.status.empty()) res.status += ", ";
         res.status += std::string("invalid transaction id: ") + str;
         failed = true;
         continue;
       }
-      crypto::hash txid = *reinterpret_cast<const crypto::hash*>(txid_data.data());
 
+      //TODO: The get_pool_transaction could have an optional meta parameter
+      bool broadcasted = false;
       cryptonote::blobdata txblob;
-      if (!m_core.get_pool_transaction(txid, txblob, relay_category::legacy))
+      if ((broadcasted = m_core.get_pool_transaction(txid, txblob, relay_category::broadcasted)) || (!restricted && m_core.get_pool_transaction(txid, txblob, relay_category::all)))
       {
+        // The settings below always choose i2p/tor if enabled. Otherwise, do fluff iff previously relayed else dandelion++ stem.
         NOTIFY_NEW_TRANSACTIONS::request r;
         r.txs.push_back(std::move(txblob));
-        m_core.get_protocol()->relay_transactions(r, boost::uuids::nil_uuid(), epee::net_utils::zone::invalid, relay_method::local);
+        const auto tx_relay = broadcasted ? relay_method::fluff : relay_method::local;
+        m_core.get_protocol()->relay_transactions(r, boost::uuids::nil_uuid(), epee::net_utils::zone::invalid, tx_relay);
         //TODO: make sure that tx has reached other nodes here, probably wait to receive reflections from other nodes
       }
       else
@@ -2798,6 +3103,8 @@ namespace cryptonote
 
     if (failed)
     {
+      error_resp.code = CORE_RPC_ERROR_CODE_INTERNAL_ERROR;
+      error_resp.message = res.status;
       return false;
     }
 
@@ -2813,7 +3120,7 @@ namespace cryptonote
     crypto::hash top_hash;
     m_core.get_blockchain_top(res.height, top_hash);
     ++res.height; // turn top block height into blockchain height
-    res.target_height = m_core.get_target_blockchain_height();
+    res.target_height = m_p2p.get_payload_object().is_synchronized() ? 0 : m_core.get_target_blockchain_height();
     res.next_needed_pruning_seed = m_p2p.get_payload_object().get_next_needed_pruning_stripe().second;
 
     for (const auto &c: m_p2p.get_payload_object().get_connections())
@@ -2822,11 +3129,7 @@ namespace cryptonote
     block_queue.foreach([&](const cryptonote::block_queue::span &span) {
       const std::string span_connection_id = epee::string_tools::pod_to_hex(span.connection_id);
       uint32_t speed = (uint32_t)(100.0f * block_queue.get_speed(span.connection_id) + 0.5f);
-      std::string address = "";
-      for (const auto &c: m_p2p.get_payload_object().get_connections())
-        if (c.connection_id == span_connection_id)
-          address = c.address;
-      res.spans.push_back({span.start_block_height, span.nblocks, span_connection_id, (uint32_t)(span.rate + 0.5f), speed, span.size, address});
+      res.spans.push_back({span.start_block_height, span.nblocks, span_connection_id, (uint32_t)(span.rate + 0.5f), speed, span.size, span.origin.str()});
       return true;
     });
     res.overview = block_queue.get_overview(res.height);
@@ -2913,7 +3216,7 @@ namespace cryptonote
     if (!req.binary)
     {
       res.status = "Binary only call";
-      return false;
+      return true;
     }
     try
     {
@@ -2925,7 +3228,7 @@ namespace cryptonote
         if (!data)
         {
           res.status = "Failed to get output distribution";
-          return false;
+          return true;
         }
 
         res.distributions.push_back({std::move(*data), amount, "", req.binary, req.compress});
@@ -2934,7 +3237,7 @@ namespace cryptonote
     catch (const std::exception &e)
     {
       res.status = "Failed to get output distribution";
-      return false;
+      return true;
     }
 
     res.status = CORE_RPC_STATUS_OK;
@@ -3168,7 +3471,8 @@ namespace cryptonote
 
     if (!m_rpc_payment)
     {
-      res.status = "Payments not enabled";
+      error_resp.code = CORE_RPC_ERROR_CODE_PAYMENTS_NOT_ENABLED;
+      error_resp.message = "Payments not enabled";
       return false;
     }
 
@@ -3196,7 +3500,8 @@ namespace cryptonote
 
     if (!m_rpc_payment)
     {
-      res.status = "Payments not enabled";
+      error_resp.code = CORE_RPC_ERROR_CODE_PAYMENTS_NOT_ENABLED;
+      error_resp.message = "Payments not enabled";
       return false;
     }
 
@@ -3250,6 +3555,12 @@ namespace cryptonote
   const command_line::arg_descriptor<std::string> core_rpc_server::arg_bootstrap_daemon_login = {
       "bootstrap-daemon-login"
     , "Specify username:password for the bootstrap daemon login"
+    , ""
+    };
+
+  const command_line::arg_descriptor<std::string> core_rpc_server::arg_bootstrap_daemon_proxy = {
+      "bootstrap-daemon-proxy"
+    , "<ip>:<port> socks proxy to use for bootstrap daemon connections"
     , ""
     };
 

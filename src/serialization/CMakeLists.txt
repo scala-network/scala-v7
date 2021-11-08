@@ -1,4 +1,5 @@
-# Copyright (c) 2016-2019, The Monero Project
+# Copyright (c) 2014-2021, The Monero Project
+# Copyright (c) 2018-2021, The Scala Network
 #
 # All rights reserved.
 #
@@ -34,14 +35,15 @@ set(serialization_headers)
 set(serialization_private_headers
   json_object.h)
 
-scala_private_headers(serialization
+monero_private_headers(serialization
   ${serialization_private_headers})
-scala_add_library(serialization
+monero_add_library(serialization
   ${serialization_sources}
   ${serialization_headers}
   ${serialization_private_headers})
 target_link_libraries(serialization
   LINK_PRIVATE
+    cryptonote_basic
     cryptonote_core
     cryptonote_protocol
     epee

@@ -1,4 +1,5 @@
-// Copyright (c) 2019, The Monero Project
+// Copyright (c) 2014-2021, The Monero Project
+// Copyright (c) 2018-2021, The Scala Network
 // 
 // All rights reserved.
 // 
@@ -38,10 +39,10 @@ inline bool do_serialize(Archive<false>& ar, cryptonote::difficulty_type &diff)
 {
   uint64_t hi, lo;
   ar.serialize_varint(hi);
-  if (!ar.stream().good())
+  if (!ar.good())
     return false;
   ar.serialize_varint(lo);
-  if (!ar.stream().good())
+  if (!ar.good())
     return false;
   diff = hi;
   diff <<= 64;
@@ -52,13 +53,13 @@ inline bool do_serialize(Archive<false>& ar, cryptonote::difficulty_type &diff)
 template <template <bool> class Archive>
 inline bool do_serialize(Archive<true>& ar, cryptonote::difficulty_type &diff)
 {
-  if (!ar.stream().good())
+  if (!ar.good())
     return false;
   const uint64_t hi = ((diff >> 64) & 0xffffffffffffffff).convert_to<uint64_t>();
   const uint64_t lo = (diff & 0xffffffffffffffff).convert_to<uint64_t>();
   ar.serialize_varint(hi);
   ar.serialize_varint(lo);
-  if (!ar.stream().good())
+  if (!ar.good())
     return false;
   return true;
 }

@@ -1,5 +1,5 @@
-//Copyright (c) 2014-2019, The Monero Project
-//Copyright (c) 2018-2020, The Scala Network
+// Copyright (c) 2014-2021, The Monero Project
+// Copyright (c) 2018-2021, The Scala Network
 // 
 // All rights reserved.
 // 
@@ -84,6 +84,7 @@ namespace tools
     //         tx_rejected
     //         tx_sum_overflow
     //         tx_too_big
+    //         zero_amount
     //         zero_destination
     //       wallet_rpc_error *
     //         daemon_busy
@@ -429,6 +430,16 @@ namespace tools
       std::string to_string() const { return refresh_error::to_string(); }
     };
     //----------------------------------------------------------------------------------------------------
+    struct reorg_depth_error : public refresh_error
+    {
+      explicit reorg_depth_error(std::string&& loc, const std::string& message)
+        : refresh_error(std::move(loc), message)
+      {
+      }
+
+      std::string to_string() const { return refresh_error::to_string(); }
+    };
+    //----------------------------------------------------------------------------------------------------
     struct signature_check_failed : public wallet_logic_error
     {
       explicit signature_check_failed(std::string&& loc, const std::string& message)
@@ -741,10 +752,18 @@ namespace tools
       uint64_t m_tx_weight_limit;
     };
     //----------------------------------------------------------------------------------------------------
+    struct zero_amount: public transfer_error
+    {
+      explicit zero_amount(std::string&& loc)
+        : transfer_error(std::move(loc), "destination amount is zero")
+      {
+      }
+    };
+    //----------------------------------------------------------------------------------------------------
     struct zero_destination : public transfer_error
     {
       explicit zero_destination(std::string&& loc)
-        : transfer_error(std::move(loc), "destination amount is zero")
+        : transfer_error(std::move(loc), "transaction has no destination")
       {
       }
     };

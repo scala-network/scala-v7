@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2019, The Monero Project
+// Copyright (c) 2016-2020, The Monero Project
 // 
 // All rights reserved.
 // 
@@ -65,8 +65,6 @@ const rapidjson::Value& get_method_field(const rapidjson::Value& src)
 void Message::toJson(rapidjson::Writer<epee::byte_stream>& dest) const
 {
   dest.StartObject();
-  INSERT_INTO_JSON_OBJECT(dest, status, status);
-  INSERT_INTO_JSON_OBJECT(dest, error_details, error_details);
   INSERT_INTO_JSON_OBJECT(dest, rpc_version, DAEMON_RPC_VERSION_ZMQ);
   doToJson(dest);
   dest.EndObject();
@@ -74,14 +72,15 @@ void Message::toJson(rapidjson::Writer<epee::byte_stream>& dest) const
 
 void Message::fromJson(const rapidjson::Value& val)
 {
-  GET_FROM_JSON_OBJECT(val, status, status);
-  GET_FROM_JSON_OBJECT(val, error_details, error_details);
   GET_FROM_JSON_OBJECT(val, rpc_version, rpc_version);
 }
 
-FullMessage::FullMessage(const std::string& json_string, bool request)
+FullMessage::FullMessage(std::string&& json_string, bool request)
+  : contents(std::move(json_string)), doc()
 {
-  doc.Parse(json_string.c_str());
+  /* Insitu parsing does not copy data from `contents` to DOM,
+     accelerating string heavy content. */
+  doc.ParseInsitu(std::addressof(contents[0]));
   if (doc.HasParseError() || !doc.IsObject())
   {
     throw cryptonote::json::PARSE_FAIL();

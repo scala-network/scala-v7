@@ -1,4 +1,5 @@
-// Copyright (c) 2019, The Monero Project
+// Copyright (c) 2014-2021, The Monero Project
+// Copyright (c) 2018-2021, The Scala Network
 //
 // All rights reserved.
 //
@@ -25,6 +26,8 @@
 // INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+#pragma once
 
 #include <memory>
 #include <string>
@@ -104,6 +107,26 @@ namespace zmq
 
     //! Unique ZMQ socket handle, calls `zmq_close` on destruction.
     using socket = std::unique_ptr<void, close>;
+
+  /*! Retry a ZMQ function on `EINTR` errors. `F` must return an int with
+      values less than 0 on error.
+
+      \param op The ZMQ function to execute + retry
+      \param args Forwarded to `op`. Must be resuable in case of retry.
+      \return All errors except for `EINTR`. */
+    template<typename F, typename... T>
+    expect<void> retry_op(F op, T&&... args) noexcept(noexcept(op(args...)))
+    {
+      for (;;)
+      {
+        if (0 <= op(args...))
+          return success();
+
+        const int error = zmq_errno();
+        if (error != EINTR)
+          return make_error_code(error);
+      }
+    }
 
     /*! Read all parts of the next message on `socket`. Blocks until the entire
         next message (all parts) are read, or until `zmq_term` is called on the

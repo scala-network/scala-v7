@@ -1,5 +1,5 @@
-//Copyright (c) 2014-2019, The Monero Project
-//Copyright (c) 2018-2020, The Scala Network
+// Copyright (c) 2014-2021, The Monero Project
+// Copyright (c) 2018-2021, The Scala Network
 // 
 // All rights reserved.
 // 
@@ -110,7 +110,8 @@ namespace nodetool
     bool get_white_peer_by_index(peerlist_entry& p, size_t i);
     bool get_gray_peer_by_index(peerlist_entry& p, size_t i);
     template<typename F> bool foreach(bool white, const F &f);
-    bool append_with_peer_white(const peerlist_entry& pr);
+    void evict_host_from_peerlist(bool white, const peerlist_entry& pr);
+    bool append_with_peer_white(const peerlist_entry& pr, bool trust_last_seen = false);
     bool append_with_peer_gray(const peerlist_entry& pr);
     bool append_with_peer_anchor(const anchor_peerlist_entry& ple);
     bool set_peer_just_seen(peerid_type peer, const epee::net_utils::network_address& addr, uint32_t pruning_seed, uint16_t rpc_port, uint32_t rpc_credits_per_hash);
@@ -120,6 +121,7 @@ namespace nodetool
     bool get_and_empty_anchor_peerlist(std::vector<anchor_peerlist_entry>& apl);
     bool remove_from_peer_anchor(const epee::net_utils::network_address& addr);
     bool remove_from_peer_white(const peerlist_entry& pe);
+    template<typename F> size_t filter(bool white, const F &f); // f returns true: drop, false: keep
     
   private:
     struct by_time{};
@@ -329,12 +331,12 @@ namespace nodetool
     ple.pruning_seed = pruning_seed;
     ple.rpc_port = rpc_port;
     ple.rpc_credits_per_hash = rpc_credits_per_hash;
-    return append_with_peer_white(ple);
+    return append_with_peer_white(ple, true);
     CATCH_ENTRY_L0("peerlist_manager::set_peer_just_seen()", false);
   }
   //--------------------------------------------------------------------------------------------------
   inline
-  bool peerlist_manager::append_with_peer_white(const peerlist_entry& ple)
+  bool peerlist_manager::append_with_peer_white(const peerlist_entry& ple, bool trust_last_seen)
   {
     TRY_ENTRY();
     if(!is_host_allowed(ple.adr))
@@ -346,6 +348,7 @@ namespace nodetool
     if(by_addr_it_wt == m_peers_white.get<by_addr>().end())
     {
       //put new record into white list
+      evict_host_from_peerlist(true, ple);
       m_peers_white.insert(ple);
       trim_white_peerlist();
     }else
@@ -356,7 +359,8 @@ namespace nodetool
         new_ple.pruning_seed = by_addr_it_wt->pruning_seed;
       if (by_addr_it_wt->rpc_port && ple.rpc_port == 0) // guard against older nodes not passing RPC port around
         new_ple.rpc_port = by_addr_it_wt->rpc_port;
-      new_ple.last_seen = by_addr_it_wt->last_seen; // do not overwrite the last seen timestamp, incoming peer list are untrusted
+      if (!trust_last_seen)
+        new_ple.last_seen = by_addr_it_wt->last_seen; // do not overwrite the last seen timestamp, incoming peer lists are untrusted
       m_peers_white.replace(by_addr_it_wt, new_ple);
     }
     //remove from gray list, if need
@@ -516,6 +520,27 @@ namespace nodetool
     return true;
 
     CATCH_ENTRY_L0("peerlist_manager::remove_from_peer_anchor()", false);
+  }
+  //--------------------------------------------------------------------------------------------------
+  template<typename F> size_t peerlist_manager::filter(bool white, const F &f)
+  {
+    size_t filtered = 0;
+    TRY_ENTRY();
+    CRITICAL_REGION_LOCAL(m_peerlist_lock);
+    peers_indexed::index<by_addr>::type& sorted_index = white ? m_peers_gray.get<by_addr>() : m_peers_white.get<by_addr>();
+    auto i = sorted_index.begin();
+    while (i != sorted_index.end())
+    {
+      if (f(*i))
+      {
+        i = sorted_index.erase(i);
+        ++filtered;
+      }
+      else
+        ++i;
+    }
+    CATCH_ENTRY_L0("peerlist_manager::filter()", filtered);
+    return filtered;
   }
   //--------------------------------------------------------------------------------------------------
 }

@@ -27,31 +27,12 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "wallet/api/wallet2_api.h"
-#include "wallet/wallet2.h"
+#pragma once
 
-namespace Scala {
-
-class WalletImpl;
-
-class SubaddressImpl : public Subaddress
+namespace cryptonote
 {
-public:
-    SubaddressImpl(WalletImpl * wallet);
-    ~SubaddressImpl();
-    
-    // Fetches addresses from Wallet2
-    void refresh(uint32_t accountIndex) override;
-    std::vector<SubaddressRow*> getAll() const override;
-    void addRow(uint32_t accountIndex, const std::string &label) override;
-    void setLabel(uint32_t accountIndex, uint32_t addressIndex, const std::string &label) override;
-
-private:
-    void clearRows();
-    
-private:
-    WalletImpl *m_wallet;
-    std::vector<SubaddressRow*> m_rows;
-};
-
+  namespace listener
+  {
+    class zmq_pub;
+  }
 }

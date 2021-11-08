@@ -1,5 +1,5 @@
-//Copyright (c) 2014-2019, The Monero Project
-//Copyright (c) 2018-2020, The Scala Network
+// Copyright (c) 2014-2021, The Monero Project
+// Copyright (c) 2018-2021, The Scala Network
 // 
 // All rights reserved.
 // 
@@ -40,6 +40,7 @@
 #include "misc_language.h"
 #include "string_tools.h"
 #include "time_helper.h"
+#include "serialization/serialization.h"
 #include "cryptonote_config.h"
 
 namespace nodetool
@@ -85,6 +86,15 @@ namespace nodetool
       KV_SERIALIZE_OPT(rpc_port, (uint16_t)0)
       KV_SERIALIZE_OPT(rpc_credits_per_hash, (uint32_t)0)
     END_KV_SERIALIZE_MAP()
+
+    BEGIN_SERIALIZE()
+      FIELD(adr)
+      FIELD(id)
+      VARINT_FIELD(last_seen)
+      VARINT_FIELD(pruning_seed)
+      VARINT_FIELD(rpc_port)
+      VARINT_FIELD(rpc_credits_per_hash)
+    END_SERIALIZE()
   };
   typedef peerlist_entry_base<epee::net_utils::network_address> peerlist_entry;
 
@@ -100,6 +110,12 @@ namespace nodetool
       KV_SERIALIZE(id)
       KV_SERIALIZE(first_seen)
     END_KV_SERIALIZE_MAP()
+
+    BEGIN_SERIALIZE()
+      FIELD(adr)
+      FIELD(id)
+      VARINT_FIELD(first_seen)
+    END_SERIALIZE()
   };
   typedef anchor_peerlist_entry_base<epee::net_utils::network_address> anchor_peerlist_entry;
 
@@ -115,6 +131,12 @@ namespace nodetool
       KV_SERIALIZE(id)
       KV_SERIALIZE(is_income)
     END_KV_SERIALIZE_MAP()
+
+    BEGIN_SERIALIZE()
+      FIELD(adr)
+      FIELD(id)
+      FIELD(is_income)
+    END_SERIALIZE()
   };
   typedef connection_entry_base<epee::net_utils::network_address> connection_entry;
 
@@ -167,6 +189,7 @@ namespace nodetool
     uint16_t rpc_port;
     uint32_t rpc_credits_per_hash;
     peerid_type peer_id;
+    uint32_t support_flags;
 
     BEGIN_KV_SERIALIZE_MAP()
       KV_SERIALIZE_VAL_POD_AS_BLOB(network_id)
@@ -174,6 +197,7 @@ namespace nodetool
       KV_SERIALIZE(my_port)
       KV_SERIALIZE_OPT(rpc_port, (uint16_t)(0))
       KV_SERIALIZE_OPT(rpc_credits_per_hash, (uint32_t)0)
+      KV_SERIALIZE_OPT(support_flags, (uint32_t)0)
     END_KV_SERIALIZE_MAP()
   };
   

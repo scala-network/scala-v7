@@ -1,5 +1,5 @@
-//Copyright (c) 2014-2019, The Monero Project
-//Copyright (c) 2018-2020, The Scala Network
+// Copyright (c) 2014-2021, The Monero Project
+// Copyright (c) 2018-2021, The Scala Network
 //
 // All rights reserved.
 //
@@ -47,10 +47,12 @@ public:
     //! true if hold
     virtual bool isPending() const override;
     virtual bool isFailed() const override;
+    virtual bool isCoinbase() const override;
     virtual uint64_t amount() const override;
     //! always 0 for incoming txes
     virtual uint64_t fee() const override;
     virtual uint64_t blockHeight() const override;
+    virtual std::string description() const override;
     virtual std::set<uint32_t> subaddrIndex() const override;
     virtual uint32_t subaddrAccount() const override;
     virtual std::string label() const override;
@@ -66,9 +68,11 @@ private:
     int         m_direction;
     bool        m_pending;
     bool        m_failed;
+    bool        m_coinbase;
     uint64_t    m_amount;
     uint64_t    m_fee;
     uint64_t    m_blockheight;
+    std::string m_description;
     std::set<uint32_t> m_subaddrIndex;        // always unique index for incoming transfers; can be multiple indices for outgoing transfers
     uint32_t m_subaddrAccount;
     std::string m_label;
@@ -84,5 +88,3 @@ private:
 };
 
 } // namespace
-
-namespace Bitscala = Scala;

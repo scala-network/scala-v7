@@ -1,5 +1,5 @@
-//Copyright (c) 2014-2019, The Monero Project
-//Copyright (c) 2018-2020, The Scala Network
+// Copyright (c) 2014-2021, The Monero Project
+// Copyright (c) 2018-2021, The Scala Network
 // 
 // All rights reserved.
 // 
@@ -40,7 +40,7 @@ inline bool do_serialize(Archive<false>& ar, std::string& str)
   ar.serialize_varint(size);
   if (ar.remaining_bytes() < size)
   {
-    ar.stream().setstate(std::ios::failbit);
+    ar.set_fail();
     return false;
   }
 

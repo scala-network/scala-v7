@@ -1,5 +1,5 @@
-//Copyright (c) 2014-2019, The Monero Project
-//Copyright (c) 2018-2020, The Scala Network
+// Copyright (c) 2014-2021, The Monero Project
+// Copyright (c) 2018-2021, The Scala Network
 // 
 // All rights reserved.
 // 
@@ -40,8 +40,7 @@ namespace serialization {
   template <class T>
     bool parse_binary(const std::string &blob, T &v)
     {
-      std::istringstream istr(blob);
-      binary_archive<false> iar(istr);
+      binary_archive<false> iar{epee::strspan<std::uint8_t>(blob)};
       return ::serialization::serialize(iar, v);
     }
 
